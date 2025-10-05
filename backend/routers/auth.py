@@ -12,7 +12,7 @@ auth_router = APIRouter(
 
 @auth_router.post("/login")
 async def login_user(param: Annotated[AuthLoginModel, Query()]):
-    user_record = await mongo.db.users.find_one({"email": param.email})
+    user_record = await mongo.users.find_one({"email": param.email})
     if not user_record:
         raise HTTPException(status_code=404, detail="User not found")
 
