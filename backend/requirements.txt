@@ -1,0 +1,7 @@
+pymongo[srv]
+fastapi
+uvicorn
+pydantic
+dotenv
+passlib
+email-validator
