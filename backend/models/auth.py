@@ -14,3 +14,12 @@ class AuthRegisterModel(BaseModel):
 class AuthLoginModel(BaseModel):
     email: EmailStr = Field(default=EmailStr, description="Email address")
     password: str = Field(default=str, description="Password")
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
+
+class UserModel(BaseModel):
+    email: EmailStr = Field(default=EmailStr, description="Email address")
+    username: str = Field(default=None, description="Username")
+    password: str = Field(default=None, description="Password")
