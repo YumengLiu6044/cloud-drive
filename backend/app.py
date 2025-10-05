@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from core.database import mongo
 from routers.auth import auth_router
 from contextlib import asynccontextmanager
@@ -6,13 +7,20 @@ from contextlib import asynccontextmanager
 
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    mongo.connect()
+    await mongo.connect()
     yield
-    mongo.close()
+    await mongo.disconnect()
 
 app = FastAPI(lifespan=lifespan)
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+)
+
+
 app.include_router(auth_router)
 
 @app.get('/')
-def root():
+async def root():
     return {"message": "Welcome to Cloud Drive"}

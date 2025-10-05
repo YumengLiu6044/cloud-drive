@@ -5,3 +5,6 @@ pydantic
 dotenv
 passlib
 email-validator
+httpx
+pytest
+bcrypt

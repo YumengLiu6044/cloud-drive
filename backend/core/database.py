@@ -1,23 +1,24 @@
 from pymongo import AsyncMongoClient
-from pymongo.asynchronous.database import AsyncDatabase
 from core.constants import DATABASE_URL, DATABASE_NAME, COLLECTIONS
 
 
 class MongoDBClient:
     _client: AsyncMongoClient | None = None
-    _database: AsyncDatabase | None = None
 
-    def connect(self):
+    async def connect(self):
         self._client = AsyncMongoClient(DATABASE_URL)
-        self._client = AsyncMongoClient(DATABASE_URL)
-        self._database = self._client.get_database(DATABASE_NAME)
+        await self._client.admin.command('ping')
 
-    def disconnect(self):
-        self._client.close()
+    async def disconnect(self):
+        await self._client.close()
+
+    @property
+    def database(self):
+        return self._client[DATABASE_NAME]
 
     @property
     def users(self):
-        return self._database[COLLECTIONS.USERS]
+        return self.database[COLLECTIONS.USERS]
 
 
 mongo = MongoDBClient()

@@ -1,5 +1,6 @@
-from typing import Annotated
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, HTTPException
+from pymongo.errors import DuplicateKeyError
+
 from core.constants import USER_FIELDS
 from core.database import mongo
 from core.security import security_manager
@@ -11,7 +12,7 @@ auth_router = APIRouter(
 )
 
 @auth_router.post("/login")
-async def login_user(param: Annotated[AuthLoginModel, Query()]):
+async def login_user(param: AuthLoginModel):
     user_record = await mongo.users.find_one({"email": param.email})
     if not user_record:
         raise HTTPException(status_code=404, detail="User not found")
@@ -24,18 +25,16 @@ async def login_user(param: Annotated[AuthLoginModel, Query()]):
         raise HTTPException(status_code=404, detail="Password incorrect")
 
 @auth_router.post("/register")
-async def register_user(param: Annotated[AuthRegisterModel, Query()]):
-    if await mongo.users.find_one(param.email):
-        return {"message": "User already registered"}
-
+async def register_user(param: AuthRegisterModel):
     hashed_password = security_manager.hash_password(param.password)
-    inserted_data = {
-        **param.model_dump(),
-        USER_FIELDS.PASSWORD: hashed_password
-    }
-    insertion_result = await mongo.users.insert_one(inserted_data)
+    inserted_data = param.model_dump()
+    inserted_data[USER_FIELDS.PASSWORD] = hashed_password
+    try:
+        insertion_result = await mongo.users.insert_one(inserted_data)
+    except DuplicateKeyError:
+        raise HTTPException(status_code=400, detail="User already exists")
 
     if insertion_result.inserted_id:
         return {"message": "User registered"}
     else:
-        raise HTTPException(status_code=400, detail="Failed to create user")
+        raise HTTPException(status_code=404, detail="Failed to create user")

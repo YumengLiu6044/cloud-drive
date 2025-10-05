@@ -2,10 +2,7 @@ from pydantic import BaseModel, Field, EmailStr
 
 from core.constants import PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH
 
-
 class AuthRegisterModel(BaseModel):
-    model_config = {"extra": "forbid"}
-
     email: EmailStr = Field(default=EmailStr, description="Email address")
     username: str = Field(default=None, description="Username")
     password: str = Field(
