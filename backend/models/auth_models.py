@@ -1,5 +1,4 @@
 from typing import Annotated
-
 from pydantic import BaseModel, Field, EmailStr, StringConstraints
 from core.constants import PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH
 

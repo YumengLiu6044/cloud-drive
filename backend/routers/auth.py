@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends
 from fastapi_mail import MessageSchema, MessageType, FastMail
 from pymongo.errors import DuplicateKeyError
 from core.constants import JWT_TOKEN_SCOPES, FRONTEND_URL, MAIL_CONFIG

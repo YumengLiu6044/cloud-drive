@@ -1,11 +1,9 @@
 from datetime import timedelta, datetime, UTC
-from typing import Optional, Annotated
-
+from typing import Optional
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
 from passlib.hash import sha256_crypt
 from jose import jwt, JWTError, ExpiredSignatureError
-
 from core.constants import JWT_TOKEN_EXPIRATION, JWT_SECRET_KEY, JWT_ALGORITHM, JWT_TOKEN_SCOPES
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")

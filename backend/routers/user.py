@@ -19,14 +19,14 @@ async def change_username(
         current_user: Annotated[str, Depends(security_manager.get_current_user)]
 ):
     user_email = current_user
-    user_record = await mongo.users.find_one({"email": user_email})
-    if user_record is None:
-        raise HTTPException(status_code=404, detail="User not found")
 
-    await mongo.users.update_one(
+    update_result = await mongo.users.update_one(
         {"email": user_email},
         {"$set": {"username": param.new_name}}
     )
+    if update_result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="Username not found")
+    
     return {
         "message": "Username changed successfully",
         "new_name": param.new_name
