@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Password reset</title>
+  <style>
+    /* Inline-safe minimal styles */
+    body { margin:10px; padding:0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial,serif; background:#f4f6f8; color:#0f1720; }
+    .container { width:100%; max-width:600px; margin:32px auto; background:#ffffff; border-radius:8px; overflow:hidden; box-shadow:0 2px 6px rgba(16,24,40,0.08); }
+    .header { padding:20px; text-align:center; background:linear-gradient(90deg,#0ea5a9,#2563eb); color:#fff; }
+    .header h1 { margin:0; font-size:20px; }
+    .content { padding:24px; font-size:16px; line-height:1.5; color:#0f1720; }
+    .button-wrap { text-align:center; margin:24px 0; }
+    .btn { display:inline-block; padding:12px 20px; border-radius:6px; text-decoration:none; font-weight:600; background:#2563eb; color:#fff; }
+    .muted { color:#586069; font-size:13px; }
+    .footer { padding:16px 24px; font-size:12px; color:#7b8794; text-align:center; }
+    a.fallback { word-break:break-all; color:#2563eb; }
+    @media (max-width:420px){ .content{padding:18px} .header{padding:16px} }
+  </style>
+</head>
+<body>
+  <div class="container" role="article" aria-label="Password reset email">
+    <div class="header">
+      <h1>{{company_name}}</h1>
+    </div>
+
+    <div class="content">
+      <p>Hello From {{company_name}},</p>
+
+      <p>We received a request to reset the password for your account ({{email}}). Click the button below to choose a new password. This link expires in {{expiry_minutes}} minutes.</p>
+
+      <div class="button-wrap">
+        <!-- Primary reset button -->
+        <a href="{{reset_link}}" class="btn" target="_blank" rel="noopener">Reset my password</a>
+      </div>
+
+      <p class="muted">If the button doesn't work, copy and paste this link into your browser:</p>
+      <p><a href="{{reset_link}}" class="fallback" target="_blank" rel="noopener">{{reset_link}}</a></p>
+
+      <p class="muted">If you didn't request a password reset, you can safely ignore this email — your password will remain unchanged.</p>
+
+      <p>Thanks,<br>{{company_name}} Support</p>
+    </div>
+
+    <div class="footer">
+      <div style="margin-top:8px;">© {{year}} {{company_name}}. All rights reserved.</div>
+    </div>
+  </div>
+</body>
+</html>

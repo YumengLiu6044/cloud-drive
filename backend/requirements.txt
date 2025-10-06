@@ -11,3 +11,4 @@ bcrypt
 python-jose[cryptography]
 fastapi-mail
 python-multipart
+jinja2

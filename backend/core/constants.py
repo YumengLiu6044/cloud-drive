@@ -1,11 +1,14 @@
-import base64
 from dotenv import load_dotenv
 from fastapi_mail import ConnectionConfig
+from jinja2 import Environment, FileSystemLoader, select_autoescape
 
 load_dotenv()
 
 from enum import Enum
 import os
+
+# Frontend URL
+FRONTEND_URL = os.getenv("FRONTEND_URL")
 
 # Database Config
 DATABASE_URL = os.getenv("MONGO_DB_URI")
@@ -45,5 +48,13 @@ MAIL_CONFIG = ConnectionConfig(
     USE_CREDENTIALS=True,
 )
 
-# Frontend URL
-FRONTEND_URL = os.getenv("FRONTEND_URL")
+jinja_env = Environment(
+    loader=FileSystemLoader("./assets"),
+    autoescape=select_autoescape(["html", "xml"])
+)
+TEMPLATE_NAME = "email_template.html"
+COMMON_TEMPLATE_VARIABLES = {
+    "company_name": "Cloud Drive",
+    "expiry_minutes": JWT_TOKEN_EXPIRATION,
+}
+PASSWORD_RESET_TEMPLATE = f"{FRONTEND_URL}/reset-password?token={{}}"

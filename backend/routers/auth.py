@@ -1,8 +1,10 @@
+from datetime import datetime
 from typing import Annotated
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from fastapi_mail import MessageSchema, MessageType, FastMail
 from pymongo.errors import DuplicateKeyError
-from core.constants import JwtTokenScope, FRONTEND_URL, MAIL_CONFIG
+from core.constants import JwtTokenScope, FRONTEND_URL, MAIL_CONFIG, jinja_env, TEMPLATE_NAME, \
+    COMMON_TEMPLATE_VARIABLES, PASSWORD_RESET_TEMPLATE
 from core.database import mongo
 from core.security import security_manager
 from models.auth_models import (
@@ -48,21 +50,31 @@ async def register_user(param: AuthRegisterModel):
         raise HTTPException(status_code=404, detail="Failed to create user")
 
 @auth_router.post("/forgot-password")
-async def forgot_password(param: AuthForgotPasswordModel):
+async def forgot_password(
+    param: AuthForgotPasswordModel,
+    background_tasks: BackgroundTasks
+):
     user_email = param.email
     forgot_token = security_manager.create_access_token(
         user_email,
         scope=JwtTokenScope.password_reset
     )
-    reset_link = f"{FRONTEND_URL}/reset-password?token={forgot_token}"
+    reset_link = PASSWORD_RESET_TEMPLATE.format(forgot_token)
+    template = jinja_env.get_template(TEMPLATE_NAME)
+    html_content = template.render(
+        **COMMON_TEMPLATE_VARIABLES,
+        email=user_email,
+        reset_link=reset_link,
+        year=datetime.now().year
+    )
     message = MessageSchema(
         recipients=[user_email],
-        body=f"<p>Click <a href={reset_link}>this link</a> to reset your password</p>",
+        body=html_content,
         subject="Reset your Cloud Drive password",
         subtype=MessageType.html
     )
     fm = FastMail(MAIL_CONFIG)
-    await fm.send_message(message)
+    background_tasks.add_task(fm.send_message, message)
     return {"message": "Password reset email sent"}
 
 @auth_router.post("/reset-password")
