@@ -17,8 +17,6 @@ app.add_middleware(
     allow_origins=["*"],
     allow_credentials=True,
 )
-
-
 app.include_router(auth_router)
 
 @app.get('/')

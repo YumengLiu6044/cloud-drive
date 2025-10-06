@@ -1,5 +1,7 @@
 from datetime import timedelta, datetime, UTC
-from typing import Optional
+from typing import Optional, Annotated
+
+from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from passlib.hash import sha256_crypt
 from jose import jwt, JWTError, ExpiredSignatureError
@@ -44,6 +46,11 @@ class SecurityManager:
         except JWTError:
             return None
 
-
+    @staticmethod
+    async def get_current_user(token: Annotated[oauth2_scheme, Depends()]):
+        user_email = SecurityManager.decode_access_token(token).get("sub")
+        if not user_email:
+            raise HTTPException(status_code=404, detail="Invalid token")
+        return user_email
 
 security_manager = SecurityManager()
