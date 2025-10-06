@@ -1,5 +1,5 @@
 from typing import Annotated
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from fastapi_mail import MessageSchema, MessageType, FastMail
 from pymongo.errors import DuplicateKeyError
 from core.constants import JWT_TOKEN_SCOPES, FRONTEND_URL, MAIL_CONFIG
@@ -18,7 +18,7 @@ auth_router = APIRouter(
 )
 
 @auth_router.post("/login")
-async def login_user(param: Annotated[AuthLoginModel, Depends()]):
+async def login_user(param: AuthLoginModel):
     user_record = await mongo.users.find_one({"email": param.username})
     if not user_record:
         raise HTTPException(status_code=404, detail="User not found")
@@ -31,7 +31,7 @@ async def login_user(param: Annotated[AuthLoginModel, Depends()]):
     return Token(access_token=token, scope=JWT_TOKEN_SCOPES.auth)
 
 @auth_router.post("/register")
-async def register_user(param: Annotated[AuthRegisterModel, Depends()]):
+async def register_user(param: AuthRegisterModel):
     hashed_password = security_manager.hash_password(param.password)
     inserted = UserModel(**param.model_dump())
     inserted.password = hashed_password
