@@ -1,19 +1,23 @@
-from pydantic import BaseModel, Field, EmailStr
+from typing import Annotated
+
+from pydantic import BaseModel, Field, EmailStr, StringConstraints
 from core.constants import PASSWORD_MIN_LENGTH, PASSWORD_MAX_LENGTH
 
 class AuthRegisterModel(BaseModel):
     email: EmailStr = Field(default=EmailStr, description="Email address")
     username: str = Field(default=None, description="Username")
-    password: str = Field(
-        default=str,
-        min_length=PASSWORD_MIN_LENGTH,
-        max_length=PASSWORD_MAX_LENGTH
-    )
+    password: Annotated[
+        str,
+        StringConstraints(
+            min_length=PASSWORD_MIN_LENGTH,
+            max_length=PASSWORD_MAX_LENGTH
+        )
+    ]
 
 
 class AuthLoginModel(BaseModel):
     email: EmailStr = Field(default=EmailStr, description="Email address")
-    password: str = Field(default=str, description="Password")
+    password: Annotated[str, StringConstraints(min_length=1)]
 
 
 class AuthForgotPasswordModel(BaseModel):
@@ -21,12 +25,13 @@ class AuthForgotPasswordModel(BaseModel):
 
 
 class AuthResetPasswordModel(BaseModel):
-    email: EmailStr = Field(default=EmailStr, description="Email address")
-    new_password: str = Field(
-        default=str,
-        min_length=PASSWORD_MIN_LENGTH,
-        max_length=PASSWORD_MAX_LENGTH
-    )
+    new_password: Annotated[
+        str,
+        StringConstraints(
+            min_length=PASSWORD_MIN_LENGTH,
+            max_length=PASSWORD_MAX_LENGTH
+        )
+    ]
 
 
 class Token(BaseModel):

@@ -5,7 +5,7 @@ from pymongo.errors import DuplicateKeyError
 from core.constants import JWT_TOKEN_SCOPES, FRONTEND_URL, MAIL_CONFIG
 from core.database import mongo
 from core.security import security_manager
-from models.auth import (
+from models.auth_models import (
     AuthLoginModel, Token,
     AuthRegisterModel, AuthForgotPasswordModel,
     AuthResetPasswordModel
@@ -66,13 +66,13 @@ async def forgot_password(param: AuthForgotPasswordModel):
     return {"message": "Password reset email sent"}
 
 @auth_router.post("/reset-password")
-async def reset_password(param: AuthResetPasswordModel, payload = Depends(security_manager.verify_reset_token)):
-    if payload != param.email:
-        raise HTTPException(status_code=401, detail="Token is invalid")
-
+async def reset_password(
+    param: AuthResetPasswordModel,
+    current_user_email: Annotated[str, Depends(security_manager.verify_reset_token)]
+):
     new_hashed_password = security_manager.hash_password(param.new_password)
     result = await mongo.users.update_one(
-        {"email": param.email},
+        {"email": current_user_email},
         {"$set": {"password": new_hashed_password}}
     )
 
@@ -80,7 +80,3 @@ async def reset_password(param: AuthResetPasswordModel, payload = Depends(securi
         raise HTTPException(status_code=404, detail="User not found")
 
     return {"message": "Password reset successful"}
-
-@auth_router.post("/user")
-async def read_users_me(param: Annotated[str, Depends(security_manager.get_current_user)]):
-    return {"email": param}

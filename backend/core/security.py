@@ -48,7 +48,8 @@ class SecurityManager:
             return None
 
     @staticmethod
-    async def get_current_user(token: Annotated[oauth2_scheme, Depends()]):
+    async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+        token = credentials.credentials
         user_email = SecurityManager.decode_access_token(token).get("sub")
         if not user_email:
             raise HTTPException(status_code=401, detail="Invalid token")
