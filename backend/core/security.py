@@ -2,13 +2,14 @@ from datetime import timedelta, datetime, UTC
 from typing import Optional, Annotated
 
 from fastapi import Depends, HTTPException
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
 from passlib.hash import sha256_crypt
 from jose import jwt, JWTError, ExpiredSignatureError
 
-from core.constants import JWT_TOKEN_EXPIRATION, JWT_SECRET_KEY, JWT_ALGORITHM
+from core.constants import JWT_TOKEN_EXPIRATION, JWT_SECRET_KEY, JWT_ALGORITHM, JWT_TOKEN_SCOPES
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+bearer_scheme = HTTPBearer(auto_error=True)
 
 class SecurityManager:
     hasher = sha256_crypt
@@ -50,7 +51,17 @@ class SecurityManager:
     async def get_current_user(token: Annotated[oauth2_scheme, Depends()]):
         user_email = SecurityManager.decode_access_token(token).get("sub")
         if not user_email:
-            raise HTTPException(status_code=404, detail="Invalid token")
+            raise HTTPException(status_code=401, detail="Invalid token")
+        return user_email
+
+    @staticmethod
+    async def verify_reset_token(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+        token = credentials.credentials
+        payload = SecurityManager.decode_access_token(token) or {}
+        user_email = payload.get("sub")
+        scope = payload.get("scope")
+        if not user_email or scope != JWT_TOKEN_SCOPES.password_reset:
+            raise HTTPException(status_code=401, detail="Invalid token")
         return user_email
 
 security_manager = SecurityManager()

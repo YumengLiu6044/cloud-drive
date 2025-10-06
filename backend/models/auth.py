@@ -21,7 +21,6 @@ class AuthForgotPasswordModel(BaseModel):
 
 
 class AuthResetPasswordModel(BaseModel):
-    token: str = Field(default=str, description="Token")
     email: EmailStr = Field(default=EmailStr, description="Email address")
     new_password: str = Field(
         default=str,

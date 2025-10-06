@@ -19,7 +19,7 @@ auth_router = APIRouter(
 
 @auth_router.post("/login")
 async def login_user(param: AuthLoginModel):
-    user_record = await mongo.users.find_one({"email": param.username})
+    user_record = await mongo.users.find_one({"email": param.email})
     if not user_record:
         raise HTTPException(status_code=404, detail="User not found")
 
@@ -66,14 +66,9 @@ async def forgot_password(param: AuthForgotPasswordModel):
     return {"message": "Password reset email sent"}
 
 @auth_router.post("/reset-password")
-async def reset_password(param: AuthResetPasswordModel):
-    payload = security_manager.decode_access_token(param.token)
-    if (
-        payload is None
-        or payload.get("scope") != JWT_TOKEN_SCOPES.password_reset
-        or payload.get("sub") != param.email
-    ):
-        raise HTTPException(status_code=404, detail="Token is invalid")
+async def reset_password(param: AuthResetPasswordModel, payload = Depends(security_manager.verify_reset_token)):
+    if payload != param.email:
+        raise HTTPException(status_code=401, detail="Token is invalid")
 
     new_hashed_password = security_manager.hash_password(param.new_password)
     result = await mongo.users.update_one(
