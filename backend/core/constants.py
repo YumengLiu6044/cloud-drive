@@ -23,9 +23,11 @@ JWT_TOKEN_EXPIRATION = 60 # The expiration time in minutes
 JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
 JWT_ALGORITHM = "HS256"
 
-class JWT_TOKEN_SCOPES(str, Enum):
+
+class JwtTokenScope(str, Enum):
     auth = "auth"
     password_reset = "password_reset"
+
 
 # Email Config
 MAIL_PASSWORD = os.getenv("MAIL_PASSWORD")

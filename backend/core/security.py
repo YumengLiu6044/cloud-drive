@@ -4,13 +4,15 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
 from passlib.hash import sha256_crypt
 from jose import jwt, JWTError, ExpiredSignatureError
-from core.constants import JWT_TOKEN_EXPIRATION, JWT_SECRET_KEY, JWT_ALGORITHM, JWT_TOKEN_SCOPES
+from core.constants import JWT_TOKEN_EXPIRATION, JWT_SECRET_KEY, JWT_ALGORITHM, JwtTokenScope
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
 bearer_scheme = HTTPBearer(auto_error=True)
 
 class SecurityManager:
     hasher = sha256_crypt
+    jwt_key = JWT_SECRET_KEY
+    jwt_algorithm = JWT_ALGORITHM
 
     def hash_password(self, password):
         return self.hasher.hash(password)
@@ -23,8 +25,7 @@ class SecurityManager:
         """
         return self.hasher.verify(password, hashed_password)
 
-    @staticmethod
-    def create_access_token(user_email: str, ttl: Optional[timedelta] = None, scope: str=None) -> str:
+    def create_access_token(self, user_email: str, ttl: Optional[timedelta] = None, scope: str=None) -> str:
         expiration = datetime.now(UTC) + (ttl or timedelta(minutes=JWT_TOKEN_EXPIRATION))
         exp_time_string = str(int(expiration.timestamp()))
         to_encode = {
@@ -32,35 +33,27 @@ class SecurityManager:
             "exp": exp_time_string,
             "scope": scope,
         }
-        encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
+        encoded_jwt = jwt.encode(to_encode, self.jwt_key, algorithm=self.jwt_algorithm)
         return encoded_jwt
 
-    @staticmethod
-    def decode_access_token(token: str):
+    def decode_access_token(self, token: str, require_scope: JwtTokenScope):
         try:
-            payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
-            return payload
+            payload = jwt.decode(token, self.jwt_key, algorithms=[self.jwt_algorithm])
+            user_email = payload.get("sub")
+            scope = payload.get("scope")
+            if not user_email or scope != require_scope:
+                raise HTTPException(status_code=401, detail="Invalid token. Scope doesn't match")
+            return user_email
         except ExpiredSignatureError:
-            return None
+            raise HTTPException(status_code=401, detail="Invalid token. Token expired")
         except JWTError:
-            return None
+            raise HTTPException(status_code=401, detail="Invalid token. Decoding failed")
 
-    @staticmethod
-    async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
-        token = credentials.credentials
-        user_email = SecurityManager.decode_access_token(token).get("sub")
-        if not user_email:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        return user_email
+    def get_current_user(self, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+        return self.decode_access_token(credentials.credentials, JwtTokenScope.auth)
 
-    @staticmethod
-    async def verify_reset_token(credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
-        token = credentials.credentials
-        payload = SecurityManager.decode_access_token(token) or {}
-        user_email = payload.get("sub")
-        scope = payload.get("scope")
-        if not user_email or scope != JWT_TOKEN_SCOPES.password_reset:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        return user_email
+    def verify_reset_token(self, credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme)):
+        return self.decode_access_token(credentials.credentials, JwtTokenScope.password_reset)
+
 
 security_manager = SecurityManager()

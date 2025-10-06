@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends
 from fastapi_mail import MessageSchema, MessageType, FastMail
 from pymongo.errors import DuplicateKeyError
-from core.constants import JWT_TOKEN_SCOPES, FRONTEND_URL, MAIL_CONFIG
+from core.constants import JwtTokenScope, FRONTEND_URL, MAIL_CONFIG
 from core.database import mongo
 from core.security import security_manager
 from models.auth_models import (
@@ -27,8 +27,8 @@ async def login_user(param: AuthLoginModel):
     if not security_manager.verify_password(param.password, user_obj.password):
         raise HTTPException(status_code=404, detail="Password incorrect")
 
-    token = security_manager.create_access_token(user_obj.email, scope=JWT_TOKEN_SCOPES.auth)
-    return Token(access_token=token, scope=JWT_TOKEN_SCOPES.auth)
+    token = security_manager.create_access_token(user_obj.email, scope=JwtTokenScope.auth)
+    return Token(access_token=token, scope=JwtTokenScope.auth)
 
 @auth_router.post("/register")
 async def register_user(param: AuthRegisterModel):
@@ -41,8 +41,8 @@ async def register_user(param: AuthRegisterModel):
         raise HTTPException(status_code=400, detail="User already exists")
 
     if insertion_result.inserted_id:
-        token = security_manager.create_access_token(param.email, scope=JWT_TOKEN_SCOPES.auth)
-        return Token(access_token=token, scope=JWT_TOKEN_SCOPES.auth)
+        token = security_manager.create_access_token(param.email, scope=JwtTokenScope.auth)
+        return Token(access_token=token, scope=JwtTokenScope.auth)
 
     else:
         raise HTTPException(status_code=404, detail="Failed to create user")
@@ -52,7 +52,7 @@ async def forgot_password(param: AuthForgotPasswordModel):
     user_email = param.email
     forgot_token = security_manager.create_access_token(
         user_email,
-        scope=JWT_TOKEN_SCOPES.password_reset
+        scope=JwtTokenScope.password_reset
     )
     reset_link = f"{FRONTEND_URL}/reset-password?token={forgot_token}"
     message = MessageSchema(
