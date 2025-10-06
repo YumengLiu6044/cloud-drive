@@ -2,7 +2,7 @@ from datetime import timedelta, datetime, UTC
 from typing import Optional
 from fastapi.security import OAuth2PasswordBearer
 from passlib.hash import sha256_crypt
-from jose import jwt, JWTError
+from jose import jwt, JWTError, ExpiredSignatureError
 
 from core.constants import JWT_TOKEN_EXPIRATION, JWT_SECRET_KEY, JWT_ALGORITHM
 
@@ -23,12 +23,14 @@ class SecurityManager:
         return self.hasher.verify(password, hashed_password)
 
     @staticmethod
-    def create_access_token(user_email: str, ttl: Optional[timedelta] = None) -> str:
-        to_encode = {
-            "sub": user_email
-        }
+    def create_access_token(user_email: str, ttl: Optional[timedelta] = None, scope: str=None) -> str:
         expiration = datetime.now(UTC) + (ttl or timedelta(minutes=JWT_TOKEN_EXPIRATION))
-        to_encode["exp"] = str(int(expiration.timestamp()))
+        exp_time_string = str(int(expiration.timestamp()))
+        to_encode = {
+            "sub": user_email,
+            "exp": exp_time_string,
+            "scope": scope,
+        }
         encoded_jwt = jwt.encode(to_encode, JWT_SECRET_KEY, algorithm=JWT_ALGORITHM)
         return encoded_jwt
 
@@ -37,6 +39,8 @@ class SecurityManager:
         try:
             payload = jwt.decode(token, JWT_SECRET_KEY, algorithms=[JWT_ALGORITHM])
             return payload
+        except ExpiredSignatureError:
+            return None
         except JWTError:
             return None
 

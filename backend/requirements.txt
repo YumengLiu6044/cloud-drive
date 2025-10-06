@@ -9,3 +9,4 @@ httpx
 pytest
 bcrypt
 python-jose[cryptography]
+fastapi-mail

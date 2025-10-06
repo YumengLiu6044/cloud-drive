@@ -1,8 +1,14 @@
 from fastapi import APIRouter, HTTPException
+from fastapi_mail import MessageSchema, MessageType, FastMail
 from pymongo.errors import DuplicateKeyError
+from core.constants import JWT_TOKEN_SCOPES, FRONTEND_URL, MAIL_CONFIG
 from core.database import mongo
 from core.security import security_manager
-from models.auth import UserModel, AuthLoginModel, Token, AuthRegisterModel
+from models.auth import (
+    UserModel, AuthLoginModel, Token,
+    AuthRegisterModel, AuthForgotPasswordModel,
+    AuthResetPasswordModel
+)
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -19,8 +25,8 @@ async def login_user(param: AuthLoginModel):
     if not security_manager.verify_password(param.password, user_obj.password):
         raise HTTPException(status_code=404, detail="Password incorrect")
 
-    token = security_manager.create_access_token(user_obj.email)
-    return Token(access_token=token, token_type="bearer")
+    token = security_manager.create_access_token(user_obj.email, scope=JWT_TOKEN_SCOPES.auth)
+    return Token(access_token=token, scope=JWT_TOKEN_SCOPES.auth)
 
 @auth_router.post("/register")
 async def register_user(param: AuthRegisterModel):
@@ -33,8 +39,47 @@ async def register_user(param: AuthRegisterModel):
         raise HTTPException(status_code=400, detail="User already exists")
 
     if insertion_result.inserted_id:
-        token = security_manager.create_access_token(param.email)
-        return Token(access_token=token, token_type="bearer")
+        token = security_manager.create_access_token(param.email, scope=JWT_TOKEN_SCOPES.auth)
+        return Token(access_token=token, scope=JWT_TOKEN_SCOPES.auth)
 
     else:
         raise HTTPException(status_code=404, detail="Failed to create user")
+
+@auth_router.post("/forgot-password")
+async def forgot_password(param: AuthForgotPasswordModel):
+    user_email = param.email
+    forgot_token = security_manager.create_access_token(
+        user_email,
+        scope=JWT_TOKEN_SCOPES.password_reset
+    )
+    reset_link = f"{FRONTEND_URL}/reset-password?token={forgot_token}"
+    message = MessageSchema(
+        recipients=[user_email],
+        body=f"<p>Click <a href={reset_link}>this link</a> to reset your password</p>",
+        subject="Reset your Cloud Drive password",
+        subtype=MessageType.html
+    )
+    fm = FastMail(MAIL_CONFIG)
+    await fm.send_message(message)
+    return {"message": "Password reset email sent"}
+
+@auth_router.post("/reset-password")
+async def reset_password(param: AuthResetPasswordModel):
+    payload = security_manager.decode_access_token(param.token)
+    if (
+        payload is None
+        or payload.get("scope") != JWT_TOKEN_SCOPES.password_reset
+        or payload.get("sub") != param.email
+    ):
+        raise HTTPException(status_code=404, detail="Token is invalid")
+
+    new_hashed_password = security_manager.hash_password(param.new_password)
+    result = await mongo.users.update_one(
+        {"email": param.email},
+        {"$set": {"password": new_hashed_password}}
+    )
+
+    if result.matched_count == 0:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    return {"message": "Password reset successful"}

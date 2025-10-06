@@ -15,9 +15,21 @@ class AuthLoginModel(BaseModel):
     email: EmailStr = Field(default=EmailStr, description="Email address")
     password: str = Field(default=str, description="Password")
 
+class AuthForgotPasswordModel(BaseModel):
+    email: EmailStr = Field(default=EmailStr, description="Email address")
+
+class AuthResetPasswordModel(BaseModel):
+    token: str = Field(default=str, description="Token")
+    email: EmailStr = Field(default=EmailStr, description="Email address")
+    new_password: str = Field(
+        default=str,
+        min_length=PASSWORD_MIN_LENGTH,
+        max_length=PASSWORD_MAX_LENGTH
+    )
+
 class Token(BaseModel):
     access_token: str
-    token_type: str
+    scope: str
 
 class UserModel(BaseModel):
     email: EmailStr = Field(default=EmailStr, description="Email address")
