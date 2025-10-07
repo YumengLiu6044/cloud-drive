@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
+import { Eye, EyeOff } from "lucide-react";
 
 export default function Login() {
 	const [isForget, setIsForget] = useState(false);
@@ -25,6 +26,8 @@ export default function Login() {
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [resetEmail, setResetEmail] = useState("");
+
+	const [showPassword, setShowPassword] = useState(false);
 
 	const handleSendPasswordReset = useCallback(
 		(e: React.MouseEvent<HTMLButtonElement>) => {
@@ -53,11 +56,11 @@ export default function Login() {
 
 	return (
 		<Container className="flex flex-col justify-center items-center">
-			<div className="pb-3 flex flex-col items-center z-10">
+			<div className="pb-3 flex flex-col items-center">
 				<img src={logo} className="w-full max-w-[70px]"></img>
 				<h1 className="text-primary text-3xl font-bold">Cloud Drive</h1>
 			</div>
-			<Card className="w-full max-w-md z-10">
+			<Card className="w-full max-w-md">
 				<CardHeader>
 					<CardTitle>
 						{isForget
@@ -113,11 +116,15 @@ export default function Login() {
 
 								<div className="grid gap-2">
 									<div className="flex justify-between">
-										<Label htmlFor="password">Password</Label>
+										<Label htmlFor="password">
+											Password
+										</Label>
 										{!isSignUp && (
 											<button
 												className="ml-auto inline-block text-xs underline-offset-4 hover:underline"
-												onClick={() => setIsForget(true)}
+												onClick={() =>
+													setIsForget(true)
+												}
 												type="button"
 											>
 												Forgot your password?
@@ -125,23 +132,38 @@ export default function Login() {
 										)}
 									</div>
 
-									<Input
-										id="password"
-										type="password"
-										autoComplete="current-password"
-										required
-										pattern=".{8,}"
-										onFocus={() =>
-											setIsPasswordFocused(true)
-										}
-										onBlur={() =>
-											setIsPasswordFocused(false)
-										}
-										value={password}
-										onChange={(e) =>
-											setPassword(e.target.value)
-										}
-									/>
+									<div className="w-full relative group">
+										<Input
+											id="password"
+											type={showPassword ? "text" : "password"}
+											autoComplete="current-password"
+											required
+											pattern=".{8,}"
+											onFocus={() =>
+												setIsPasswordFocused(true)
+											}
+											onBlur={() =>
+												setIsPasswordFocused(false)
+											}
+											value={password}
+											onChange={(e) =>
+												setPassword(e.target.value)
+											}
+										/>
+										<button
+											type="button"
+											onClick={() =>
+												setShowPassword(!showPassword)
+											}
+											className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground group-hover:opacity-100 opacity-0 transition"
+										>
+											{!showPassword ? (
+												<EyeOff size={20} />
+											) : (
+												<Eye size={20} />
+											)}
+										</button>
+									</div>
 									{isSignUp && isPasswordFocused && (
 										<p className="w-full text-start text-muted-foreground text-xs">
 											Minimum Length: 8

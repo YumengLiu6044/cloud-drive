@@ -21,11 +21,11 @@ export default function ResetPassword() {
 
 	return (
 		<Container className="flex flex-col justify-center items-center">
-			<div className="pb-3 flex flex-col items-center z-10">
+			<div className="pb-3 flex flex-col items-center">
 				<img src={logo} className="w-full max-w-[70px]"></img>
 				<h1 className="text-primary text-3xl font-bold">Cloud Drive</h1>
 			</div>
-			<Card className="w-full max-w-md z-10">
+			<Card className="w-full max-w-md">
 				<CardHeader>
 					<CardTitle>Reset your password</CardTitle>
 					<CardDescription>
