@@ -1,4 +1,5 @@
-import { loginBackground, logo } from "@/assets/assets";
+import { logo } from "@/assets/assets";
+import Container from "@/components/Container";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -18,12 +19,11 @@ export default function Login() {
 	const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
 	return (
-		<div className="relative w-screen h-screen flex flex-col justify-center items-center p-5">
-      <img src={loginBackground} className="absolute w-full h-full z-0"></img>
-      <div className="pb-3 flex flex-col items-center z-10">
-        <img src={logo} className="w-full max-w-[70px]"></img>
-        <h1 className="text-primary text-3xl font-bold">Cloud Drive</h1>
-      </div>
+		<Container className="flex flex-col justify-center items-center p-5">
+			<div className="pb-3 flex flex-col items-center z-10">
+				<img src={logo} className="w-full max-w-[70px]"></img>
+				<h1 className="text-primary text-3xl font-bold">Cloud Drive</h1>
+			</div>
 			<Card className="w-full max-w-md self-center z-10">
 				<CardHeader>
 					<CardTitle>
@@ -42,15 +42,34 @@ export default function Login() {
 				<CardContent>
 					{!isForget ? (
 						<div className="flex flex-col gap-6">
-							<div className="grid gap-2">
-								<Label htmlFor="email">Email</Label>
-								<Input
-									id="email"
-									type="email"
-									placeholder="me@example.com"
-									required
-								/>
+							<div className="flex gap-3">
+								<div className="grid gap-2 w-full">
+									<Label htmlFor="email">Email</Label>
+									<Input
+										id="email"
+										type="email"
+										placeholder="me@example.com"
+										autoComplete="email"
+										required
+									/>
+								</div>
+								{isSignUp && (
+									<div className="grid gap-2 w-full">
+										<div className="flex items-center">
+											<Label htmlFor="username">
+												Username
+											</Label>
+										</div>
+										<Input
+											id="username"
+											type="text"
+											placeholder="optional"
+											autoComplete="username"
+										/>
+									</div>
+								)}
 							</div>
+
 							<div className="grid gap-2">
 								<div className="flex items-center">
 									<Label htmlFor="password">Password</Label>
@@ -66,7 +85,7 @@ export default function Login() {
 								<Input
 									id="password"
 									type="password"
-									autoComplete="new-password"
+									autoComplete="current-password"
 									required
 									pattern=".{8,}"
 									onFocus={() => setIsPasswordFocused(true)}
@@ -166,6 +185,6 @@ export default function Login() {
 					)}
 				</CardContent>
 			</Card>
-		</div>
+		</Container>
 	);
 }

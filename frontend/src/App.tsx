@@ -11,6 +11,7 @@ import DriveLayout from "./routes/DriveLayout";
 import Dashboard from "./routes/Dashboard";
 import Files from "./routes/Files";
 import Settings from "./routes/Settings";
+import ResetPassword from "./routes/ResetPassword";
 
 export default function App() {
 	return (
@@ -34,6 +35,11 @@ export default function App() {
 					<Route path="files" element={<Files />} />
 					<Route path="settings" element={<Settings />} />
 				</Route>
+				<Route path="/reset-password" element={<ResetPassword/>}></Route>
+				<Route
+					path="*"
+					element={<Navigate to="/login" replace />}
+				></Route>
 			</Routes>
 		</Router>
 	);
