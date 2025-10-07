@@ -1,3 +1,4 @@
+import { loginBackground, logo } from "@/assets/assets";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -17,8 +18,13 @@ export default function Login() {
 	const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
 	return (
-		<div className="w-screen h-screen flex justify-center items-center p-5">
-			<Card className="w-full max-w-md self-center">
+		<div className="relative w-screen h-screen flex flex-col justify-center items-center p-5">
+      <img src={loginBackground} className="absolute w-full h-full z-0"></img>
+      <div className="pb-3 flex flex-col items-center z-10">
+        <img src={logo} className="w-full max-w-[70px]"></img>
+        <h1 className="text-primary text-3xl font-bold">Cloud Drive</h1>
+      </div>
+			<Card className="w-full max-w-md self-center z-10">
 				<CardHeader>
 					<CardTitle>
 						{isForget
