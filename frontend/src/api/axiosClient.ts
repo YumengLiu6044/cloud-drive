@@ -1,8 +1,9 @@
+import { BACKEND_URL } from "@/constants";
 import useAuthStore from "@/context/authStore";
 import axios from "axios";
 
 const axiosClient = axios.create({
-	baseURL: import.meta.env.VITE_BACKEND_URL,
+	baseURL: BACKEND_URL,
 	headers: {
 		"Content-Type": "application/json",
 	},
@@ -19,7 +20,10 @@ axiosClient.interceptors.request.use((config) => {
 axiosClient.interceptors.response.use(
 	(response) => response,
 	(error) => {
-		if (error.response?.status == 401) {
+		const status = error.response?.status;
+    const requestUrl = error.config?.url ?? "";
+
+		if (status === 401 && !requestUrl.includes("/auth/reset-password")) {
 			const { setToken } = useAuthStore.getState();
 			setToken(null);
 			window.location.href = "/login";

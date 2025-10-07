@@ -7,7 +7,7 @@ interface ContainerProps {
 }
 export default function Container({children, className}: ContainerProps) {
   return (
-    <div className={'relative w-screen h-screen ' + className}>
+    <div className={'relative w-screen h-screen p-5 ' + className}>
       <img
 				src={loginBackground}
 				className="absolute w-full h-full z-0"
