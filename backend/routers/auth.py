@@ -3,7 +3,7 @@ from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from fastapi_mail import MessageSchema, MessageType, FastMail
 from pymongo.errors import DuplicateKeyError
-from core.constants import JwtTokenScope, FRONTEND_URL, MAIL_CONFIG, jinja_env, TEMPLATE_NAME, \
+from core.constants import JwtTokenScope, MAIL_CONFIG, jinja_env, TEMPLATE_NAME, \
     COMMON_TEMPLATE_VARIABLES, PASSWORD_RESET_TEMPLATE
 from core.database import mongo
 from core.security import security_manager
@@ -82,6 +82,7 @@ async def reset_password(
     param: AuthResetPasswordModel,
     current_user_email: Annotated[str, Depends(security_manager.verify_reset_token)]
 ):
+    print(current_user_email)
     new_hashed_password = security_manager.hash_password(param.new_password)
     result = await mongo.users.update_one(
         {"email": current_user_email},
