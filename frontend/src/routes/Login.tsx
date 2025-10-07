@@ -14,7 +14,11 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
-import { Eye, EyeOff } from "lucide-react";
+import PasswordField from "@/components/PasswordField";
+import { PASSWORD_MIN_LENGTH, SUB_ROUTES } from "@/constants";
+import { useNavigate } from "react-router-dom";
+import useAuthStore from "@/context/authStore";
+import { LoaderCircle } from "lucide-react";
 
 export default function Login() {
 	const [isForget, setIsForget] = useState(false);
@@ -27,7 +31,10 @@ export default function Login() {
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [resetEmail, setResetEmail] = useState("");
 
-	const [showPassword, setShowPassword] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+
+	const navigator = useNavigate();
+	const { setToken } = useAuthStore();
 
 	const handleSendPasswordReset = useCallback(
 		(e: React.MouseEvent<HTMLButtonElement>) => {
@@ -36,7 +43,7 @@ export default function Login() {
 				toast.error("Please enter your email");
 				return;
 			}
-
+			setIsLoading(true);
 			AuthApi.forgotPassword(resetEmail)
 				.then(() => {
 					toast.success(
@@ -49,9 +56,85 @@ export default function Login() {
 					toast.error(
 						error.response?.data?.message || "Error occurred"
 					);
-				});
+				})
+				.finally(() => setIsLoading(false));
 		},
 		[resetEmail]
+	);
+
+	const handleFormSubmit = useCallback(
+		(e: React.MouseEvent<HTMLButtonElement>) => {
+			e.preventDefault();
+			if (!email || !password) {
+				toast.error("Please fill in all required fields");
+				return;
+			}
+			setIsLoading(true);
+			if (isSignUp) {
+				if (password !== confirmPassword) {
+					toast.error("Passwords do not match");
+					setIsLoading(false);
+					return;
+				}
+				if (password.length < PASSWORD_MIN_LENGTH) {
+					toast.error("Password must be at least 8 characters");
+					setIsLoading(false);
+					return;
+				}
+				AuthApi.register(email, username, password)
+					.then((response) => {
+						toast.success("Registration successful");
+						setToken(response.data.access_token);
+						setTimeout(() => {
+							navigator(SUB_ROUTES.drive.base);
+						}, 1000);
+					})
+					.catch((error) => {
+						console.error(error);
+						switch (error.response?.status) {
+							case 409:
+								toast.error("Email already in use");
+								break;
+							default:
+								toast.error(
+									error.response?.data?.message ||
+										"An unexpected error occurred"
+								);
+								break;
+						}
+					})
+					.finally(() => setIsLoading(false));
+				return;
+			} else {
+				AuthApi.login(email, password)
+					.then((response) => {
+						toast.success("Login successful");
+						setToken(response.data.access_token);
+						setTimeout(() => {
+							navigator(SUB_ROUTES.drive.base);
+						}, 1000);
+					})
+					.catch((error) => {
+						console.error(error);
+						switch (error.response?.status) {
+							case 401:
+								toast.error("Invalid email or password");
+								break;
+							case 404:
+								toast.error("User not found");
+								break;
+							default:
+								toast.error(
+									error.response?.data?.message ||
+										"An unexpected error occurred"
+								);
+								break;
+						}
+					})
+					.finally(() => setIsLoading(false));
+			}
+		},
+		[email, password, confirmPassword, isSignUp, username, navigator]
 	);
 
 	return (
@@ -103,12 +186,12 @@ export default function Login() {
 											<Input
 												id="username"
 												type="text"
-												placeholder="optional"
 												autoComplete="username"
 												value={username}
 												onChange={(e) =>
 													setUsername(e.target.value)
 												}
+												required
 											/>
 										</div>
 									)}
@@ -132,38 +215,18 @@ export default function Login() {
 										)}
 									</div>
 
-									<div className="w-full relative group">
-										<Input
-											id="password"
-											type={showPassword ? "text" : "password"}
-											autoComplete="current-password"
-											required
-											pattern=".{8,}"
-											onFocus={() =>
-												setIsPasswordFocused(true)
-											}
-											onBlur={() =>
-												setIsPasswordFocused(false)
-											}
-											value={password}
-											onChange={(e) =>
-												setPassword(e.target.value)
-											}
-										/>
-										<button
-											type="button"
-											onClick={() =>
-												setShowPassword(!showPassword)
-											}
-											className="absolute inset-y-0 right-0 flex items-center px-3 text-muted-foreground group-hover:opacity-100 opacity-0 transition"
-										>
-											{!showPassword ? (
-												<EyeOff size={20} />
-											) : (
-												<Eye size={20} />
-											)}
-										</button>
-									</div>
+									<PasswordField
+										setIsPasswordFocused={
+											setIsPasswordFocused
+										}
+										setPassword={setPassword}
+										password={password}
+										autoComplete={
+											isSignUp
+												? "new-password"
+												: "current-password"
+										}
+									></PasswordField>
 									{isSignUp && isPasswordFocused && (
 										<p className="w-full text-start text-muted-foreground text-xs">
 											Minimum Length: 8
@@ -195,8 +258,13 @@ export default function Login() {
 									<Button
 										type="submit"
 										className="w-full font-normal"
+										disabled={isLoading}
+										onClick={handleFormSubmit}
 									>
 										{isSignUp ? "Sign Up" : "Login"}
+										{isLoading && (
+											<LoaderCircle className="animate-spin"></LoaderCircle>
+										)}
 									</Button>
 
 									<div className="w-full text-center text-sm text-muted-foreground">

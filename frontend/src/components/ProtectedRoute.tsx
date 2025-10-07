@@ -1,3 +1,5 @@
+import { SUB_ROUTES } from "@/constants";
+import useAuthStore from "@/context/authStore";
 import type React from "react";
 import { Navigate } from "react-router-dom";
 
@@ -6,14 +8,9 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  // Example: auth token stored in localStorage
-  const token = localStorage.getItem("auth_token");
-
+  const {token} = useAuthStore()
   if (!token) {
-    // Not logged in → redirect to /login
-    return <Navigate to="/login" replace />;
+    return <Navigate to={SUB_ROUTES.login} replace />;
   }
-
-  // Logged in → render the protected component
   return children;
 }

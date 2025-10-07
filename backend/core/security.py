@@ -25,18 +25,18 @@ class SecurityManager:
         """
         return self.hasher.verify(password, hashed_password)
 
-    def create_access_token(self, user_email: str, ttl: Optional[timedelta] = None, scope: str=None) -> str:
+    def create_access_token(self, user_email: str, scope: str, ttl: Optional[timedelta] = None) -> str:
         expiration = datetime.now(UTC) + (ttl or timedelta(minutes=JWT_TOKEN_EXPIRATION))
-        exp_time_string = str(int(expiration.timestamp()))
         to_encode = {
             "sub": user_email,
-            "exp": exp_time_string,
+            "exp": expiration,
             "scope": scope,
         }
+        print(f"Token payload: {to_encode}")  # --- IGNORE ---
         encoded_jwt = jwt.encode(to_encode, self.jwt_key, algorithm=self.jwt_algorithm)
         return encoded_jwt
 
-    def decode_access_token(self, token: str, require_scope: JwtTokenScope):
+    def decode_access_token(self, token: str, require_scope: str):
         try:
             payload = jwt.decode(token, self.jwt_key, algorithms=[self.jwt_algorithm])
             user_email = payload.get("sub")

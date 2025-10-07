@@ -13,3 +13,10 @@ export const AUTH_API_BASE = "/auth";
 export const useAuthStorageKey = "auth-store";
 
 export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+export const PASSWORD_MIN_LENGTH = 8;
+
+export const IGNORE_401_ROUTES = [
+	"/reset-password",
+	"/login",
+] as const;
