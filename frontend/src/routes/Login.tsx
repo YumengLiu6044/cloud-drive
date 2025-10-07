@@ -22,13 +22,9 @@ import { LoaderCircle } from "lucide-react";
 
 export default function Login() {
 	const [isForget, setIsForget] = useState(false);
-	const [isSignUp, setIsSignUp] = useState(false);
-	const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
 	const [email, setEmail] = useState("");
-	const [username, setUsername] = useState("");
 	const [password, setPassword] = useState("");
-	const [confirmPassword, setConfirmPassword] = useState("");
 	const [resetEmail, setResetEmail] = useState("");
 
 	const [isLoading, setIsLoading] = useState(false);
@@ -70,71 +66,32 @@ export default function Login() {
 				return;
 			}
 			setIsLoading(true);
-			if (isSignUp) {
-				if (password !== confirmPassword) {
-					toast.error("Passwords do not match");
-					setIsLoading(false);
-					return;
-				}
-				if (password.length < PASSWORD_MIN_LENGTH) {
-					toast.error("Password must be at least 8 characters");
-					setIsLoading(false);
-					return;
-				}
-				AuthApi.register(email, username, password)
-					.then((response) => {
-						toast.success("Registration successful");
-						setToken(response.data.access_token);
-						setTimeout(() => {
-							navigator(SUB_ROUTES.drive.base);
-						}, 1000);
-					})
-					.catch((error) => {
-						console.error(error);
-						switch (error.response?.status) {
-							case 409:
-								toast.error("Email already in use");
-								break;
-							default:
-								toast.error(
-									error.response?.data?.message ||
-										"An unexpected error occurred"
-								);
-								break;
-						}
-					})
-					.finally(() => setIsLoading(false));
-				return;
-			} else {
-				AuthApi.login(email, password)
-					.then((response) => {
-						toast.success("Login successful");
-						setToken(response.data.access_token);
-						setTimeout(() => {
-							navigator(SUB_ROUTES.drive.base);
-						}, 1000);
-					})
-					.catch((error) => {
-						console.error(error);
-						switch (error.response?.status) {
-							case 401:
-								toast.error("Invalid email or password");
-								break;
-							case 404:
-								toast.error("User not found");
-								break;
-							default:
-								toast.error(
-									error.response?.data?.message ||
-										"An unexpected error occurred"
-								);
-								break;
-						}
-					})
-					.finally(() => setIsLoading(false));
-			}
+			AuthApi.login(email, password)
+				.then((response) => {
+					toast.success("Login successful");
+					setToken(response.data.access_token);
+					navigator(SUB_ROUTES.drive.base);
+				})
+				.catch((error) => {
+					console.error(error);
+					switch (error.response?.status) {
+						case 401:
+							toast.error("Invalid email or password");
+							break;
+						case 404:
+							toast.error("User not found");
+							break;
+						default:
+							toast.error(
+								error.response?.data?.message ||
+									"An unexpected error occurred"
+							);
+							break;
+					}
+				})
+				.finally(() => setIsLoading(false));
 		},
-		[email, password, confirmPassword, isSignUp, username, navigator]
+		[email, password, navigator]
 	);
 
 	return (
@@ -153,9 +110,7 @@ export default function Login() {
 					<CardDescription>
 						{isForget
 							? "Enter your email below to receive a reset link"
-							: !isSignUp
-							? "Enter your email below to login to your account"
-							: "Register an account with your email"}
+							: "Enter your email below to login to your account"}
 					</CardDescription>
 				</CardHeader>
 				<CardContent>
@@ -177,24 +132,6 @@ export default function Login() {
 											}
 										/>
 									</div>
-									{isSignUp && (
-										<div className="grid gap-2 w-full">
-											<Label htmlFor="username">
-												Username
-											</Label>
-
-											<Input
-												id="username"
-												type="text"
-												autoComplete="username"
-												value={username}
-												onChange={(e) =>
-													setUsername(e.target.value)
-												}
-												required
-											/>
-										</div>
-									)}
 								</div>
 
 								<div className="grid gap-2">
@@ -202,58 +139,22 @@ export default function Login() {
 										<Label htmlFor="password">
 											Password
 										</Label>
-										{!isSignUp && (
-											<button
-												className="ml-auto inline-block text-xs underline-offset-4 hover:underline"
-												onClick={() =>
-													setIsForget(true)
-												}
-												type="button"
-											>
-												Forgot your password?
-											</button>
-										)}
+
+										<button
+											className="ml-auto inline-block text-xs underline-offset-4 hover:underline"
+											onClick={() => setIsForget(true)}
+											type="button"
+										>
+											Forgot your password?
+										</button>
 									</div>
 
 									<PasswordField
-										setIsPasswordFocused={
-											setIsPasswordFocused
-										}
 										setPassword={setPassword}
 										password={password}
-										autoComplete={
-											isSignUp
-												? "new-password"
-												: "current-password"
-										}
+										autoComplete="current-password"
 									></PasswordField>
-									{isSignUp && isPasswordFocused && (
-										<p className="w-full text-start text-muted-foreground text-xs">
-											Minimum Length: 8
-										</p>
-									)}
 								</div>
-								{isSignUp && (
-									<div className="grid gap-2">
-										<Label htmlFor="confirm_password">
-											Confirm Password
-										</Label>
-
-										<Input
-											autoComplete="new-password"
-											id="confirm_password"
-											type="password"
-											value={confirmPassword}
-											onChange={(e) =>
-												setConfirmPassword(
-													e.target.value
-												)
-											}
-											placeholder="Re-enter your password"
-											required
-										/>
-									</div>
-								)}
 								<div className="flex flex-col gap-2">
 									<Button
 										type="submit"
@@ -261,24 +162,22 @@ export default function Login() {
 										disabled={isLoading}
 										onClick={handleFormSubmit}
 									>
-										{isSignUp ? "Sign Up" : "Login"}
+										Login
 										{isLoading && (
 											<LoaderCircle className="animate-spin"></LoaderCircle>
 										)}
 									</Button>
 
 									<div className="w-full text-center text-sm text-muted-foreground">
-										{isSignUp
-											? "Already have an account?"
-											: "Don't have an account?"}{" "}
+										Don't have an account?{" "}
 										<button
 											className="text-medium text-primary hover:underline underline-offset-2"
 											type="button"
 											onClick={() =>
-												setIsSignUp((prev) => !prev)
+												navigator(SUB_ROUTES.register)
 											}
 										>
-											{isSignUp ? "Login" : "Sign up"}
+											Sign up
 										</button>
 									</div>
 								</div>

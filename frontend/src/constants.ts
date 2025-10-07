@@ -1,5 +1,6 @@
 export const SUB_ROUTES = {
 	login: "/login",
+	register: "/register",
 	resetPassword: "/reset-password",
 	drive: {
 		base: "/drive",

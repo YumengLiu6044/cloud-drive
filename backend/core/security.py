@@ -32,7 +32,6 @@ class SecurityManager:
             "exp": expiration,
             "scope": scope,
         }
-        print(f"Token payload: {to_encode}")  # --- IGNORE ---
         encoded_jwt = jwt.encode(to_encode, self.jwt_key, algorithm=self.jwt_algorithm)
         return encoded_jwt
 

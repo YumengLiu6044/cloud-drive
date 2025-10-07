@@ -14,6 +14,7 @@ import Settings from "./routes/Settings";
 import ResetPassword from "./routes/ResetPassword";
 import Trash from "./routes/Trash";
 import { SUB_ROUTES } from "./constants";
+import Register from "./routes/Register";
 
 export default function App() {
 	return (
@@ -24,6 +25,7 @@ export default function App() {
 					element={<Navigate to={SUB_ROUTES.login} replace />}
 				/>
 				<Route path={SUB_ROUTES.login} element={<Login />} />
+				<Route path={SUB_ROUTES.register} element={<Register />} />
 				<Route
 					path={SUB_ROUTES.drive.base}
 					element={

@@ -5,7 +5,7 @@ import { Eye, EyeOff } from "lucide-react";
 interface PasswordFieldProps {
 	password: string;
 	setPassword: (password: string) => void;
-	setIsPasswordFocused: (isFocused: boolean) => void;
+	setIsPasswordFocused?: (isFocused: boolean) => void;
 	autoComplete?: string;
 }
 
@@ -25,8 +25,8 @@ export default function PasswordField({
 				autoComplete={autoComplete}
 				required
 				pattern=".{8,}"
-				onFocus={() => setIsPasswordFocused(true)}
-				onBlur={() => setIsPasswordFocused(false)}
+				onFocus={() => setIsPasswordFocused?.(true)}
+				onBlur={() => setIsPasswordFocused?.(false)}
 				value={password}
 				onChange={(e) => setPassword(e.target.value)}
 			/>
