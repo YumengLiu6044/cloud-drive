@@ -1,6 +1,5 @@
 import { AuthApi } from "@/api/authApi";
 import { logo } from "@/assets/assets";
-import AppContainer from "@/components/Container";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -15,7 +14,7 @@ import { Separator } from "@/components/ui/separator";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import PasswordField from "@/components/PasswordField";
-import { PASSWORD_MIN_LENGTH, SUB_ROUTES } from "@/constants";
+import { SUB_ROUTES } from "@/constants";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "@/context/authStore";
 import { LoaderCircle } from "lucide-react";
