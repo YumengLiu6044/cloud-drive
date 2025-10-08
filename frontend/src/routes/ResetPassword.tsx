@@ -1,5 +1,6 @@
 import { AuthApi } from "@/api/authApi";
 import { logo } from "@/assets/assets";
+import AuthCard from "@/components/AuthCard";
 import PasswordField from "@/components/PasswordField";
 import { Button } from "@/components/ui/button";
 import {
@@ -69,74 +70,61 @@ export default function ResetPassword() {
 	);
 
 	return (
-		<div className="h-full flex flex-col justify-center items-center">
-			<div className="pb-3 flex flex-col items-center">
-				<img src={logo} className="w-full max-w-[70px]"></img>
-				<h1 className="text-primary text-3xl font-bold">Cloud Drive</h1>
+		<AuthCard
+			cardTitle="Reset your password"
+			cardDescription="Input your new password below to reset your password"
+		>
+			<div className="grid gap-2">
+				<Label htmlFor="password">Password</Label>
+
+				<PasswordField
+					setIsPasswordFocused={setIsPasswordFocused}
+					setPassword={setPassword}
+					password={password}
+					autoComplete="new-password"
+				></PasswordField>
+				{isPasswordFocused && (
+					<p className="w-full text-start text-muted-foreground text-xs">
+						Minimum Length: 8
+					</p>
+				)}
 			</div>
-			<Card className="w-full max-w-md">
-				<CardHeader>
-					<CardTitle>Reset your password</CardTitle>
-					<CardDescription>
-						Input your new password below to reset your password
-					</CardDescription>
-				</CardHeader>
-				<CardContent className="flex flex-col gap-5">
-					<div className="grid gap-2">
-						<Label htmlFor="password">Password</Label>
+			<div className="grid gap-2">
+				<Label htmlFor="confirm_password">Confirm Password</Label>
 
-						<PasswordField
-							setIsPasswordFocused={setIsPasswordFocused}
-							setPassword={setPassword}
-							password={password}
-							autoComplete="new-password"
-						></PasswordField>
-						{isPasswordFocused && (
-							<p className="w-full text-start text-muted-foreground text-xs">
-								Minimum Length: 8
-							</p>
-						)}
-					</div>
-					<div className="grid gap-2">
-						<Label htmlFor="confirm_password">
-							Confirm Password
-						</Label>
+				<Input
+					autoComplete="new-password"
+					id="confirm_password"
+					type="password"
+					value={confirmPassword}
+					onChange={(e) => setConfirmPassword(e.target.value)}
+					required
+				/>
+			</div>
 
-						<Input
-							autoComplete="new-password"
-							id="confirm_password"
-							type="password"
-							value={confirmPassword}
-							onChange={(e) => setConfirmPassword(e.target.value)}
-							required
-						/>
-					</div>
-
-					<div className="w-full grid gap-2">
-						<Button
-							type="submit"
-							className="font-normal"
-							onClick={() =>
-								handleResetPassword(password, resetToken ?? "")
-							}
-							disabled={isLoading}
-						>
-							Reset Password
-							{isLoading && (
-								<LoaderCircle className="animate-spin"></LoaderCircle>
-							)}
-						</Button>
-						<Button
-							type="button"
-							variant="ghost"
-							className="font-normal"
-							onClick={onClickBacktoLogin}
-						>
-							Go Back to Login
-						</Button>
-					</div>
-				</CardContent>
-			</Card>
-		</div>
+			<div className="w-full grid gap-2">
+				<Button
+					type="submit"
+					className="font-normal"
+					onClick={() =>
+						handleResetPassword(password, resetToken ?? "")
+					}
+					disabled={isLoading}
+				>
+					Reset Password
+					{isLoading && (
+						<LoaderCircle className="animate-spin"></LoaderCircle>
+					)}
+				</Button>
+				<Button
+					type="button"
+					variant="ghost"
+					className="font-normal"
+					onClick={onClickBacktoLogin}
+				>
+					Go Back to Login
+				</Button>
+			</div>
+		</AuthCard>
 	);
 }

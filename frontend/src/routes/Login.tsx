@@ -18,6 +18,7 @@ import { SUB_ROUTES } from "@/constants";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "@/context/authStore";
 import { LoaderCircle } from "lucide-react";
+import AuthCard from "@/components/AuthCard";
 
 export default function Login() {
 	const [isForget, setIsForget] = useState(false);
@@ -94,152 +95,129 @@ export default function Login() {
 	);
 
 	return (
-		<div className="h-full flex flex-col justify-center items-center">
-			<div className="pb-3 flex flex-col items-center">
-				<img src={logo} className="w-full max-w-[70px]"></img>
-				<h1 className="text-primary text-3xl font-bold">Cloud Drive</h1>
-			</div>
-			<Card className="w-full max-w-md">
-				<CardHeader>
-					<CardTitle>
-						{isForget
-							? "Forgot Password"
-							: "Welcome to Cloud Drive"}
-					</CardTitle>
-					<CardDescription>
-						{isForget
-							? "Enter your email below to receive a reset link"
-							: "Enter your email below to login to your account"}
-					</CardDescription>
-				</CardHeader>
-				<CardContent>
-					<form>
-						{!isForget ? (
-							<div className="flex flex-col gap-6">
-								<div className="flex gap-3">
-									<div className="grid gap-2 w-full">
-										<Label htmlFor="email">Email</Label>
-										<Input
-											id="email"
-											type="email"
-											placeholder="me@example.com"
-											autoComplete="email"
-											required
-											value={email}
-											onChange={(e) =>
-												setEmail(e.target.value)
-											}
-										/>
-									</div>
-								</div>
+		<AuthCard
+			cardTitle="Welcome to Cloud Drive"
+			cardDescription="Enter your email below to login to your account"
+		>
+			<form>
+				{!isForget ? (
+					<div className="flex flex-col gap-6">
+						<div className="flex gap-3">
+							<div className="grid gap-2 w-full">
+								<Label htmlFor="email">Email</Label>
+								<Input
+									id="email"
+									type="email"
+									placeholder="me@example.com"
+									autoComplete="email"
+									required
+									value={email}
+									onChange={(e) => setEmail(e.target.value)}
+								/>
+							</div>
+						</div>
 
-								<div className="grid gap-2">
-									<div className="flex justify-between">
-										<Label htmlFor="password">
-											Password
-										</Label>
+						<div className="grid gap-2">
+							<div className="flex justify-between">
+								<Label htmlFor="password">Password</Label>
 
-										<button
-											className="ml-auto inline-block text-xs underline-offset-4 hover:underline"
-											onClick={() => setIsForget(true)}
-											type="button"
-										>
-											Forgot your password?
-										</button>
-									</div>
-
-									<PasswordField
-										setPassword={setPassword}
-										password={password}
-										autoComplete="current-password"
-									></PasswordField>
-								</div>
-								<div className="flex flex-col gap-2">
-									<Button
-										type="submit"
-										className="w-full font-normal"
-										disabled={isLoading}
-										onClick={handleFormSubmit}
-									>
-										Login
-										{isLoading && (
-											<LoaderCircle className="animate-spin"></LoaderCircle>
-										)}
-									</Button>
-
-									<div className="w-full text-center text-sm text-muted-foreground">
-										Don't have an account?{" "}
-										<button
-											className="text-medium text-primary hover:underline underline-offset-2"
-											type="button"
-											onClick={() =>
-												navigator(SUB_ROUTES.register)
-											}
-										>
-											Sign up
-										</button>
-									</div>
-								</div>
-								<div className="relative flex items-center justify-center">
-									<div className="absolute inset-0 top-1/2">
-										<Separator></Separator>
-									</div>
-									<p className="px-2 relative text-xs text-muted-foreground bg-card uppercase">
-										Or Continue with Google
-									</p>
-								</div>
-								<Button
+								<button
+									className="ml-auto inline-block text-xs underline-offset-4 hover:underline"
+									onClick={() => setIsForget(true)}
 									type="button"
-									variant="outline"
-									className="w-full font-normal"
 								>
-									<img
-										width="25"
-										alt="Google-favicon-vector"
-										src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Google-favicon-vector.png?20221007124453"
-									/>
-									Continue with Google
-								</Button>
+									Forgot your password?
+								</button>
 							</div>
-						) : (
-							<div className="flex flex-col gap-6">
-								<div className="grid gap-2">
-									<Label htmlFor="reset_email" className="">
-										Email
-									</Label>
-									<Input
-										id="reset-email"
-										type="email"
-										required
-										placeholder="name@example.com"
-										value={resetEmail}
-										onChange={(e) =>
-											setResetEmail(e.target.value)
-										}
-									></Input>
-								</div>
-								<div className="grid gap-2">
-									<Button
-										type="submit"
-										onClick={handleSendPasswordReset}
-										className="font-normal"
-									>
-										Send Reset Link
-									</Button>
-									<Button
-										type="button"
-										variant="ghost"
-										className="font-normal"
-										onClick={() => setIsForget(false)}
-									>
-										Go Back to Login
-									</Button>
-								</div>
+
+							<PasswordField
+								setPassword={setPassword}
+								password={password}
+								autoComplete="current-password"
+							></PasswordField>
+						</div>
+						<div className="flex flex-col gap-2">
+							<Button
+								type="submit"
+								className="w-full font-normal"
+								disabled={isLoading}
+								onClick={handleFormSubmit}
+							>
+								Login
+								{isLoading && (
+									<LoaderCircle className="animate-spin"></LoaderCircle>
+								)}
+							</Button>
+
+							<div className="w-full text-center text-sm text-muted-foreground">
+								Don't have an account?{" "}
+								<button
+									className="text-medium text-primary hover:underline underline-offset-2"
+									type="button"
+									onClick={() =>
+										navigator(SUB_ROUTES.register)
+									}
+								>
+									Sign up
+								</button>
 							</div>
-						)}
-					</form>
-				</CardContent>
-			</Card>
-		</div>
+						</div>
+						<div className="relative flex items-center justify-center">
+							<div className="absolute inset-0 top-1/2">
+								<Separator></Separator>
+							</div>
+							<p className="px-2 relative text-xs text-muted-foreground bg-card uppercase">
+								Or Continue with Google
+							</p>
+						</div>
+						<Button
+							type="button"
+							variant="outline"
+							className="w-full font-normal"
+						>
+							<img
+								width="25"
+								alt="Google-favicon-vector"
+								src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Google-favicon-vector.png?20221007124453"
+							/>
+							Continue with Google
+						</Button>
+					</div>
+				) : (
+					<div className="flex flex-col gap-6">
+						<div className="grid gap-2">
+							<Label htmlFor="reset_email" className="">
+								Email
+							</Label>
+							<Input
+								id="reset-email"
+								type="email"
+								required
+								placeholder="name@example.com"
+								value={resetEmail}
+								onChange={(e) => setResetEmail(e.target.value)}
+							></Input>
+						</div>
+						<div className="grid gap-2">
+							<Button
+								type="submit"
+								onClick={handleSendPasswordReset}
+								className="font-normal"
+							>
+								Send Reset Link
+							</Button>
+							<Button
+								type="button"
+								variant="ghost"
+								className="font-normal"
+								onClick={() => setIsForget(false)}
+							>
+								Go Back to Login
+							</Button>
+						</div>
+					</div>
+				)}
+			</form>
+		</AuthCard>
 	);
 }
