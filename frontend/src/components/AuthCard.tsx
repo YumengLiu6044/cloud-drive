@@ -12,7 +12,7 @@ interface AuthCardProps {
 	cardTitle: string;
 	cardDescription: string;
 	children: React.ReactNode;
-	key: string;
+	cardKey: string;
 	isVisible: boolean;
 }
 
@@ -23,7 +23,7 @@ export default function AuthCard({
 	cardTitle,
 	cardDescription,
 	children,
-	key,
+	cardKey,
 	isVisible,
 }: AuthCardProps) {
 	return (
@@ -34,7 +34,7 @@ export default function AuthCard({
 					animate={mainState}
 					exit={secondaryState}
 					transition={{ duration: 0.5 }}
-					key={key}
+					key={cardKey}
 					className="h-full flex flex-col justify-center items-center"
 				>
 					<div className="pb-3 flex flex-col items-center">

@@ -5,8 +5,6 @@ import {
 	Navigate,
 } from "react-router-dom";
 import Login from "./routes/Login";
-
-import ProtectedRoute from "./components/ProtectedRoute";
 import DriveLayout from "./routes/DriveLayout";
 import Dashboard from "./routes/Dashboard";
 import Files from "./routes/Files";
@@ -32,11 +30,7 @@ export default function App() {
 					<Route path={SUB_ROUTES.register} element={<Register />} />
 					<Route
 						path={SUB_ROUTES.drive.base}
-						element={
-							<ProtectedRoute>
-								<DriveLayout />
-							</ProtectedRoute>
-						}
+						element={<DriveLayout />}
 					>
 						<Route
 							index
@@ -58,12 +52,24 @@ export default function App() {
 							path={SUB_ROUTES.drive.trash}
 							element={<Trash />}
 						/>
+						<Route
+							path={SUB_ROUTES.drive.settings}
+							element={<Settings />}
+						/>
+						<Route
+							path="*"
+							element={
+								<Navigate
+									to={SUB_ROUTES.drive.dashboard}
+									replace
+								></Navigate>
+							}
+						></Route>
 					</Route>
 					<Route
 						path={SUB_ROUTES.resetPassword}
 						element={<ResetPassword />}
 					></Route>
-					<Route path={SUB_ROUTES.settings} element={<Settings />} />
 				</Route>
 			</Routes>
 		</Router>

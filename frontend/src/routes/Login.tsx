@@ -100,7 +100,7 @@ export default function Login() {
 		<AuthCard
 			cardTitle="Welcome to Cloud Drive"
 			cardDescription="Enter your email below to login to your account"
-			key="login-card"
+			cardKey="login-card"
 			isVisible={isVisible}
 		>
 			<form>

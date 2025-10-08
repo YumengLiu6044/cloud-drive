@@ -73,7 +73,7 @@ export default function ResetPassword() {
 		<AuthCard
 			cardTitle="Reset your password"
 			cardDescription="Input your new password below to reset your password"
-			key="reset-password-card"
+			cardKey="reset-password-card"
 			isVisible={isVisible}
 		>
 			<div className="grid gap-2">
