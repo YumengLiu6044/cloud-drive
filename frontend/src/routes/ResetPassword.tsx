@@ -1,15 +1,7 @@
 import { AuthApi } from "@/api/authApi";
-import { logo } from "@/assets/assets";
 import AuthCard from "@/components/AuthCard";
 import PasswordField from "@/components/PasswordField";
 import { Button } from "@/components/ui/button";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PASSWORD_MIN_LENGTH, SUB_ROUTES } from "@/constants";
