@@ -1,6 +1,6 @@
 import { AuthApi } from "@/api/authApi";
 import { logo } from "@/assets/assets";
-import Container from "@/components/Container";
+import AppContainer from "@/components/Container";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -95,7 +95,7 @@ export default function Login() {
 	);
 
 	return (
-		<Container className="flex flex-col justify-center items-center">
+		<div className="h-full flex flex-col justify-center items-center">
 			<div className="pb-3 flex flex-col items-center">
 				<img src={logo} className="w-full max-w-[70px]"></img>
 				<h1 className="text-primary text-3xl font-bold">Cloud Drive</h1>
@@ -241,6 +241,6 @@ export default function Login() {
 					</form>
 				</CardContent>
 			</Card>
-		</Container>
+		</div>
 	);
 }

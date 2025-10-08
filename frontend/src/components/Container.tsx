@@ -1,18 +1,17 @@
-import { loginBackground } from '@/assets/assets'
-import React from 'react'
+import { loginBackground } from "@/assets/assets";
+import { Outlet } from "react-router-dom";
 
 interface ContainerProps {
-  children: React.ReactNode
-  className?: string
+	className?: string;
 }
-export default function Container({children, className}: ContainerProps) {
-  return (
-    <div className={'relative w-screen h-screen p-5 ' + className}>
-      <img
+export default function AppContainer({ className }: ContainerProps) {
+	return (
+		<div className={"relative w-screen h-screen " + className}>
+			<img
 				src={loginBackground}
 				className="absolute w-full h-full -z-10"
 			></img>
-      {children}
-    </div>
-  )
+			<Outlet></Outlet>
+		</div>
+	);
 }

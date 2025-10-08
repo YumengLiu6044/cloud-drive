@@ -1,6 +1,6 @@
 import { AuthApi } from "@/api/authApi";
 import { logo } from "@/assets/assets";
-import Container from "@/components/Container";
+import AppContainer from "@/components/Container";
 import PasswordField from "@/components/PasswordField";
 import { Button } from "@/components/ui/button";
 import {
@@ -36,7 +36,7 @@ export default function Register() {
 	const handleFormSubmit = useCallback(
 		(e: React.MouseEvent<HTMLButtonElement>) => {
 			e.preventDefault();
-      setIsLoading(true);
+			setIsLoading(true);
 			if (password !== confirmPassword) {
 				toast.error("Passwords do not match");
 				setIsLoading(false);
@@ -73,7 +73,7 @@ export default function Register() {
 	);
 
 	return (
-		<Container className="flex flex-col justify-center items-center">
+		<div className="h-full flex flex-col justify-center items-center">
 			<div className="pb-3 flex flex-col items-center">
 				<img src={logo} className="w-full max-w-[70px]"></img>
 				<h1 className="text-primary text-3xl font-bold">Cloud Drive</h1>
@@ -203,6 +203,6 @@ export default function Register() {
 					</form>
 				</CardContent>
 			</Card>
-		</Container>
+		</div>
 	);
 }
