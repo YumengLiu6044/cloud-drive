@@ -20,6 +20,7 @@ export default function Login() {
 	const [resetEmail, setResetEmail] = useState("");
 
 	const [isLoading, setIsLoading] = useState(false);
+	const [isVisible, setIsVisible] = useState(true);
 
 	const navigator = useNavigate();
 	const { setToken } = useAuthStore();
@@ -37,7 +38,6 @@ export default function Login() {
 					toast.success(
 						"Password reset link has been sent to your email."
 					);
-					setIsForget(false);
 				})
 				.catch((error) => {
 					switch (error.response?.status) {
@@ -69,7 +69,10 @@ export default function Login() {
 				.then((response) => {
 					toast.success("Login successful");
 					setToken(response.data.access_token);
-					navigator(SUB_ROUTES.drive.base);
+					setIsVisible(false);
+					setTimeout(() => {
+						navigator(SUB_ROUTES.drive.dashboard);
+					}, 500);
 				})
 				.catch((error) => {
 					console.error(error);
@@ -97,6 +100,8 @@ export default function Login() {
 		<AuthCard
 			cardTitle="Welcome to Cloud Drive"
 			cardDescription="Enter your email below to login to your account"
+			key="login-card"
+			isVisible={isVisible}
 		>
 			<form>
 				{!isForget ? (

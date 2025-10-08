@@ -22,6 +22,8 @@ export default function Register() {
 
 	const [isLoading, setIsLoading] = useState(false);
 
+  const [isVisible, setIsVisible] = useState(true);
+
 	const navigator = useNavigate();
 	const { setToken } = useAuthStore();
 
@@ -43,7 +45,10 @@ export default function Register() {
 				.then((response) => {
 					toast.success("Registration successful");
 					setToken(response.data.access_token);
-					navigator(SUB_ROUTES.drive.base);
+          setIsVisible(false);
+					setTimeout(() => {
+            navigator(SUB_ROUTES.drive.dashboard);
+          }, 500);
 				})
 				.catch((error) => {
 					console.error(error);
@@ -68,6 +73,8 @@ export default function Register() {
 		<AuthCard
 			cardTitle="Register an account"
 			cardDescription="Join Cloud Drive today. Create your account"
+			key="register-account-card"
+      isVisible={isVisible}
 		>
 			<form>
 				<div className="flex flex-col gap-6">

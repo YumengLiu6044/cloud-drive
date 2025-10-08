@@ -16,7 +16,8 @@ export default function ResetPassword() {
 	const [confirmPassword, setConfirmPassword] = useState("");
 
 	const navigator = useNavigate();
-	const onClickBacktoLogin = () => navigator(SUB_ROUTES.login);
+
+	const [isVisible, setIsVisible] = useState(true);
 
 	const [searchParams] = useSearchParams();
 	const resetToken = searchParams.get("token") ?? "";
@@ -61,10 +62,19 @@ export default function ResetPassword() {
 		[password, confirmPassword]
 	);
 
+	const handleBacktoLogin = useCallback(() => {
+		setIsVisible(false);
+		setTimeout(() => {
+			navigator(SUB_ROUTES.login);
+		}, 500);
+	}, []);
+
 	return (
 		<AuthCard
 			cardTitle="Reset your password"
 			cardDescription="Input your new password below to reset your password"
+			key="reset-password-card"
+			isVisible={isVisible}
 		>
 			<div className="grid gap-2">
 				<Label htmlFor="password">Password</Label>
@@ -112,7 +122,7 @@ export default function ResetPassword() {
 					type="button"
 					variant="ghost"
 					className="font-normal"
-					onClick={onClickBacktoLogin}
+					onClick={handleBacktoLogin}
 				>
 					Go Back to Login
 				</Button>
