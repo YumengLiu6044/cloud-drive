@@ -40,10 +40,17 @@ export default function Login() {
 					setIsForget(false);
 				})
 				.catch((error) => {
-					console.error(error);
-					toast.error(
-						error.response?.data?.message || "Error occurred"
-					);
+					switch (error.response?.status) {
+						case 404:
+							toast.error("User not found");
+							break;
+						default:
+							toast.error(
+								error.response?.data?.message ||
+									"An unexpected error occurred"
+							);
+							break;
+					}
 				})
 				.finally(() => setIsLoading(false));
 		},
@@ -195,8 +202,12 @@ export default function Login() {
 								type="submit"
 								onClick={handleSendPasswordReset}
 								className="font-normal"
+								disabled={isLoading}
 							>
 								Send Reset Link
+								{isLoading && (
+									<LoaderCircle className="animate-spin"></LoaderCircle>
+								)}
 							</Button>
 							<Button
 								type="button"
