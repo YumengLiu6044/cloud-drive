@@ -6,6 +6,7 @@ import {
 } from "@/constants";
 import useAuthStore from "@/context/authStore";
 import axios from "axios";
+import { toast } from "sonner";
 
 const axiosClient = axios.create({
 	baseURL: BACKEND_URL,
@@ -25,7 +26,8 @@ axiosClient.interceptors.request.use((config) => {
 axiosClient.interceptors.response.use(
 	(response) => response,
 	(error) => {
-		const status = error.response?.status;
+		const { status = "", data = {} } = error.response || {};
+		const detail = data.detail;
 		const requestUrl = error.config?.url ?? "";
 
 		if (
@@ -38,7 +40,18 @@ axiosClient.interceptors.response.use(
 			setToken(null);
 			window.location.href = SUB_ROUTES.login;
 		}
-		return Promise.reject(error);
+
+		let message = "An unexpected error has occured";
+
+		if (typeof detail === "string") {
+			message = detail;
+		} else if (Array.isArray(detail) && detail.length > 0) {
+			message = detail[0].msg || "Invalid input data";
+		} else {
+			message = "An unexpected error has occurred";
+		}
+		toast.error(message)
+		return Promise.reject(new Error(message));
 	}
 );
 export default axiosClient;

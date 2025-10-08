@@ -50,20 +50,6 @@ export default function Register() {
 						navigator(SUB_ROUTES.drive.dashboard);
 					}, 500);
 				})
-				.catch((error) => {
-					console.error(error);
-					switch (error.response?.status) {
-						case 409:
-							toast.error("Email already in use");
-							break;
-						default:
-							toast.error(
-								error.response?.data?.message ||
-									"An unexpected error occurred"
-							);
-							break;
-					}
-				})
 				.finally(() => setIsLoading(false));
 		},
 		[password, confirmPassword, email, username]

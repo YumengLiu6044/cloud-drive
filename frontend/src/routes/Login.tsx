@@ -39,19 +39,6 @@ export default function Login() {
 						"Password reset link has been sent to your email."
 					);
 				})
-				.catch((error) => {
-					switch (error.response?.status) {
-						case 404:
-							toast.error("User not found");
-							break;
-						default:
-							toast.error(
-								error.response?.data?.message ||
-									"An unexpected error occurred"
-							);
-							break;
-					}
-				})
 				.finally(() => setIsLoading(false));
 		},
 		[resetEmail]
@@ -73,23 +60,6 @@ export default function Login() {
 					setTimeout(() => {
 						navigator(SUB_ROUTES.drive.dashboard);
 					}, 500);
-				})
-				.catch((error) => {
-					console.error(error);
-					switch (error.response?.status) {
-						case 401:
-							toast.error("Invalid email or password");
-							break;
-						case 404:
-							toast.error("User not found");
-							break;
-						default:
-							toast.error(
-								error.response?.data?.message ||
-									"An unexpected error occurred"
-							);
-							break;
-					}
 				})
 				.finally(() => setIsLoading(false));
 		},
