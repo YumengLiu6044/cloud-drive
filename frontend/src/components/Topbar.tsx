@@ -4,6 +4,18 @@ import { Button } from "./ui/button";
 import { useSidebarStore } from "@/context/sidebarStore";
 import { AnimatePresence, motion } from "motion/react";
 import useAuthStore from "@/context/authStore";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuLabel,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { SIDEBAR_ITEMS } from "@/constants";
+import { Link } from "react-router-dom";
+import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu";
+import { useDeviceType } from "@/hooks/useDeviceType";
 
 export default function Topbar() {
 	const toggleIsCollapsed = useSidebarStore(
@@ -12,6 +24,8 @@ export default function Topbar() {
 
 	const isSidebarVisible = useSidebarStore((state) => state.isSidebarVisible);
 	const handleLogout = useAuthStore((state) => state.logout);
+
+	const { isMobile, type } = useDeviceType();
 
 	return (
 		<AnimatePresence>
@@ -41,26 +55,55 @@ export default function Topbar() {
 					className="w-full bg-accent py-4 px-6 flex justify-between border-b-1 border-border"
 				>
 					<div className="flex gap-3 items-center">
-						<Button variant="outline" onClick={toggleIsCollapsed}>
-							<Menu aria-label="Collapse Sidebar Menu" />
-						</Button>
+						{!isMobile && (
+							<Button
+								variant="outline"
+								onClick={toggleIsCollapsed}
+							>
+								<Menu aria-label="Collapse Sidebar Menu" />
+							</Button>
+						)}
 						<div className="relative w-fit h-fit">
 							<Input
 								type="text"
-								className="w-xs pr-10"
+								className="max-w-xs md:w-xs pr-10"
 								placeholder="Search in Drive"
 							></Input>
 							<Search className="absolute right-3 inset-y-0 text-muted-foreground h-full"></Search>
 						</div>
 					</div>
 
-					<div className="flex items-center gap-3">
-						<Button variant="outline" onClick={handleLogout}>
-							<LogOut aria-label="Log out"></LogOut>
-						</Button>
+					<DropdownMenu key={type}>
+						<DropdownMenuTrigger
+							className="h-full aspect-square rounded-full bg-accent-foreground"
+							disabled={!isMobile}
+						></DropdownMenuTrigger>
+						<DropdownMenuContent className="mr-3 block md:hidden">
+							<DropdownMenuLabel>Account</DropdownMenuLabel>
 
-						<div className="h-full aspect-square rounded-full bg-foreground"></div>
-					</div>
+							<DropdownMenuGroup>
+								{SIDEBAR_ITEMS.map((item, index) => (
+									<DropdownMenuItem key={index}>
+										<item.Icon></item.Icon>
+										<Link
+											to={item.route}
+											className="text-xs"
+										>
+											{item.name}
+										</Link>
+									</DropdownMenuItem>
+								))}
+							</DropdownMenuGroup>
+							<DropdownMenuSeparator></DropdownMenuSeparator>
+							<DropdownMenuItem
+								className="text-xs"
+								onClick={handleLogout}
+							>
+								<LogOut></LogOut>
+								Sign out
+							</DropdownMenuItem>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</motion.div>
 			)}
 		</AnimatePresence>

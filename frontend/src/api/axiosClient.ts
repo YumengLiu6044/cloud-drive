@@ -36,8 +36,8 @@ axiosClient.interceptors.response.use(
 				(route) => !requestUrl.includes(AUTH_API_BASE + route)
 			)
 		) {
-			const { setToken } = useAuthStore.getState();
-			setToken(null);
+			const { logout } = useAuthStore.getState();
+			logout();
 			window.location.href = SUB_ROUTES.login;
 		}
 
@@ -50,7 +50,7 @@ axiosClient.interceptors.response.use(
 		} else {
 			message = "An unexpected error has occurred";
 		}
-		toast.error(message)
+		toast.error(message);
 		return Promise.reject(new Error(message));
 	}
 );

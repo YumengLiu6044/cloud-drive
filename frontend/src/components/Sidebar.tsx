@@ -43,7 +43,7 @@ export default function Sidebar() {
 						...mainState,
 						width: isCollapsed ? "6rem" : "18rem",
 					}}
-					className="h-screen flex flex-col gap-3 bg-accent border-r-1 border-border"
+					className="hidden md:flex h-screen flex-col gap-3 bg-accent border-r-1 border-border"
 				>
 					<div className="flex items-center py-4 px-6">
 						<img src={logo} className="w-12"></img>
