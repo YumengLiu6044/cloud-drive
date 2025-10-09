@@ -58,7 +58,7 @@ export default function Login() {
 					setToken(response.data.access_token);
 					setIsVisible(false);
 					setTimeout(() => {
-						navigator(SUB_ROUTES.drive.dashboard);
+						navigator(SUB_ROUTES.drive.base);
 					}, 500);
 				})
 				.finally(() => setIsLoading(false));

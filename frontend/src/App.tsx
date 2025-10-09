@@ -6,7 +6,6 @@ import {
 } from "react-router-dom";
 import Login from "./routes/Login";
 import DriveLayout from "./routes/DriveLayout";
-import Dashboard from "./routes/Dashboard";
 import Files from "./routes/Files";
 import Settings from "./routes/Settings";
 import ResetPassword from "./routes/ResetPassword";
@@ -36,14 +35,10 @@ export default function App() {
 							index
 							element={
 								<Navigate
-									to={SUB_ROUTES.drive.dashboard}
+									to={SUB_ROUTES.drive.files}
 								></Navigate>
 							}
 						></Route>
-						<Route
-							path={SUB_ROUTES.drive.dashboard}
-							element={<Dashboard />}
-						/>
 						<Route
 							path={SUB_ROUTES.drive.files}
 							element={<Files />}
@@ -60,7 +55,7 @@ export default function App() {
 							path="*"
 							element={
 								<Navigate
-									to={SUB_ROUTES.drive.dashboard}
+									to={SUB_ROUTES.drive.files}
 									replace
 								></Navigate>
 							}
