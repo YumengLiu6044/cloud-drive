@@ -1,8 +1,8 @@
-import { LogOut, Menu, Search } from "lucide-react";
+import { ChevronDown, LogOut, Menu, Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useSidebarStore } from "@/context/sidebarStore";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useAnimation } from "motion/react";
 import useAuthStore from "@/context/authStore";
 import {
 	DropdownMenu,
@@ -13,9 +13,10 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { SIDEBAR_ITEMS } from "@/constants";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu";
 import { useDeviceType } from "@/hooks/useDeviceType";
+import { useEffect, useState } from "react";
 
 export default function Topbar() {
 	const toggleIsCollapsed = useSidebarStore(
@@ -26,6 +27,17 @@ export default function Topbar() {
 	const handleLogout = useAuthStore((state) => state.logout);
 
 	const { isMobile, type } = useDeviceType();
+
+	const controls = useAnimation();
+	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+	useEffect(() => {
+		controls.start({
+			rotate: mobileMenuOpen ? 180 : 0,
+			transition: { duration: 0.3 },
+		});
+	}, [mobileMenuOpen]);
+
+	const navigator = useNavigate();
 
 	return (
 		<AnimatePresence>
@@ -73,24 +85,38 @@ export default function Topbar() {
 						</div>
 					</div>
 
-					<DropdownMenu key={type}>
+					<DropdownMenu
+						key={type}
+						onOpenChange={setMobileMenuOpen}
+						open={mobileMenuOpen}
+					>
 						<DropdownMenuTrigger
-							className="h-full aspect-square rounded-full bg-accent-foreground"
 							disabled={!isMobile}
-						></DropdownMenuTrigger>
+							className="h-full"
+						>
+							<div className="h-full flex items-center gap-2">
+								<Button className="h-full aspect-square rounded-full p-0">
+									YL
+								</Button>
+								{isMobile && (
+									<motion.div animate={controls}>
+										<ChevronDown className="w-3 h-3"></ChevronDown>
+									</motion.div>
+								)}
+							</div>
+						</DropdownMenuTrigger>
 						<DropdownMenuContent className="mr-3 block md:hidden">
 							<DropdownMenuLabel>Account</DropdownMenuLabel>
 
 							<DropdownMenuGroup>
 								{SIDEBAR_ITEMS.map((item, index) => (
-									<DropdownMenuItem key={index}>
+									<DropdownMenuItem
+										className="text-xs"
+										key={index}
+										onClick={() => navigator(item.route)}
+									>
 										<item.Icon></item.Icon>
-										<Link
-											to={item.route}
-											className="text-xs"
-										>
-											{item.name}
-										</Link>
+										{item.name}
 									</DropdownMenuItem>
 								))}
 							</DropdownMenuGroup>
