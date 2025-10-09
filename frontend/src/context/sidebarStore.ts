@@ -1,7 +1,10 @@
 import type { SidebarStore } from "@/type";
 import { create } from "zustand";
 
-export const useSidebarStore = create<SidebarStore>((set) => ({
+export const useSidebarStore = create<SidebarStore>((set, get) => ({
 	isCollapsed: false,
-	setIsCollapsed: (newState: boolean) => set({ isCollapsed: newState }),
+	toggleIsCollapsed: () => {
+		const {isCollapsed} = get()
+		set({isCollapsed: !isCollapsed})
+	},
 }));

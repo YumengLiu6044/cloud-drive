@@ -11,7 +11,7 @@ export type JWTPayload = {
 
 export type SidebarStore = {
 	isCollapsed: boolean;
-	setIsCollapsed: (_: boolean) => void;
+	toggleIsCollapsed: () => void;
 };
 
 export interface CustomNode {

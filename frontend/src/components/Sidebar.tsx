@@ -7,20 +7,19 @@ import { HardDrive, Plus } from "lucide-react";
 import { Progress } from "./ui/progress";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "motion/react";
+import CollapsibleText from "./CollapsibleText";
 
-const secondaryState = { opacity: 0, x: -10 };
+const secondaryState = { opacity: 0, x: -10, width: 0 };
 const mainState = { opacity: 1, x: 0 };
 
 export default function Sidebar() {
 	const isCollapsed = useSidebarStore((state) => state.isCollapsed);
-	const setIsCollapsed = useSidebarStore((state) => state.setIsCollapsed);
 
 	const location = useLocation();
 	const navigator = useNavigate();
 
 	return (
 		<AnimatePresence>
-
 			<motion.div
 				initial={secondaryState}
 				exit={secondaryState}
@@ -32,19 +31,18 @@ export default function Sidebar() {
 			>
 				<div className="flex items-center py-4 px-6">
 					<img src={logo} className="w-12"></img>
-	
-					<motion.h1
+
+					<CollapsibleText
+						isCollapsed={isCollapsed}
 						animate={{
-							opacity: isCollapsed ? 0 : 1,
-							width: !isCollapsed ? "fit-content" : 0,
 							paddingLeft: !isCollapsed ? "0.5rem" : "0",
 						}}
-						className="text-2xl font-medium text-nowrap"
+						className="text-2xl font-medium"
 					>
 						Cloud Drive
-					</motion.h1>
+					</CollapsibleText>
 				</div>
-	
+
 				<div className="py-2 px-4">
 					<Button
 						variant="outline"
@@ -52,23 +50,20 @@ export default function Sidebar() {
 							isCollapsed && "justify-center"
 						}`}
 						aria-label="New Folder"
-						onClick={() => setIsCollapsed(!isCollapsed)}
 					>
 						<Plus className="w-5 h-5" />
-	
-						<motion.span
+
+						<CollapsibleText
+							isCollapsed={isCollapsed}
 							animate={{
-								opacity: isCollapsed ? 0 : 1,
-								width: isCollapsed ? 0 : "fit-content",
 								paddingLeft: isCollapsed ? 0 : "1.25rem",
 							}}
-							className="text-nowrap"
 						>
 							New
-						</motion.span>
+						</CollapsibleText>
 					</Button>
 				</div>
-	
+
 				<div className="h-full w-full flex flex-col gap-2 py-2 px-4">
 					{SIDEBAR_ITEMS.map((item, index) => (
 						<Button
@@ -84,17 +79,15 @@ export default function Sidebar() {
 							onClick={() => navigator(item.route)}
 						>
 							<item.Icon className="w-5 h-5"></item.Icon>
-	
-							<motion.span
+
+							<CollapsibleText
+								isCollapsed={isCollapsed}
 								animate={{
-									opacity: isCollapsed ? 0 : 1,
-									width: isCollapsed ? 0 : "fit-content",
 									paddingLeft: isCollapsed ? 0 : "1.25rem",
 								}}
-								className="text-nowrap"
 							>
 								{item.name}
-							</motion.span>
+							</CollapsibleText>
 						</Button>
 					))}
 				</div>
@@ -107,32 +100,25 @@ export default function Sidebar() {
 					}}
 					className={`flex flex-col gap-2 py-4 px-4 text-sm text-muted-foreground`}
 				>
-					<div className="flex items-center gap-2">
+					<div className="flex items-center">
 						<HardDrive className="w-5 h-5" />
-	
-						<motion.span
+
+						<CollapsibleText
 							animate={{
-								opacity: isCollapsed ? 0 : 1,
-								width: !isCollapsed ? "fit-content" : 0,
+								paddingLeft: isCollapsed ? 0 : "8px",
 							}}
-							className="text-nowrap"
+							isCollapsed={isCollapsed}
 						>
 							Storage
-						</motion.span>
+						</CollapsibleText>
 					</div>
 					<Progress value={40} />
-	
-					<motion.span
-						animate={{
-							opacity: isCollapsed ? 0 : 1,
-						}}
-						className="text-xs text-nowrap"
-					>
+
+					<CollapsibleText isCollapsed={isCollapsed}>
 						4.5 GB of 10 GB used
-					</motion.span>
+					</CollapsibleText>
 				</motion.div>
 			</motion.div>
 		</AnimatePresence>
-
 	);
 }

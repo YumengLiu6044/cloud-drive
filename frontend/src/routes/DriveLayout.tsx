@@ -1,17 +1,19 @@
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Sidebar from "@/components/Sidebar";
+import Topbar from "@/components/Topbar";
 import { Outlet } from "react-router-dom";
 
 export default function DriveLayout() {
 	return (
 		<ProtectedRoute>
-			<div className="flex min-h-screen">
+			<div className="flex h-full">
 				{/* Sidebar */}
 				<Sidebar></Sidebar>
 
 				{/* Content area */}
-				<main className="flex-1 p-6">
-					<Outlet /> {/* Renders subroute content */}
+				<main className="w-full">
+					<Topbar></Topbar>
+					<Outlet />
 				</main>
 			</div>
 		</ProtectedRoute>
