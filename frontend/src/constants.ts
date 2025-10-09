@@ -1,4 +1,4 @@
-import { Folder, Settings, Trash2 } from "lucide-react";
+import { Clock, Folder, Settings, Trash2 } from "lucide-react";
 
 export const SUB_ROUTES = {
 	login: "/login",
@@ -9,6 +9,7 @@ export const SUB_ROUTES = {
 		files: "/drive/files",
 		trash: "/drive/trash",
 		settings: "/drive/settings",
+		recent: "/drive/recent",
 	},
 } as const;
 export const AUTH_API_BASE = "/auth";
@@ -25,6 +26,11 @@ export const SIDEBAR_ITEMS = [
 		name: "Files",
 		Icon: Folder,
 		route: SUB_ROUTES.drive.files,
+	},
+	{
+		name: "Recent",
+		Icon: Clock,
+		route: SUB_ROUTES.drive.recent,
 	},
 	{
 		name: "Trash",

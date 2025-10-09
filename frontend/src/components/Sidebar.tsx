@@ -8,7 +8,7 @@ import { Progress } from "./ui/progress";
 import { useLocation, useNavigate } from "react-router-dom";
 import { AnimatePresence, motion, useAnimation } from "motion/react";
 import CollapsibleText from "./CollapsibleText";
-import { useEffect } from "react";
+import { useCallback } from "react";
 
 const secondaryState = { opacity: 0, x: -10, width: 0 };
 const mainState = { opacity: 1, x: 0 };
@@ -16,28 +16,22 @@ const mainState = { opacity: 1, x: 0 };
 export default function Sidebar() {
 	const isCollapsed = useSidebarStore((state) => state.isCollapsed);
 	const isSidebarVisible = useSidebarStore((state) => state.isSidebarVisible);
-	const setSidebarVisible = useSidebarStore(
-		(state) => state.setIsSidebarVisible
-	);
-	useEffect(() => {
-		setSidebarVisible(true);
-	}, []);
 
 	const location = useLocation();
 	const navigator = useNavigate();
 
 	const controls = useAnimation();
-	const handleMouseEnter = () => {
+	const handleMouseEnter = useCallback(() => {
 		controls.set({ rotate: 0 });
 		controls.start({
 			rotate: 180,
 			transition: { duration: 0.8 },
 		});
-	};
+	}, []);
 
-	const handleMouseLeave = () => {
+	const handleMouseLeave = useCallback(() => {
 		controls.set({ rotate: 0 });
-	};
+	}, []);
 
 	return (
 		<AnimatePresence>
@@ -118,6 +112,7 @@ export default function Sidebar() {
 								</CollapsibleText>
 							</Button>
 						))}
+						<div className="h-full" />
 					</div>
 					<Separator className="text-border"></Separator>
 					{/* Storage */}

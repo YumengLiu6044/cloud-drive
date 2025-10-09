@@ -13,6 +13,7 @@ import Trash from "./routes/Trash";
 import { SUB_ROUTES } from "./constants";
 import Register from "./routes/Register";
 import AppContainer from "./components/Container";
+import Recent from "./routes/Recent";
 
 export default function App() {
 	return (
@@ -51,6 +52,10 @@ export default function App() {
 							path={SUB_ROUTES.drive.settings}
 							element={<Settings />}
 						/>
+						<Route
+							path={SUB_ROUTES.drive.recent}
+							element={<Recent />}
+						></Route>
 						<Route
 							path="*"
 							element={
