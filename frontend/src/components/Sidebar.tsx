@@ -41,7 +41,7 @@ export default function Sidebar() {
 					exit={secondaryState}
 					animate={{
 						...mainState,
-						width: isCollapsed ? "6rem" : "18rem",
+						width: isCollapsed ? "5rem" : "18rem",
 					}}
 					className="hidden md:flex h-screen flex-col gap-3 bg-accent border-r-1 border-border"
 				>

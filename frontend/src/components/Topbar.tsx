@@ -62,9 +62,9 @@ export default function Topbar() {
 						opacity: 1,
 						y: 0,
 						height: "4rem",
-						padding: "16px 24px",
+						padding: "12px 24px",
 					}}
-					className="w-full bg-accent py-4 px-6 flex justify-between border-b-1 border-border"
+					className="w-full bg-accent flex justify-between border-b-1 border-border"
 				>
 					<div className="flex gap-3 items-center">
 						{!isMobile && (
