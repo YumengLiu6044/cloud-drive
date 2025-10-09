@@ -6,7 +6,7 @@ import { Button } from "./ui/button";
 import { HardDrive, Plus } from "lucide-react";
 import { Progress } from "./ui/progress";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AnimatePresence, motion } from "motion/react";
+import { AnimatePresence, motion, useAnimation } from "motion/react";
 import CollapsibleText from "./CollapsibleText";
 
 const secondaryState = { opacity: 0, x: -10, width: 0 };
@@ -18,6 +18,19 @@ export default function Sidebar() {
 	const location = useLocation();
 	const navigator = useNavigate();
 
+	const controls = useAnimation();
+	const handleMouseEnter = () => {
+		controls.set({ rotate: 0 });
+		controls.start({
+			rotate: 180,
+			transition: { duration: 0.8 },
+		});
+	};
+
+	const handleMouseLeave = () => {
+		controls.set({ rotate: 0 });
+	};
+
 	return (
 		<AnimatePresence>
 			<motion.div
@@ -25,7 +38,7 @@ export default function Sidebar() {
 				exit={secondaryState}
 				animate={{
 					...mainState,
-					width: isCollapsed ? "6rem" : "16rem",
+					width: isCollapsed ? "6rem" : "18rem",
 				}}
 				className="h-screen flex flex-col gap-3 bg-accent border-r-1 border-border"
 			>
@@ -50,8 +63,12 @@ export default function Sidebar() {
 							isCollapsed && "justify-center"
 						}`}
 						aria-label="New Folder"
+						onMouseEnter={handleMouseEnter}
+						onMouseLeave={handleMouseLeave}
 					>
-						<Plus className="w-5 h-5" />
+						<motion.div animate={controls}>
+							<Plus className="w-5 h-5" />
+						</motion.div>
 
 						<CollapsibleText
 							isCollapsed={isCollapsed}
