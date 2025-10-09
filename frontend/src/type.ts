@@ -1,6 +1,7 @@
 export type AuthStore = {
 	token: string | null;
-	setToken: (_: string | null) => void;
+	login: (_: string | null) => void;
+	logout: () => void
 };
 
 export type JWTPayload = {
@@ -12,6 +13,9 @@ export type JWTPayload = {
 export type SidebarStore = {
 	isCollapsed: boolean;
 	toggleIsCollapsed: () => void;
+
+	isSidebarVisible: boolean;
+	setIsSidebarVisible: (_: boolean) => void
 };
 
 export interface CustomNode {

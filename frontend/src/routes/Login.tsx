@@ -23,7 +23,7 @@ export default function Login() {
 	const [isVisible, setIsVisible] = useState(true);
 
 	const navigator = useNavigate();
-	const { setToken } = useAuthStore();
+	const { login } = useAuthStore();
 
 	const handleSendPasswordReset = useCallback(
 		(e: React.MouseEvent<HTMLButtonElement>) => {
@@ -55,7 +55,7 @@ export default function Login() {
 			AuthApi.login(email, password)
 				.then((response) => {
 					toast.success("Login successful");
-					setToken(response.data.access_token);
+					login(response.data.access_token);
 					setIsVisible(false);
 					setTimeout(() => {
 						navigator(SUB_ROUTES.drive.base);

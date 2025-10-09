@@ -25,7 +25,7 @@ export default function Register() {
 	const [isVisible, setIsVisible] = useState(true);
 
 	const navigator = useNavigate();
-	const { setToken } = useAuthStore();
+	const { login } = useAuthStore();
 
 	const handleFormSubmit = useCallback(
 		(e: React.MouseEvent<HTMLButtonElement>) => {
@@ -44,7 +44,7 @@ export default function Register() {
 			AuthApi.register(email, username, password)
 				.then((response) => {
 					toast.success("Registration successful");
-					setToken(response.data.access_token);
+					login(response.data.access_token);
 					setIsVisible(false);
 					setTimeout(() => {
 						navigator(SUB_ROUTES.drive.base);
