@@ -2,13 +2,12 @@ import { ChevronDown, LogOut, Menu, Search } from "lucide-react";
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { useSidebarStore } from "@/context/sidebarStore";
-import { AnimatePresence, motion, useAnimation } from "motion/react";
+import { motion, useAnimation } from "motion/react";
 import useAuthStore from "@/context/authStore";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
-	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
@@ -23,7 +22,6 @@ export default function Topbar() {
 		(state) => state.toggleIsCollapsed
 	);
 
-	const isSidebarVisible = useSidebarStore((state) => state.isSidebarVisible);
 	const handleLogout = useAuthStore((state) => state.logout);
 
 	const { isMobile, type } = useDeviceType();
@@ -40,98 +38,61 @@ export default function Topbar() {
 	const navigator = useNavigate();
 
 	return (
-		<AnimatePresence>
-			{isSidebarVisible && (
-				<motion.div
-					transition={{
-						delay: 0.5,
-					}}
-					initial={{
-						opacity: 0,
-						y: -10,
-						height: 0,
-						padding: "0 0",
-					}}
-					exit={{
-						opacity: 0,
-						y: -10,
-						height: 0,
-						padding: "0 0",
-					}}
-					animate={{
-						opacity: 1,
-						y: 0,
-						height: "4rem",
-						padding: "12px 24px",
-					}}
-					className="w-full bg-accent flex justify-between border-b-1 border-border"
-				>
-					<div className="flex gap-3 items-center">
-						{!isMobile && (
-							<Button
-								variant="outline"
-								onClick={toggleIsCollapsed}
-							>
-								<Menu aria-label="Collapse Sidebar Menu" />
-							</Button>
-						)}
-						<div className="relative w-fit h-fit">
-							<Input
-								type="text"
-								className="max-w-xs md:w-xs pr-10"
-								placeholder="Search in Drive"
-							></Input>
-							<Search className="absolute right-3 inset-y-0 text-muted-foreground h-full"></Search>
+		<div className="w-full h-16 py-[10px] px-[20px] md:px-[40px] bg-background flex justify-between border-b-1 border-border">
+			<div className="flex gap-3 items-center">
+				{!isMobile && (
+					<Button variant="outline" onClick={toggleIsCollapsed}>
+						<Menu aria-label="Collapse Sidebar Menu" />
+					</Button>
+				)}
+				<div className="relative w-fit h-full">
+					<Input
+						type="text"
+						className="max-w-xs md:w-xs pr-10 h-full"
+						placeholder="Search in Drive"
+					></Input>
+					<Search className="absolute right-3 inset-y-0 text-muted-foreground h-full"></Search>
+				</div>
+			</div>
+
+			<DropdownMenu
+				key={type}
+				onOpenChange={setMobileMenuOpen}
+				open={mobileMenuOpen}
+			>
+				<DropdownMenuTrigger className="h-full">
+					<div className="h-full flex items-center gap-2">
+						<div className="h-full aspect-square flex items-center justify-center rounded-full p-3 bg-primary text-background">
+							<span>YL</span>
 						</div>
+						<motion.div animate={controls}>
+							<ChevronDown className="w-3 h-3"></ChevronDown>
+						</motion.div>
 					</div>
-
-					<DropdownMenu
-						key={type}
-						onOpenChange={setMobileMenuOpen}
-						open={mobileMenuOpen}
-					>
-						<DropdownMenuTrigger
-							disabled={!isMobile}
-							className="h-full"
-						>
-							<div className="h-full flex items-center gap-2">
-								<Button className="h-full aspect-square rounded-full p-0">
-									YL
-								</Button>
-								{isMobile && (
-									<motion.div animate={controls}>
-										<ChevronDown className="w-3 h-3"></ChevronDown>
-									</motion.div>
-								)}
-							</div>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent className="mr-3 block md:hidden">
-							<DropdownMenuLabel>Account</DropdownMenuLabel>
-
-							<DropdownMenuGroup>
-								{SIDEBAR_ITEMS.map((item, index) => (
-									<DropdownMenuItem
-										className="text-xs"
-										key={index}
-										onClick={() => navigator(item.route)}
-									>
-										<item.Icon></item.Icon>
-										{item.name}
-									</DropdownMenuItem>
-								))}
-							</DropdownMenuGroup>
-							<DropdownMenuSeparator></DropdownMenuSeparator>
+				</DropdownMenuTrigger>
+				<DropdownMenuContent>
+					<DropdownMenuGroup>
+						{SIDEBAR_ITEMS.map((item, index) => (
 							<DropdownMenuItem
-								className="text-xs"
-								onClick={handleLogout}
+								className="text-xs md:text-base flex gap-5"
+								key={index}
+								onClick={() => navigator(item.route)}
 							>
-								<LogOut></LogOut>
-								Sign out
+								<item.Icon></item.Icon>
+								{item.name}
 							</DropdownMenuItem>
-						</DropdownMenuContent>
-					</DropdownMenu>
-				</motion.div>
-			)}
-		</AnimatePresence>
+						))}
+					</DropdownMenuGroup>
+					<DropdownMenuSeparator></DropdownMenuSeparator>
+					<DropdownMenuItem
+						className="text-xs md:text-base flex gap-5"
+						onClick={handleLogout}
+					>
+						<LogOut></LogOut>
+						Sign out
+					</DropdownMenuItem>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
 	);
 }

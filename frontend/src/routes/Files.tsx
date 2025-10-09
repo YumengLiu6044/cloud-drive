@@ -1,9 +1,7 @@
-import React from 'react'
+import FileViewer from "@/components/FileViewer";
 
 export default function Files() {
   return (
-    <div>
-      
-    </div>
+    <FileViewer></FileViewer>
   )
 }

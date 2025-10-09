@@ -8,6 +8,4 @@ export const useSidebarStore = create<SidebarStore>((set, get) => ({
 		set({ isCollapsed: !isCollapsed });
 	},
 
-	isSidebarVisible: true,
-	setIsSidebarVisible: (newState) => set({ isSidebarVisible: newState }),
 }));
