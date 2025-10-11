@@ -8,12 +8,11 @@ import {
 import { Checkbox } from "./ui/checkbox";
 import { LIST_HEADER_COLS, mockFiles } from "@/constants";
 import { ArrowUp } from "lucide-react";
-import { ScrollArea } from "./ui/scroll-area";
 import FileListRow from "./FileListRow";
 
 export default function FileListView() {
 	return (
-		<ScrollArea className="h-[80vh]">
+		<div className="h-[80vh] w-[90vw] md:w-auto overflow-auto">
 			<Table className="relative">
 				<TableHeader>
 					<TableRow className="sticky top-0 [&>th]:py-3">
@@ -44,6 +43,6 @@ export default function FileListView() {
 					))}
 				</TableBody>
 			</Table>
-		</ScrollArea>
+		</div>
 	);
 }
