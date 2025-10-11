@@ -11,7 +11,7 @@ export default function DriveLayout() {
 				<Sidebar></Sidebar>
 
 				{/* Content area */}
-				<main className="w-full">
+				<main className="w-full h-full">
 					<Topbar></Topbar>
 					<Outlet />
 				</main>

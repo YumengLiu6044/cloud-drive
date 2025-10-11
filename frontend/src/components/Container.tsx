@@ -1,10 +1,8 @@
 import { loginBackground } from "@/assets/assets";
+import type { CustomNode } from "@/type";
 import { Outlet } from "react-router-dom";
 
-interface ContainerProps {
-	className?: string;
-}
-export default function AppContainer({ className }: ContainerProps) {
+export default function AppContainer({ className }: CustomNode) {
 	return (
 		<div className={"relative w-screen h-screen " + className}>
 			<img
