@@ -29,3 +29,8 @@ export type MockFile = {
 	owner: string;
 	fileType?: string | null;
 };
+
+export interface FileListRowProps {
+  key: number | string,
+  item: MockFile
+}

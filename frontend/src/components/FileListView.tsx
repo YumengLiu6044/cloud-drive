@@ -1,20 +1,15 @@
 import {
 	Table,
 	TableBody,
-	TableCell,
 	TableHead,
 	TableHeader,
 	TableRow,
 } from "./ui/table";
 import { Checkbox } from "./ui/checkbox";
 import { LIST_HEADER_COLS, mockFiles } from "@/constants";
-import { ArrowUp, EllipsisVertical, FileText, Folder } from "lucide-react";
-import type { CustomNode, MockFile } from "@/type";
+import { ArrowUp } from "lucide-react";
 import { ScrollArea } from "./ui/scroll-area";
-
-const Cell = ({ children, className = "" }: CustomNode) => (
-	<TableCell className={`py-5 ${className}`}>{children}</TableCell>
-);
+import FileListRow from "./FileListRow";
 
 export default function FileListView() {
 	return (
@@ -45,32 +40,7 @@ export default function FileListView() {
 
 				<TableBody>
 					{mockFiles.map((item, index) => (
-						<TableRow key={index} className="group">
-							<Cell>
-								<Checkbox className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-border" />
-							</Cell>
-							{Object.keys(LIST_HEADER_COLS).map((key, _) => (
-								<Cell key={key}>
-									<div className="flex gap-2 items-center">
-										{key === "name" &&
-											(item.type === "folder" ? (
-												<Folder size={15}></Folder>
-											) : (
-												<FileText size={15}></FileText>
-											))}
-										<span>
-											{item[key as keyof MockFile]}
-										</span>
-									</div>
-								</Cell>
-							))}
-							<Cell className="flex justify-end">
-								<EllipsisVertical
-									size={20}
-									className="text-transparent group-hover:text-muted-foreground"
-								/>
-							</Cell>
-						</TableRow>
+						<FileListRow key={index} item={item}></FileListRow>
 					))}
 				</TableBody>
 			</Table>
