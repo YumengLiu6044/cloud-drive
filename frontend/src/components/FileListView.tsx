@@ -1,14 +1,17 @@
 import { Table, TableBody, TableHead, TableHeader, TableRow } from "./ui/table";
-import { LIST_HEADER_COLS, mockFiles } from "@/constants";
+import { LIST_HEADER_COLS } from "@/constants";
 import { ArrowUp } from "lucide-react";
 import FileListRow from "./FileListRow";
 import type { FileListViewProps } from "@/type";
+import { useFileStore } from "@/context/fileStore";
 
 export default function FileListView({
 	selectedFiles,
 	fileCursorIndex,
 	handleRowClick
 }: FileListViewProps) {
+	const {files} = useFileStore()
+
 	return (
 		<div className="h-[80vh] w-[90vw] md:w-auto overflow-auto">
 			<Table className="relative">
@@ -36,7 +39,7 @@ export default function FileListView({
 				</TableHeader>
 
 				<TableBody>
-					{mockFiles.map((item, index) => (
+					{files.map((item, index) => (
 						<FileListRow
 							key={index}
 							onClick={() => handleRowClick(index)}

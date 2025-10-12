@@ -1,5 +1,5 @@
 import { LIST_HEADER_COLS } from "@/constants";
-import type { CustomNode, FileListRowProps, MockFile } from "@/type";
+import type { CustomNode, FileListRowProps, File } from "@/type";
 import { Folder, FileText, EllipsisVertical } from "lucide-react";
 import { TableCell, TableRow } from "./ui/table";
 
@@ -30,7 +30,7 @@ export default function FileListRow({
 							) : (
 								<FileText size={15}></FileText>
 							))}
-						<span>{item[key as keyof MockFile]}</span>
+						<span>{item[key as keyof File]}</span>
 					</div>
 				</Cell>
 			))}

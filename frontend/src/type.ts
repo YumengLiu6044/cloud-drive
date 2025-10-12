@@ -20,7 +20,7 @@ export interface CustomNode {
 	children?: React.ReactNode;
 }
 
-export type MockFile = {
+export type File = {
 	id: number;
 	name: string;
 	type: string;
@@ -31,16 +31,16 @@ export type MockFile = {
 };
 
 export interface FileListRowProps {
-	item: MockFile;
+	item: File;
 	isSelected: boolean;
 	isActive: boolean;
-	onClick: () => void
+	onClick: () => void;
 }
 
 export interface FileListViewProps {
 	selectedFiles: Set<number>;
 	fileCursorIndex: number;
-	handleRowClick: (_: number) => void
+	handleRowClick: (_: number) => void;
 }
 
 export type KeyCombo = {
@@ -49,4 +49,9 @@ export type KeyCombo = {
 	shift?: boolean;
 	alt?: boolean;
 	meta?: boolean;
+};
+
+export type FileStore = {
+	files: File[];
+	setFiles: (newFiles: File[]) => void
 };

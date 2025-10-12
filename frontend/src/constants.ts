@@ -1,5 +1,5 @@
 import { Clock, Folder, Settings, Trash2 } from "lucide-react";
-import type { MockFile } from "./type";
+import type { File } from "./type";
 
 export const SUB_ROUTES = {
 	login: "/login",
@@ -59,7 +59,7 @@ export const DEVICE_TYPES = {
 	desktop: "desktop",
 } as const;
 
-export const mockFiles: MockFile[] = [
+export const mockFiles: File[] = [
 	{
 		id: 1,
 		name: "Documents",

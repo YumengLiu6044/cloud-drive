@@ -5,9 +5,9 @@ import FileListView from "./FileListView";
 import FileGridView from "./FileGridView";
 import { ButtonGroup } from "./ui/button-group";
 import { Button } from "./ui/button";
-import { mockFiles } from "@/constants";
 import useKeyCombo from "@/hooks/useKeyCombo";
 import useKeyDown from "@/hooks/useKeyDown";
+import { useFileStore } from "@/context/fileStore";
 
 export default function FileViewer() {
 	const [selectedTabValue, setSelectedTabValue] = useState("list");
@@ -16,6 +16,8 @@ export default function FileViewer() {
 		setSelectedTabValue(value);
 	}, []);
 
+	// File state variables
+	const {files} = useFileStore()
 	const [selectedFiles, setSelectedFiles] = useState<Set<number>>(new Set());
 	const [fileCursorIndex, setFileCursorIndex] = useState<number>(-1);
 
@@ -37,13 +39,13 @@ export default function FileViewer() {
 		setSelectedFiles(new Set());
 		setFileCursorIndex(-1);
 	};
-	const handleSelectedAll = () => {
-		if (selectedFiles.size === mockFiles.length) {
+	const handleSelectedAll = useCallback(() => {
+		if (selectedFiles.size === files.length) {
 			setSelectedFiles(new Set());
 		} else {
-			setSelectedFiles(new Set(mockFiles.map((_, index) => index)));
+			setSelectedFiles(new Set(files.map((_, index) => index)));
 		}
-	};
+	}, [files, selectedFiles]);
 	useKeyCombo({ key: "a", ctrl: true }, handleSelectedAll);
 	useKeyCombo({ key: "a", meta: true }, handleSelectedAll);
 
@@ -53,7 +55,7 @@ export default function FileViewer() {
 		if (shiftDownIndex === -1) {
 			setFileCursorIndex((prev) => {
 				if (prev === -1) return prev
-				const newIndex = Math.min(mockFiles.length - 1, prev + 1);
+				const newIndex = Math.min(files.length - 1, prev + 1);
 				setSelectedFiles(new Set<number>().add(newIndex));
 				return newIndex;
 			});
@@ -63,7 +65,7 @@ export default function FileViewer() {
 			setFileCursorIndex((prev) => {
 				if (prev === -1) return prev
 				const newIndex = prev + 1;
-				if (newIndex >= mockFiles.length) return prev;
+				if (newIndex >= files.length) return prev;
 				if (newIndex > shiftDownIndex) {
 					setSelectedFiles((prev) =>
 						new Set<number>(prev).add(newIndex)
@@ -78,7 +80,7 @@ export default function FileViewer() {
 				return newIndex;
 			});
 		}
-	}, [shiftDownIndex]);
+	}, [shiftDownIndex, files]);
 	useKeyDown("ArrowDown", handleArrowDown, () => {});
 
 	// Arrow up handling
