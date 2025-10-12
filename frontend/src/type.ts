@@ -1,3 +1,5 @@
+import type { Dispatch } from "react";
+
 export type AuthStore = {
 	token: string | null;
 	login: (_: string | null) => void;
@@ -21,7 +23,7 @@ export interface CustomNode {
 }
 
 export type MockFile = {
-	id: string;
+	id: number;
 	name: string;
 	type: string;
 	size: string | null;
@@ -31,6 +33,23 @@ export type MockFile = {
 };
 
 export interface FileListRowProps {
-  key: number | string,
-  item: MockFile
+	item: MockFile;
+	isSelected: boolean;
+	isActive: boolean;
+	onClick: () => void
 }
+
+export interface FileListViewProps {
+	selectedFiles: Set<number>;
+	setSelectedFiles: Dispatch<React.SetStateAction<Set<number>>>;
+	fileCursorIndex: number;
+	setFileCursorIndex: (_: number) => void;
+}
+
+export type KeyCombo = {
+	key: string;
+	ctrl?: boolean;
+	shift?: boolean;
+	alt?: boolean;
+	meta?: boolean;
+};

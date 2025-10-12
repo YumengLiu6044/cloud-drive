@@ -1,23 +1,29 @@
-import {
-	Table,
-	TableBody,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "./ui/table";
-import { Checkbox } from "./ui/checkbox";
+import { Table, TableBody, TableHead, TableHeader, TableRow } from "./ui/table";
 import { LIST_HEADER_COLS, mockFiles } from "@/constants";
 import { ArrowUp } from "lucide-react";
 import FileListRow from "./FileListRow";
+import type { FileListViewProps } from "@/type";
 
-export default function FileListView() {
+export default function FileListView({
+	selectedFiles,
+	setSelectedFiles,
+	fileCursorIndex,
+	setFileCursorIndex,
+}: FileListViewProps) {
+	const handleRowClick = (index: number) => {
+		// Move the cursor
+		setFileCursorIndex(index);
+		const newSet = new Set<number>().add(index);
+		setSelectedFiles(newSet)
+	};
+
 	return (
 		<div className="h-[80vh] w-[90vw] md:w-auto overflow-auto">
 			<Table className="relative">
 				<TableHeader>
 					<TableRow className="sticky top-0 [&>th]:py-3">
 						<TableHead>
-							<Checkbox className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-border" />
+							{/* <Checkbox className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-border" /> */}
 						</TableHead>
 
 						{Object.entries(LIST_HEADER_COLS).map(
@@ -39,7 +45,13 @@ export default function FileListView() {
 
 				<TableBody>
 					{mockFiles.map((item, index) => (
-						<FileListRow key={index} item={item}></FileListRow>
+						<FileListRow
+							key={index}
+							onClick={() => handleRowClick(index)}
+							item={item}
+							isSelected={selectedFiles.has(index)}
+							isActive={index === fileCursorIndex}
+						></FileListRow>
 					))}
 				</TableBody>
 			</Table>
