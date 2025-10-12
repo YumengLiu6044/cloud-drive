@@ -3,7 +3,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from core.database import mongo
 from routers.auth import auth_router
 from contextlib import asynccontextmanager
-
 from routers.user import user_router
 
 

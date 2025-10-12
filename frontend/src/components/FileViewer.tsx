@@ -10,6 +10,7 @@ import useKeyDown from "@/hooks/useKeyDown";
 import { useFileStore } from "@/context/fileStore";
 
 export default function FileViewer() {
+	// Tab management
 	const [selectedTabValue, setSelectedTabValue] = useState("list");
 	const handleToggleValueChange = useCallback((value: string) => {
 		if (!value) return;
@@ -40,9 +41,12 @@ export default function FileViewer() {
 		setFileCursorIndex(-1);
 	};
 	const handleSelectedAll = useCallback(() => {
+		// Clear selections
 		if (selectedFiles.size === files.length) {
 			setSelectedFiles(new Set());
-		} else {
+		} 
+		// Selected all
+		else {
 			setSelectedFiles(new Set(files.map((_, index) => index)));
 		}
 	}, [files, selectedFiles]);
@@ -171,7 +175,7 @@ export default function FileViewer() {
 						<></>
 					)}
 
-					<ToggleGroup
+					{/* <ToggleGroup
 						variant="outline"
 						type="single"
 						defaultValue="list"
@@ -190,7 +194,7 @@ export default function FileViewer() {
 						>
 							<Layout></Layout>
 						</ToggleGroupItem>
-					</ToggleGroup>
+					</ToggleGroup> */}
 				</div>
 			</div>
 

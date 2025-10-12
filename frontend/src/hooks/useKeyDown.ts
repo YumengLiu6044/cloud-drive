@@ -13,7 +13,7 @@ export default function useKeyDown(
 		};
 		const handleKeyUp = (e: KeyboardEvent) => {
 			if (e.key === listenKey) {
-				keyupCallback?.();
+				keyupCallback();
 			}
 		};
 

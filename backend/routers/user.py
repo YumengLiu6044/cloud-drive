@@ -21,8 +21,8 @@ async def read_users_me(param: Annotated[str, Depends(security_manager.get_curre
 
 @user_router.post("/change-username")
 async def change_username(
-        param: UserChangeNameRequest,
-        current_user: Annotated[str, Depends(security_manager.get_current_user)]
+    param: UserChangeNameRequest,
+    current_user: Annotated[str, Depends(security_manager.get_current_user)]
 ):
     user_email = current_user
     update_result = await mongo.users.update_one(
