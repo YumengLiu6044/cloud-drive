@@ -17,9 +17,7 @@ export default function FileListView({
 			<Table className="relative">
 				<TableHeader>
 					<TableRow className="sticky top-0 [&>th]:py-3">
-						<TableHead>
-							{/* <Checkbox className="data-[state=checked]:bg-blue-500 data-[state=checked]:border-border" /> */}
-						</TableHead>
+						<TableHead/>
 
 						{Object.entries(LIST_HEADER_COLS).map(
 							([key, value]) => (
@@ -44,8 +42,8 @@ export default function FileListView({
 							key={index}
 							onClick={() => handleRowClick(index)}
 							item={item}
-							isSelected={selectedFiles.has(index)}
-							isActive={index === fileCursorIndex}
+							isSelected={index === fileCursorIndex}
+							isActive={selectedFiles.has(index)}
 						></FileListRow>
 					))}
 				</TableBody>

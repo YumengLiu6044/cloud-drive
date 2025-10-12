@@ -2,6 +2,7 @@ import { LIST_HEADER_COLS } from "@/constants";
 import type { CustomNode, FileListRowProps, File } from "@/type";
 import { Folder, FileText, EllipsisVertical } from "lucide-react";
 import { TableCell, TableRow } from "./ui/table";
+import { useEffect, useRef } from "react";
 
 const Cell = ({ children, className = "" }: CustomNode) => (
 	<TableCell className={`py-5 ${className}`}>{children}</TableCell>
@@ -13,10 +14,24 @@ export default function FileListRow({
 	isSelected,
 	onClick,
 }: FileListRowProps) {
+	const rowRef = useRef<HTMLTableRowElement>(null);
+	useEffect(() => {
+		const currentNode = rowRef.current;
+		if (!currentNode) return;
+
+		if (isSelected) {
+			currentNode.scrollIntoView({
+				behavior: "smooth",
+				block: "center"
+			});
+		}
+	}, [isSelected]);
+
 	return (
 		<TableRow
-			className={`${isSelected ? "bg-blue-100 hover:bg-blue-100" : ""} ${
-				isActive ? "outline outline-blue-500" : ""
+			ref={rowRef}
+			className={`${isActive ? "bg-blue-100 hover:bg-blue-100" : ""} ${
+				isSelected ? "outline outline-blue-500" : ""
 			} group`}
 			onClick={onClick}
 		>
