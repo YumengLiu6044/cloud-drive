@@ -17,7 +17,7 @@ export default function FileViewer() {
 	}, []);
 
 	// File state variables
-	const {files} = useFileStore()
+	const { files } = useFileStore();
 	const [selectedFiles, setSelectedFiles] = useState<Set<number>>(new Set());
 	const [fileCursorIndex, setFileCursorIndex] = useState<number>(-1);
 
@@ -54,7 +54,7 @@ export default function FileViewer() {
 		// No shift
 		if (shiftDownIndex === -1) {
 			setFileCursorIndex((prev) => {
-				if (prev === -1) return prev
+				if (prev === -1) return prev;
 				const newIndex = Math.min(files.length - 1, prev + 1);
 				setSelectedFiles(new Set<number>().add(newIndex));
 				return newIndex;
@@ -63,7 +63,7 @@ export default function FileViewer() {
 		// Shifted
 		else {
 			setFileCursorIndex((prev) => {
-				if (prev === -1) return prev
+				if (prev === -1) return prev;
 				const newIndex = prev + 1;
 				if (newIndex >= files.length) return prev;
 				if (newIndex > shiftDownIndex) {
@@ -88,7 +88,7 @@ export default function FileViewer() {
 		// Unshifted
 		if (shiftDownIndex === -1) {
 			setFileCursorIndex((prev) => {
-				if (prev === -1) return prev
+				if (prev === -1) return prev;
 				const newIndex = Math.max(0, prev - 1);
 				setSelectedFiles(new Set<number>().add(newIndex));
 				return newIndex;
@@ -97,7 +97,7 @@ export default function FileViewer() {
 		// Shifted
 		else {
 			setFileCursorIndex((prev) => {
-				if (prev === -1) return prev
+				if (prev === -1) return prev;
 				const newIndex = prev - 1;
 				if (newIndex < 0) return prev;
 
@@ -129,24 +129,25 @@ export default function FileViewer() {
 				setSelectedFiles(newSet);
 			} else {
 				if (clickedIndex === shiftDownIndex) return;
-				setSelectedFiles((_) => {
-					const newSet = new Set<number>();
-					for (
-						let i = Math.min(shiftDownIndex, clickedIndex);
-						i <= Math.max(shiftDownIndex, clickedIndex);
-						i++
-					) {
-						newSet.add(i);
-					}
-					return newSet;
-				});
+				const newSet = new Set<number>();
+				for (
+					let i = Math.min(shiftDownIndex, clickedIndex);
+					i <= Math.max(shiftDownIndex, clickedIndex);
+					i++
+				) {
+					newSet.add(i);
+				}
+				setSelectedFiles(newSet);
 			}
 		},
 		[shiftDownIndex]
 	);
 
 	return (
-		<div className="w-full flex flex-col gap-4" onMouseDown={(e) => e.preventDefault()}>
+		<div
+			className="w-full flex flex-col gap-4"
+			onMouseDown={(e) => e.preventDefault()}
+		>
 			<div className="w-full h-fit px-5 md:px-10 py-[10px] bg-card flex items-center justify-between border-b">
 				<h2>My Drive</h2>
 				<div className="flex items-center gap-5">

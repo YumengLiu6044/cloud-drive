@@ -22,7 +22,7 @@ export default function FileListRow({
 		if (isSelected) {
 			currentNode.scrollIntoView({
 				behavior: "smooth",
-				block: "center"
+				block: "nearest"
 			});
 		}
 	}, [isSelected]);
