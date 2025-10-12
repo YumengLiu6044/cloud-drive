@@ -1,5 +1,3 @@
-import type { Dispatch } from "react";
-
 export type AuthStore = {
 	token: string | null;
 	login: (_: string | null) => void;
@@ -41,9 +39,8 @@ export interface FileListRowProps {
 
 export interface FileListViewProps {
 	selectedFiles: Set<number>;
-	setSelectedFiles: Dispatch<React.SetStateAction<Set<number>>>;
 	fileCursorIndex: number;
-	setFileCursorIndex: (_: number) => void;
+	handleRowClick: (_: number) => void
 }
 
 export type KeyCombo = {

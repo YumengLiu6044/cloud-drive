@@ -6,17 +6,9 @@ import type { FileListViewProps } from "@/type";
 
 export default function FileListView({
 	selectedFiles,
-	setSelectedFiles,
 	fileCursorIndex,
-	setFileCursorIndex,
+	handleRowClick
 }: FileListViewProps) {
-	const handleRowClick = (index: number) => {
-		// Move the cursor
-		setFileCursorIndex(index);
-		const newSet = new Set<number>().add(index);
-		setSelectedFiles(newSet)
-	};
-
 	return (
 		<div className="h-[80vh] w-[90vw] md:w-auto overflow-auto">
 			<Table className="relative">

@@ -19,7 +19,7 @@ export default function FileViewer() {
 	const [selectedFiles, setSelectedFiles] = useState<Set<number>>(new Set());
 	const [fileCursorIndex, setFileCursorIndex] = useState<number>(-1);
 
-	// --------------- Keyboard event interception -------------------
+	// ----------------- Keyboard event interception ---------------------
 	const [shiftDownIndex, setShiftDownIndex] = useState(-1);
 	const handleShiftDown = useCallback(() => {
 		if (fileCursorIndex !== -1) {
@@ -52,6 +52,7 @@ export default function FileViewer() {
 		// No shift
 		if (shiftDownIndex === -1) {
 			setFileCursorIndex((prev) => {
+				if (prev === -1) return prev
 				const newIndex = Math.min(mockFiles.length - 1, prev + 1);
 				setSelectedFiles(new Set<number>().add(newIndex));
 				return newIndex;
@@ -60,7 +61,9 @@ export default function FileViewer() {
 		// Shifted
 		else {
 			setFileCursorIndex((prev) => {
-				const newIndex = Math.min(mockFiles.length - 1, prev + 1);
+				if (prev === -1) return prev
+				const newIndex = prev + 1;
+				if (newIndex >= mockFiles.length) return prev;
 				if (newIndex > shiftDownIndex) {
 					setSelectedFiles((prev) =>
 						new Set<number>(prev).add(newIndex)
@@ -83,6 +86,7 @@ export default function FileViewer() {
 		// Unshifted
 		if (shiftDownIndex === -1) {
 			setFileCursorIndex((prev) => {
+				if (prev === -1) return prev
 				const newIndex = Math.max(0, prev - 1);
 				setSelectedFiles(new Set<number>().add(newIndex));
 				return newIndex;
@@ -91,7 +95,10 @@ export default function FileViewer() {
 		// Shifted
 		else {
 			setFileCursorIndex((prev) => {
-				const newIndex = Math.max(0, prev - 1);
+				if (prev === -1) return prev
+				const newIndex = prev - 1;
+				if (newIndex < 0) return prev;
+
 				if (newIndex >= shiftDownIndex) {
 					setSelectedFiles((prevFiles) => {
 						const newSet = new Set(prevFiles);
@@ -109,8 +116,35 @@ export default function FileViewer() {
 	}, [shiftDownIndex]);
 	useKeyDown("ArrowUp", handleArrowUp, () => {});
 
+	// Handle row click
+	const handleRowClick = useCallback(
+		(clickedIndex: number) => {
+			// Move the cursor
+			setFileCursorIndex(clickedIndex);
+
+			if (shiftDownIndex === -1) {
+				const newSet = new Set<number>().add(clickedIndex);
+				setSelectedFiles(newSet);
+			} else {
+				if (clickedIndex === shiftDownIndex) return;
+				setSelectedFiles((_) => {
+					const newSet = new Set<number>();
+					for (
+						let i = Math.min(shiftDownIndex, clickedIndex);
+						i <= Math.max(shiftDownIndex, clickedIndex);
+						i++
+					) {
+						newSet.add(i);
+					}
+					return newSet;
+				});
+			}
+		},
+		[shiftDownIndex]
+	);
+
 	return (
-		<div className="w-full flex flex-col gap-4">
+		<div className="w-full flex flex-col gap-4" onMouseDown={(e) => e.preventDefault()}>
 			<div className="w-full h-fit px-5 md:px-10 py-[10px] bg-card flex items-center justify-between border-b">
 				<h2>My Drive</h2>
 				<div className="flex items-center gap-5">
@@ -161,10 +195,9 @@ export default function FileViewer() {
 				<div className="w-full h-[80vh] bg-card rounded-2xl border-border">
 					{selectedTabValue === "list" ? (
 						<FileListView
+							handleRowClick={handleRowClick}
 							selectedFiles={selectedFiles}
-							setSelectedFiles={setSelectedFiles}
 							fileCursorIndex={fileCursorIndex}
-							setFileCursorIndex={setFileCursorIndex}
 						/>
 					) : (
 						<FileGridView />
