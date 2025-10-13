@@ -1,28 +1,19 @@
-import { Download, Layout, List, Trash2, X } from "lucide-react";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Download, Trash2, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import FileListView from "./FileListView";
-import FileGridView from "./FileGridView";
 import { ButtonGroup } from "./ui/button-group";
 import { Button } from "./ui/button";
-import useKeyCombo from "@/hooks/useKeyCombo";
 import useKeyDown from "@/hooks/useKeyDown";
 import { useFileStore } from "@/context/fileStore";
 
 export default function FileViewer() {
-	// Tab management
-	const [selectedTabValue, setSelectedTabValue] = useState("list");
-	const handleToggleValueChange = useCallback((value: string) => {
-		if (!value) return;
-		setSelectedTabValue(value);
-	}, []);
-
 	// File state variables
 	const { files } = useFileStore();
 	const [selectedFiles, setSelectedFiles] = useState<Set<number>>(new Set());
 	const [fileCursorIndex, setFileCursorIndex] = useState<number>(-1);
 
 	// ----------------- Keyboard event interception ---------------------
+	// Shift status
 	const [shiftDownIndex, setShiftDownIndex] = useState(-1);
 	const handleShiftDown = useCallback(() => {
 		if (fileCursorIndex !== -1) {
@@ -35,23 +26,38 @@ export default function FileViewer() {
 	}, []);
 	useKeyDown("Shift", handleShiftDown, handleShiftUp);
 
+	// Control key status
+	const [isControlPressed, setIsControlPressed] = useState(false);
+	useKeyDown(
+		"Control",
+		() => setIsControlPressed(true),
+		() => setIsControlPressed(false)
+	);
+	const [isMetaPressed, setIsMetaPressed] = useState(false);
+	useKeyDown(
+		"Meta",
+		() => setIsMetaPressed(true),
+		() => setIsMetaPressed(false)
+	);
+
 	// All selection / removal
 	const handleRemoveAllSelected = () => {
 		setSelectedFiles(new Set());
 		setFileCursorIndex(-1);
 	};
 	const handleSelectedAll = useCallback(() => {
+		if (!isControlPressed && !isMetaPressed) return;
+
 		// Clear selections
 		if (selectedFiles.size === files.length) {
 			setSelectedFiles(new Set());
-		} 
+		}
 		// Selected all
 		else {
 			setSelectedFiles(new Set(files.map((_, index) => index)));
 		}
-	}, [files, selectedFiles]);
-	useKeyCombo({ key: "a", ctrl: true }, handleSelectedAll);
-	useKeyCombo({ key: "a", meta: true }, handleSelectedAll);
+	}, [files, selectedFiles, isControlPressed, isMetaPressed]);
+	useKeyDown("a", handleSelectedAll, () => {});
 
 	// Arrow down handling
 	const handleArrowDown = useCallback(() => {
@@ -127,11 +133,18 @@ export default function FileViewer() {
 		(clickedIndex: number) => {
 			// Move the cursor
 			setFileCursorIndex(clickedIndex);
+			if (isControlPressed || isMetaPressed) {
+				setSelectedFiles((prev) => {
+					const newSet = new Set(prev);
 
-			if (shiftDownIndex === -1) {
-				const newSet = new Set<number>().add(clickedIndex);
-				setSelectedFiles(newSet);
-			} else {
+					if (prev.has(clickedIndex)) {
+						newSet.delete(clickedIndex);
+					} else {
+						newSet.add(clickedIndex);
+					}
+					return newSet;
+				});
+			} else if (shiftDownIndex !== -1) {
 				if (clickedIndex === shiftDownIndex) return;
 				const newSet = new Set<number>();
 				for (
@@ -142,9 +155,12 @@ export default function FileViewer() {
 					newSet.add(i);
 				}
 				setSelectedFiles(newSet);
+			} else {
+				const newSet = new Set<number>().add(clickedIndex);
+				setSelectedFiles(newSet);
 			}
 		},
-		[shiftDownIndex]
+		[shiftDownIndex, isControlPressed, isMetaPressed]
 	);
 
 	return (
@@ -174,41 +190,16 @@ export default function FileViewer() {
 					) : (
 						<></>
 					)}
-
-					{/* <ToggleGroup
-						variant="outline"
-						type="single"
-						defaultValue="list"
-						value={selectedTabValue}
-						onValueChange={handleToggleValueChange}
-					>
-						<ToggleGroupItem
-							value="list"
-							aria-label="Toggle list view"
-						>
-							<List></List>
-						</ToggleGroupItem>
-						<ToggleGroupItem
-							value="grid"
-							aria-label="Toggle grid view"
-						>
-							<Layout></Layout>
-						</ToggleGroupItem>
-					</ToggleGroup> */}
 				</div>
 			</div>
 
 			<div className="w-full px-5 md:px-10">
 				<div className="w-full h-[80vh] bg-card rounded-2xl border-border">
-					{selectedTabValue === "list" ? (
-						<FileListView
-							handleRowClick={handleRowClick}
-							selectedFiles={selectedFiles}
-							fileCursorIndex={fileCursorIndex}
-						/>
-					) : (
-						<FileGridView />
-					)}
+					<FileListView
+						handleRowClick={handleRowClick}
+						selectedFiles={selectedFiles}
+						fileCursorIndex={fileCursorIndex}
+					/>
 				</div>
 			</div>
 		</div>

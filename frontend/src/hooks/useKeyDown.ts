@@ -7,11 +7,14 @@ export default function useKeyDown(
 ) {
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
+			e.preventDefault();
 			if (e.key === listenKey) {
 				callback();
 			}
 		};
 		const handleKeyUp = (e: KeyboardEvent) => {
+			e.preventDefault();
+
 			if (e.key === listenKey) {
 				keyupCallback();
 			}
