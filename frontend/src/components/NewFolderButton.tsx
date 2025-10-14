@@ -6,7 +6,6 @@ import { useCallback, useMemo, useState } from "react";
 import type { NewFolderButtonProps } from "@/type";
 import {
 	Dialog,
-	DialogClose,
 	DialogContent,
 	DialogDescription,
 	DialogFooter,
@@ -24,8 +23,8 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 	const handleMouseEnter = useCallback(() => {
 		controls.set({ rotate: 0 });
 		controls.start({
-			rotate: 180,
-			transition: { duration: 0.8 },
+			rotate: 90,
+			transition: { duration: 0.5 },
 		});
 	}, []);
 
@@ -40,7 +39,9 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 	const handleDialogOpenChange = useCallback(
 		(newState: boolean) => {
 			if (!isLoading) {
-				returnToMain();
+				if (newState) {
+          returnToMain();
+        }
 				setIsDialogOpen(newState);
 			}
 		},
@@ -118,7 +119,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 				</DialogHeader>
 				{/* Main Menu */}
 				{!isCreateNewFolder && !isUploadNewFodler && (
-					<div className="w-full flex items-center gap-5 [&>button]:bg-card">
+					<div className="w-full flex flex-col md:flex-row items-center gap-5 [&>button]:bg-card">
 						<button
 							className="group hover:bg-primary h-full w-full p-5 rounded-xl border border-border flex flex-col gap-1 justify-center items-center transition-all"
 							aria-label="New folder"
@@ -175,7 +176,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 				)}
 				{isUploadNewFodler && (
 					<button
-						className=" h-full w-full p-5 rounded-xl flex flex-col gap-1 justify-center items-center transition-all border-2 border-dashed border-primary"
+						className="h-full w-full p-5 rounded-xl flex flex-col gap-1 justify-center items-center transition-all border-2 border-dashed border-primary bg-card"
 						aria-label="Upload files"
 						onClick={() => setIsUploadNewFolder(true)}
 					>
@@ -186,9 +187,9 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 							></Upload>
 						</div>
 						<div className="flex flex-col items-center">
-							<p className="text-xl font-medium">Upload Files</p>
+							<p className="text-xl">Click to upload or drag and drop</p>
 							<p className="text-sm text-muted-foreground text-cente">
-								Upload existing files
+								Select one or more files
 							</p>
 						</div>
 					</button>
@@ -198,11 +199,12 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 					<DialogFooter>
 						<div className="w-full flex justify-between">
 							<Button variant="outline" onClick={returnToMain}>
-								Cancel
+								Back
 							</Button>
 
 							<Button
 								type="submit"
+                className="px-5"
 								disabled={isLoading}
 								onClick={handleSubmit}
 							>
