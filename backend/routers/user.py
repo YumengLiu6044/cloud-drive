@@ -14,10 +14,9 @@ async def read_users_me(param: Annotated[str, Depends(security_manager.get_curre
         raise HTTPException(status_code=404, detail="User not found")
 
     user_obj = UserModel(**user_record)
-    return {
-        "email": user_obj.email,
-        "name": user_obj.username,
-    }
+    returned_user = user_obj.__dict__
+    returned_user.pop("password")
+    return returned_user
 
 @user_router.post("/change-username")
 async def change_username(
