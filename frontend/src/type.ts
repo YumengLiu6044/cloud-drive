@@ -55,3 +55,7 @@ export type FileStore = {
 	files: File[];
 	setFiles: (newFiles: File[]) => void
 };
+
+export interface NewFolderButtonProps {
+	isCollapsed: boolean
+}

@@ -3,31 +3,18 @@ import { Separator } from "./ui/separator";
 import { useSidebarStore } from "@/context/sidebarStore";
 import { SIDEBAR_ITEMS } from "@/constants";
 import { Button } from "./ui/button";
-import { HardDrive, Plus } from "lucide-react";
+import { HardDrive } from "lucide-react";
 import { Progress } from "./ui/progress";
 import { useLocation, useNavigate } from "react-router-dom";
-import { motion, useAnimation } from "motion/react";
+import { motion } from "motion/react";
 import CollapsibleText from "./CollapsibleText";
-import { useCallback } from "react";
+import NewFolderButton from "./NewFolderButton";
 
 export default function Sidebar() {
 	const isCollapsed = useSidebarStore((state) => state.isCollapsed);
 
 	const location = useLocation();
 	const navigator = useNavigate();
-
-	const controls = useAnimation();
-	const handleMouseEnter = useCallback(() => {
-		controls.set({ rotate: 0 });
-		controls.start({
-			rotate: 180,
-			transition: { duration: 0.8 },
-		});
-	}, []);
-
-	const handleMouseLeave = useCallback(() => {
-		controls.set({ rotate: 0 });
-	}, []);
 
 	return (
 		<motion.div
@@ -51,28 +38,7 @@ export default function Sidebar() {
 			</div>
 
 			<div className="py-2 px-4">
-				<Button
-					variant="outline"
-					className={`flex gap-0 justify-start w-full hover:bg-blue-500 hover:text-background rounded-full hover:shadow-xl ${
-						isCollapsed && "justify-center"
-					}`}
-					aria-label="New Folder"
-					onMouseEnter={handleMouseEnter}
-					onMouseLeave={handleMouseLeave}
-				>
-					<motion.div animate={controls}>
-						<Plus className="w-5 h-5" />
-					</motion.div>
-
-					<CollapsibleText
-						isCollapsed={isCollapsed}
-						animate={{
-							paddingLeft: isCollapsed ? 0 : "1.25rem",
-						}}
-					>
-						New
-					</CollapsibleText>
-				</Button>
+				<NewFolderButton isCollapsed={isCollapsed}></NewFolderButton>
 			</div>
 
 			<div className="h-full w-full flex flex-col gap-2 py-2 px-4">
