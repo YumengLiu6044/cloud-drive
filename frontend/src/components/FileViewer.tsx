@@ -1,4 +1,4 @@
-import { Download, Trash2, X } from "lucide-react";
+import { Copy, Download, Trash2, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import FileListView from "./FileListView";
 import { ButtonGroup } from "./ui/button-group";
@@ -133,6 +133,8 @@ export default function FileViewer() {
 		(clickedIndex: number) => {
 			// Move the cursor
 			setFileCursorIndex(clickedIndex);
+
+			// Handle control / meta + click
 			if (isControlPressed || isMetaPressed) {
 				setSelectedFiles((prev) => {
 					const newSet = new Set(prev);
@@ -144,7 +146,9 @@ export default function FileViewer() {
 					}
 					return newSet;
 				});
-			} else if (shiftDownIndex !== -1) {
+			} 
+			// Handle shift + click
+			else if (shiftDownIndex !== -1) {
 				if (clickedIndex === shiftDownIndex) return;
 				const newSet = new Set<number>();
 				for (
@@ -155,7 +159,9 @@ export default function FileViewer() {
 					newSet.add(i);
 				}
 				setSelectedFiles(newSet);
-			} else {
+			} 
+			// Handle default click
+			else {
 				const newSet = new Set<number>().add(clickedIndex);
 				setSelectedFiles(newSet);
 			}
@@ -168,7 +174,7 @@ export default function FileViewer() {
 			className="w-full flex flex-col gap-4"
 			onMouseDown={(e) => e.preventDefault()}
 		>
-			<div className="w-full h-fit px-5 md:px-10 py-[10px] bg-card flex items-center justify-between border-b">
+			<div className="w-full px-5 md:px-10 py-[10px] bg-card flex items-center justify-between border-b">
 				<h2>My Drive</h2>
 				<div className="flex items-center gap-5">
 					{selectedFiles.size ? (
@@ -180,10 +186,13 @@ export default function FileViewer() {
 								<X></X>
 								{selectedFiles.size} selected
 							</Button>
-							<Button variant="outline">
+							<Button variant="outline" aria-label="Copy files">
+								<Copy></Copy>
+							</Button>
+							<Button variant="outline" aria-label="Download files">
 								<Download></Download>
 							</Button>
-							<Button variant="outline">
+							<Button variant="outline" aria-label="Move to trash">
 								<Trash2></Trash2>
 							</Button>
 						</ButtonGroup>

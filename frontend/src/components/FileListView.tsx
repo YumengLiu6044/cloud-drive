@@ -1,4 +1,4 @@
-import { Table, TableBody, TableHead, TableHeader, TableRow } from "./ui/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 import { LIST_HEADER_COLS } from "@/constants";
 import { ArrowUp } from "lucide-react";
 import FileListRow from "./FileListRow";
@@ -32,12 +32,11 @@ export default function FileListView({
 								</TableHead>
 							)
 						)}
-						<TableHead></TableHead>
 					</TableRow>
 				</TableHeader>
 
 				<TableBody>
-					{files.map((item, index) => (
+					{files.length && files.map((item, index) => (
 						<FileListRow
 							key={index}
 							onClick={() => handleRowClick(index)}
@@ -46,6 +45,9 @@ export default function FileListView({
 							isActive={selectedFiles.has(index)}
 						></FileListRow>
 					))}
+					<TableRow>
+						<TableCell></TableCell>
+					</TableRow>
 				</TableBody>
 			</Table>
 		</div>

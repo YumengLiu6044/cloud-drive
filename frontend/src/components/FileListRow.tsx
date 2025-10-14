@@ -1,6 +1,6 @@
 import { LIST_HEADER_COLS } from "@/constants";
 import type { CustomNode, FileListRowProps, File } from "@/type";
-import { Folder, FileText, EllipsisVertical } from "lucide-react";
+import { Folder, FileText } from "lucide-react";
 import { TableCell, TableRow } from "./ui/table";
 import { useEffect, useRef } from "react";
 
@@ -22,7 +22,7 @@ export default function FileListRow({
 		if (isSelected) {
 			currentNode.scrollIntoView({
 				behavior: "smooth",
-				block: "nearest"
+				block: "nearest",
 			});
 		}
 	}, [isSelected]);
@@ -30,9 +30,12 @@ export default function FileListRow({
 	return (
 		<TableRow
 			ref={rowRef}
-			className={`${isActive ? "bg-blue-100 hover:bg-blue-100" : ""} ${
-				isSelected ? "outline outline-blue-500" : ""
-			} group`}
+			className={`
+				group
+				${isActive ? "bg-blue-100 hover:bg-blue-100" : ""} 
+				${isSelected ? "outline outline-blue-500" : ""} 
+				`}
+				
 			onClick={onClick}
 		>
 			<Cell />
@@ -49,12 +52,6 @@ export default function FileListRow({
 					</div>
 				</Cell>
 			))}
-			<Cell className="flex justify-end">
-				<EllipsisVertical
-					size={20}
-					className="text-transparent group-hover:text-muted-foreground"
-				/>
-			</Cell>
 		</TableRow>
 	);
 }
