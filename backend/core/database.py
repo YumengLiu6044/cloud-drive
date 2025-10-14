@@ -20,5 +20,9 @@ class MongoDBClient:
     def users(self):
         return self.database[COLLECTIONS.USERS]
 
+    @property
+    def files(self):
+        return self.database[COLLECTIONS.FILES]
+
 
 mongo = MongoDBClient()

@@ -16,6 +16,7 @@ DATABASE_NAME = "cloud-drive-data"
 
 class COLLECTIONS(str, Enum):
     USERS = "users"
+    FILES = "files"
 
 # Password Config
 PASSWORD_MIN_LENGTH = 8

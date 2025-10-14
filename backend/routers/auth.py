@@ -12,7 +12,7 @@ from models.auth_models import (
     AuthRegisterModel, AuthForgotPasswordModel,
     AuthResetPasswordModel
 )
-from models.db_models import UserModel
+from models.db_models import UserModel, FileModel
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -37,10 +37,7 @@ async def register_user(param: AuthRegisterModel):
     hashed_password = security_manager.hash_password(param.password)
     inserted = UserModel(**param.model_dump())
     inserted.password = hashed_password
-    try:
-        insertion_result = await mongo.users.insert_one(inserted.__dict__)
-    except DuplicateKeyError:
-        raise HTTPException(status_code=409, detail="User already exists")
+    insertion_result = await create_user(inserted)
 
     if insertion_result.inserted_id:
         token = security_manager.create_access_token(param.email, JwtTokenScope.auth)
@@ -95,3 +92,28 @@ async def reset_password(
         raise HTTPException(status_code=404, detail="User not found")
 
     return {"message": "Password reset successful"}
+
+
+async def create_user(new_user: UserModel):
+    try:
+        insertion_result = await mongo.users.insert_one(new_user.__dict__)
+    except DuplicateKeyError:
+        raise HTTPException(status_code=409, detail="User already exists")
+
+    root_folder = FileModel(
+        owner=new_user.email,
+        parent_id="",
+        file_name="My Drive",
+        is_folder=True
+    )
+    root_insertion = await mongo.files.insert_one(root_folder.__dict__)
+    if root_row_id := root_insertion.inserted_id:
+        await mongo.users.update_one(
+            {"email": new_user.email},
+            {"$set": {"drive_root_id": str(root_row_id)}}
+        )
+
+    else:
+        raise HTTPException(status_code=500, detail="Failed to create root folder")
+
+    return insertion_result
