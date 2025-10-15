@@ -103,7 +103,7 @@ async def create_user(new_user: UserModel):
     root_folder = FileModel(
         owner=new_user.email,
         parent_id="",
-        file_name="My Drive",
+        name="My Drive",
         is_folder=True
     )
     root_insertion = await mongo.files.insert_one(root_folder.__dict__)

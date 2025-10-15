@@ -4,6 +4,8 @@ from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
 from passlib.hash import sha256_crypt
 from jose import jwt, JWTError, ExpiredSignatureError
+from pydantic import EmailStr
+
 from core.constants import JWT_TOKEN_EXPIRATION, JWT_SECRET_KEY, JWT_ALGORITHM, JwtTokenScope
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
@@ -35,7 +37,7 @@ class SecurityManager:
         encoded_jwt = jwt.encode(to_encode, self.jwt_key, algorithm=self.jwt_algorithm)
         return encoded_jwt
 
-    def decode_access_token(self, token: str, require_scope: str):
+    def decode_access_token(self, token: str, require_scope: str) -> EmailStr:
         try:
             payload = jwt.decode(token, self.jwt_key, algorithms=[self.jwt_algorithm])
             user_email = payload.get("sub")
