@@ -36,7 +36,7 @@ export default function FileListView({
 				</TableHeader>
 
 				<TableBody>
-					{files.length && files.map((item, index) => (
+					{files.length > 0 && files.map((item, index) => (
 						<FileListRow
 							key={index}
 							onClick={() => handleRowClick(index)}

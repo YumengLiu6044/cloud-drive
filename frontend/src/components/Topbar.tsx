@@ -23,6 +23,7 @@ export default function Topbar() {
 	);
 
 	const handleLogout = useAuthStore((state) => state.logout);
+	const username = useAuthStore((state) => state.username);
 
 	const { isMobile, type } = useDeviceType();
 
@@ -62,8 +63,8 @@ export default function Topbar() {
 			>
 				<DropdownMenuTrigger className="h-full">
 					<div className="h-full flex items-center gap-2">
-						<div className="h-full aspect-square flex items-center justify-center rounded-full p-3 bg-primary text-background">
-							<span>YL</span>
+						<div className="h-full aspect-square flex items-center justify-center rounded-full p-2.5 bg-primary text-background">
+							<span className="uppercase">{username?.substring(0, 2)}</span>
 						</div>
 						<motion.div animate={controls}>
 							<ChevronDown className="w-3 h-3"></ChevronDown>

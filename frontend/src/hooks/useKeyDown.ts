@@ -7,6 +7,13 @@ export default function useKeyDown(
 ) {
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
+			const tag = (e.target as HTMLElement).tagName;
+			const isEditable =
+				tag === "INPUT" ||
+				tag === "TEXTAREA" ||
+				(e.target as HTMLElement).isContentEditable;
+
+			if (isEditable) return; // skip when typing in inputs
 			e.preventDefault();
 			if (e.key === listenKey) {
 				callback();

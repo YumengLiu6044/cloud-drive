@@ -47,7 +47,7 @@ export default function Register() {
 					login(response.data.access_token);
 					setIsVisible(false);
 					setTimeout(() => {
-						navigator(SUB_ROUTES.drive.base);
+						navigator(SUB_ROUTES.loginCallback);
 					}, 500);
 				})
 				.finally(() => setIsLoading(false));

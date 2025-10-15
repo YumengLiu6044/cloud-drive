@@ -1,5 +1,4 @@
 import {
-	AUTH_API_BASE,
 	BACKEND_URL,
 	IGNORE_401_ROUTES,
 	SUB_ROUTES,
@@ -33,7 +32,7 @@ axiosClient.interceptors.response.use(
 		if (
 			status === 401 &&
 			IGNORE_401_ROUTES.every(
-				(route) => !requestUrl.includes(AUTH_API_BASE + route)
+				(route) => !requestUrl.includes(route)
 			)
 		) {
 			const { logout } = useAuthStore.getState();

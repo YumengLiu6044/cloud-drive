@@ -14,6 +14,7 @@ import { SUB_ROUTES } from "./constants";
 import Register from "./routes/Register";
 import AppContainer from "./components/Container";
 import Recent from "./routes/Recent";
+import LoginCallback from "./routes/LoginCallback";
 
 export default function App() {
 	return (
@@ -28,6 +29,7 @@ export default function App() {
 					></Route>
 					<Route path={SUB_ROUTES.login} element={<Login />} />
 					<Route path={SUB_ROUTES.register} element={<Register />} />
+					<Route path={SUB_ROUTES.loginCallback} element={<LoginCallback />} />
 					<Route
 						path={SUB_ROUTES.drive.base}
 						element={<DriveLayout />}

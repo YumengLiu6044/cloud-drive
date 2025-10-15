@@ -2,6 +2,9 @@ export type AuthStore = {
 	token: string | null;
 	login: (_: string | null) => void;
 	logout: () => void;
+
+	username: string | null;
+	setUsername: (_: string) => void;
 };
 
 export type JWTPayload = {
@@ -20,18 +23,18 @@ export interface CustomNode {
 	children?: React.ReactNode;
 }
 
-export type File = {
-	id: number;
+export type Resource = {
+	_id: string;
 	name: string;
-	type: string;
+	is_folder: string;
 	size: string | null;
-	modified: string;
+	last_modified: string;
 	owner: string;
-	fileType?: string | null;
+	type: string
 };
 
 export interface FileListRowProps {
-	item: File;
+	item: Resource;
 	isSelected: boolean;
 	isActive: boolean;
 	onClick: () => void;
@@ -51,11 +54,24 @@ export type KeyCombo = {
 	meta?: boolean;
 };
 
+export type Directory = {
+	id: string;
+	name: string;
+}
+
 export type FileStore = {
-	files: File[];
-	setFiles: (newFiles: File[]) => void
+	files: Resource[];
+	setFiles: (newFiles: Resource[]) => void;
+
+	currentDirectory: Directory | null;
+	setCurrentDirectory: (newDirectory: Directory | null) => void;
+
+	rootDirectory: Directory | null;
+	setRootDirectory: (newDirectory: Directory | null) => void;
+
+	refreshFiles: () => void
 };
 
 export interface NewFolderButtonProps {
-	isCollapsed: boolean
+	isCollapsed: boolean;
 }

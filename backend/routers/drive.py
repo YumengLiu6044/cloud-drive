@@ -1,5 +1,5 @@
+from datetime import datetime
 from typing import Annotated
-
 from bson import ObjectId
 from fastapi import (
     APIRouter,
@@ -11,7 +11,7 @@ from pymongo.errors import DuplicateKeyError
 
 from core.database import mongo
 from core.security import security_manager
-from models.db_models import FileModel
+from models.db_models import DriveModel
 from models.drive_models import CreateFolderRequest, ListContentModel
 
 drive_router = APIRouter(prefix="/drive", tags=["drive"])
@@ -53,11 +53,13 @@ async def create_folder(
     requested_parent = param.parent_id
     await verify_parent_id(requested_parent, current_user)
 
-    new_folder = FileModel(
+    new_folder = DriveModel(
         parent_id=param.parent_id,
         is_folder=True,
         name=param.name,
-        owner=current_user
+        owner=current_user,
+        last_modified=datetime.now(),
+        type="Folder"
     )
     try:
         insertion_result = await mongo.files.insert_one(new_folder.__dict__)

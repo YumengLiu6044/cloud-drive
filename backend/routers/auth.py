@@ -12,7 +12,7 @@ from models.auth_models import (
     AuthRegisterModel, AuthForgotPasswordModel,
     AuthResetPasswordModel
 )
-from models.db_models import UserModel, FileModel
+from models.db_models import UserModel, DriveModel
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -100,7 +100,7 @@ async def create_user(new_user: UserModel):
     except DuplicateKeyError:
         raise HTTPException(status_code=409, detail="User already exists")
 
-    root_folder = FileModel(
+    root_folder = DriveModel(
         owner=new_user.email,
         parent_id="",
         name="My Drive",

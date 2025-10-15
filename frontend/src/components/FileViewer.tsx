@@ -1,5 +1,5 @@
 import { Copy, Download, Trash2, X } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import FileListView from "./FileListView";
 import { ButtonGroup } from "./ui/button-group";
 import { Button } from "./ui/button";
@@ -8,9 +8,16 @@ import { useFileStore } from "@/context/fileStore";
 
 export default function FileViewer() {
 	// File state variables
-	const { files } = useFileStore();
+	const files = useFileStore((state) => state.files);
+	const currentDirectory = useFileStore((state) => state.currentDirectory);
+	const {refreshFiles} = useFileStore.getState()
+
 	const [selectedFiles, setSelectedFiles] = useState<Set<number>>(new Set());
 	const [fileCursorIndex, setFileCursorIndex] = useState<number>(-1);
+
+	useEffect(() => {
+		refreshFiles()
+	}, []);
 
 	// ----------------- Keyboard event interception ---------------------
 	// Shift status
@@ -146,7 +153,7 @@ export default function FileViewer() {
 					}
 					return newSet;
 				});
-			} 
+			}
 			// Handle shift + click
 			else if (shiftDownIndex !== -1) {
 				if (clickedIndex === shiftDownIndex) return;
@@ -159,7 +166,7 @@ export default function FileViewer() {
 					newSet.add(i);
 				}
 				setSelectedFiles(newSet);
-			} 
+			}
 			// Handle default click
 			else {
 				const newSet = new Set<number>().add(clickedIndex);
@@ -189,10 +196,16 @@ export default function FileViewer() {
 							<Button variant="outline" aria-label="Copy files">
 								<Copy></Copy>
 							</Button>
-							<Button variant="outline" aria-label="Download files">
+							<Button
+								variant="outline"
+								aria-label="Download files"
+							>
 								<Download></Download>
 							</Button>
-							<Button variant="outline" aria-label="Move to trash">
+							<Button
+								variant="outline"
+								aria-label="Move to trash"
+							>
 								<Trash2></Trash2>
 							</Button>
 						</ButtonGroup>

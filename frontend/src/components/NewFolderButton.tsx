@@ -16,6 +16,9 @@ import {
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import DOMPurify from "dompurify";
+import { toast } from "sonner";
+import { DriveApi } from "@/api/driveApi";
+import { useFileStore } from "@/context/fileStore";
 
 export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 	// Animation management
@@ -40,13 +43,17 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 		(newState: boolean) => {
 			if (!isLoading) {
 				if (newState) {
-          returnToMain();
-        }
+					returnToMain();
+				}
 				setIsDialogOpen(newState);
 			}
 		},
 		[isLoading]
 	);
+
+	// File states
+	const currentDirectory = useFileStore((state) => state.currentDirectory);
+	const refreshFiles = useFileStore((state) => state.refreshFiles);
 
 	const [newFolderName, setNewFolderName] = useState("");
 	const [isCreateNewFolder, setIsCreateNewFolder] = useState(false);
@@ -57,21 +64,34 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 	}, []);
 
 	const handleSubmit = useCallback(() => {
-		setIsLoading(true);
 		// API call for creating new file
 		const sanitizedName = DOMPurify.sanitize(newFolderName);
+		if (!sanitizedName) {
+			toast.error("The folder name can't be empty");
+			return;
+		}
+		if (!currentDirectory) {
+			toast.error("Unexpected directory error");
+			return;
+		}
 
-		setTimeout(() => {
-			setIsLoading(false);
-			setIsDialogOpen(false);
-		}, 1000);
-	}, [newFolderName]);
+		setIsLoading(true);
+
+		DriveApi.createNewFolder(currentDirectory.id, newFolderName)
+			.then(() => {
+				refreshFiles();
+				setIsDialogOpen(false);
+			})
+			.finally(() => {
+				setIsLoading(false);
+			});
+	}, [newFolderName, currentDirectory, newFolderName]);
 
 	const cardTitle = useMemo(() => {
 		if (isCreateNewFolder) {
 			return {
 				title: "Create New Folder",
-				description: "Create new folder on Cloud Drive",
+				description: `Create new folder under ${currentDirectory?.name}`,
 			};
 		} else if (isUploadNewFodler) {
 			return {
@@ -84,7 +104,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 				description: "Select an action to get started",
 			};
 		}
-	}, [isCreateNewFolder, isUploadNewFodler]);
+	}, [isCreateNewFolder, isUploadNewFodler, currentDirectory]);
 
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
@@ -169,6 +189,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 							id="folder-name"
 							name="folder-name"
 							className="bg-card"
+							type="text"
 							value={newFolderName}
 							onChange={(e) => setNewFolderName(e.target.value)}
 						/>
@@ -176,7 +197,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 				)}
 				{isUploadNewFodler && (
 					<button
-						className="h-full w-full p-5 rounded-xl flex flex-col gap-1 justify-center items-center transition-all border-2 border-dashed border-primary bg-card"
+						className="h-full w-full p-5 rounded-xl flex flex-col gap-1 justify-center items-center border-2 border-dashed border-secondary hover:border-primary transition-colors bg-card"
 						aria-label="Upload files"
 						onClick={() => setIsUploadNewFolder(true)}
 					>
@@ -187,7 +208,9 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 							></Upload>
 						</div>
 						<div className="flex flex-col items-center">
-							<p className="text-xl">Click to upload or drag and drop</p>
+							<p className="text-xl">
+								Click to upload or drag and drop
+							</p>
 							<p className="text-sm text-muted-foreground text-cente">
 								Select one or more files
 							</p>
@@ -204,7 +227,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 
 							<Button
 								type="submit"
-                className="px-5"
+								className="px-5"
 								disabled={isLoading}
 								onClick={handleSubmit}
 							>

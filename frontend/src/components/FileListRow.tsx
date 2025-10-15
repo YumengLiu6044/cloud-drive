@@ -1,5 +1,5 @@
 import { LIST_HEADER_COLS } from "@/constants";
-import type { CustomNode, FileListRowProps, File } from "@/type";
+import type { CustomNode, FileListRowProps, Resource } from "@/type";
 import { Folder, FileText } from "lucide-react";
 import { TableCell, TableRow } from "./ui/table";
 import { useEffect, useRef } from "react";
@@ -35,7 +35,6 @@ export default function FileListRow({
 				${isActive ? "bg-blue-100 hover:bg-blue-100" : ""} 
 				${isSelected ? "outline outline-blue-500" : ""} 
 				`}
-				
 			onClick={onClick}
 		>
 			<Cell />
@@ -43,12 +42,22 @@ export default function FileListRow({
 				<Cell key={key}>
 					<div className="flex gap-2 items-center">
 						{key === "name" &&
-							(item.type === "folder" ? (
+							(item.is_folder ? (
 								<Folder size={15}></Folder>
 							) : (
 								<FileText size={15}></FileText>
 							))}
-						<span>{item[key as keyof File]}</span>
+						<span>
+							{key === "last_modified"
+								? new Date(
+										item.last_modified
+								  ).toLocaleDateString("en-US", {
+										month: "short",
+										day: "numeric",
+										year: "numeric",
+								  })
+								: item[key as keyof Resource]}
+						</span>
 					</div>
 				</Cell>
 			))}
