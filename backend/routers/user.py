@@ -1,9 +1,9 @@
 from typing import Annotated
 
 from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException, UploadFile, Query
+from fastapi import APIRouter, Depends, HTTPException, UploadFile
 from fastapi.responses import FileResponse, StreamingResponse
-from gridfs import AsyncGridOutCursor, NoFile
+from gridfs import NoFile
 
 from core.constants import PROFILE_PICTURES_TEMPLATE, FALLBACK_PROFILE_PICTURE
 from core.database import mongo
