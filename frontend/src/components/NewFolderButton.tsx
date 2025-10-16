@@ -56,7 +56,9 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 	);
 
 	// File states
-	const currentDirectory = useFileStore((state) => state.currentDirectory);
+	const directoryTree = useFileStore((state) => state.directoryTree)
+	const currentDirectory = directoryTree.at(-1)
+	
 	const refreshFiles = useFileStore((state) => state.refreshFiles);
 
 	const [newFolderName, setNewFolderName] = useState("");

@@ -1,6 +1,6 @@
 import { DriveApi } from "@/api/driveApi";
 import { STORAGE_KEYS } from "@/constants";
-import type { FileStore, Resource } from "@/type";
+import type { Directory, FileStore } from "@/type";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -14,12 +14,7 @@ export const useFileStore = create<FileStore>()(
 				});
 			},
 
-			currentDirectory: null,
-			setCurrentDirectory(newDirectory) {
-				set({
-					currentDirectory: newDirectory,
-				});
-			},
+
 
 			rootDirectory: null,
 			setRootDirectory(newDirectory) {
@@ -28,25 +23,40 @@ export const useFileStore = create<FileStore>()(
 				});
 			},
 
+			directoryTree: [],
+			setDirectoryTree: (newDirectories: Directory[]) =>
+				set({directoryTree: newDirectories}),
+
 			refreshFiles() {
-				const { currentDirectory } = get();
+				const { directoryTree } = get();
+				const currentDirectory = directoryTree.at(-1)
 				if (!currentDirectory) return;
 
 				DriveApi.listContent(currentDirectory.id).then((response) => {
-					const files: Resource[] = response.data.result ?? [];
-					console.log(files)
-					set({
-						files: files,
-					});
+					set({files: response.data.result ?? []});
 				});
+			},
+
+			changeDirectory(newDirectory) {
+				const {directoryTree, setDirectoryTree} = get()
+				const directoryIndex = directoryTree.findIndex(item => item.id === newDirectory.id)
+
+				// Going up the directory tree
+				if (directoryIndex !== -1) {
+					setDirectoryTree(directoryTree.slice(0, directoryIndex + 1))
+				} 
+				// Going down in the directory tree
+				else {
+					setDirectoryTree([...directoryTree, newDirectory])
+				}
 			},
 		}),
 		{
 			name: STORAGE_KEYS.fileStore,
 			partialize: (state) => ({
 				files: state.files,
-				currentDirectory: state.currentDirectory,
 				rootDirectory: state.rootDirectory,
+				directoryTree: state.directoryTree
 			}),
 		}
 	)

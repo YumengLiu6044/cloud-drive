@@ -10,7 +10,7 @@ import { toast } from "sonner";
 export default function LoginCallback() {
 	const navigator = useNavigate();
 	const { token, setUsername, setEmail, setProfileImageId } = useAuthStore.getState();
-	const { setCurrentDirectory, setRootDirectory } = useFileStore.getState();
+	const { setDirectoryTree, setRootDirectory } = useFileStore.getState();
 
 	if (!token) return;
 
@@ -22,7 +22,7 @@ export default function LoginCallback() {
 					name: "My Drive",
 					id: body.drive_root_id,
 				};
-				setCurrentDirectory(rootDirectory);
+				setDirectoryTree([rootDirectory]);
 				setRootDirectory(rootDirectory);
 
 				setUsername(body.username);

@@ -1,4 +1,11 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "./ui/table";
 import { LIST_HEADER_COLS } from "@/constants";
 import { ArrowUp } from "lucide-react";
 import FileListRow from "./FileListRow";
@@ -8,16 +15,17 @@ import { useFileStore } from "@/context/fileStore";
 export default function FileListView({
 	selectedFiles,
 	fileCursorIndex,
-	handleRowClick
+	handleRowClick,
+	handleRowDoubleClick,
 }: FileListViewProps) {
-	const {files} = useFileStore()
+	const files = useFileStore((state) => state.files);
 
 	return (
 		<div className="h-[80vh] w-[90vw] md:w-auto overflow-auto">
 			<Table className="relative">
 				<TableHeader>
 					<TableRow className="sticky top-0 [&>th]:py-3">
-						<TableHead/>
+						<TableHead />
 
 						{Object.entries(LIST_HEADER_COLS).map(
 							([key, value]) => (
@@ -36,15 +44,17 @@ export default function FileListView({
 				</TableHeader>
 
 				<TableBody>
-					{files.length > 0 && files.map((item, index) => (
-						<FileListRow
-							key={index}
-							onClick={() => handleRowClick(index)}
-							item={item}
-							isSelected={index === fileCursorIndex}
-							isActive={selectedFiles.has(index)}
-						></FileListRow>
-					))}
+					{files.length > 0 &&
+						files.map((item, index) => (
+							<FileListRow
+								handleRowDoubleClick={handleRowDoubleClick}
+								key={index}
+								onClick={() => handleRowClick(index)}
+								item={item}
+								isSelected={index === fileCursorIndex}
+								isActive={selectedFiles.has(index)}
+							></FileListRow>
+						))}
 					<TableRow>
 						<TableCell></TableCell>
 					</TableRow>

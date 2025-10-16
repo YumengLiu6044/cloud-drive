@@ -2,7 +2,7 @@ import { LIST_HEADER_COLS } from "@/constants";
 import type { CustomNode, FileListRowProps, Resource } from "@/type";
 import { Folder, FileText } from "lucide-react";
 import { TableCell, TableRow } from "./ui/table";
-import { useEffect, useRef } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 const Cell = ({ children, className = "" }: CustomNode) => (
 	<TableCell className={`py-5 ${className}`}>{children}</TableCell>
@@ -13,6 +13,7 @@ export default function FileListRow({
 	isActive,
 	isSelected,
 	onClick,
+	handleRowDoubleClick,
 }: FileListRowProps) {
 	const rowRef = useRef<HTMLTableRowElement>(null);
 	useEffect(() => {
@@ -27,6 +28,10 @@ export default function FileListRow({
 		}
 	}, [isSelected]);
 
+	const onDoubleClick = useCallback(() => {
+		handleRowDoubleClick(item);
+	}, [item]);
+
 	return (
 		<TableRow
 			ref={rowRef}
@@ -36,6 +41,7 @@ export default function FileListRow({
 				${isSelected ? "outline outline-blue-500" : ""} 
 				`}
 			onClick={onClick}
+			onDoubleClick={onDoubleClick}
 		>
 			<Cell />
 			{Object.keys(LIST_HEADER_COLS).map((key, _) => (

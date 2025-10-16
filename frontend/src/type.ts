@@ -44,12 +44,14 @@ export interface FileListRowProps {
 	isSelected: boolean;
 	isActive: boolean;
 	onClick: () => void;
+	handleRowDoubleClick: (_: Resource) => void;
 }
 
 export interface FileListViewProps {
 	selectedFiles: Set<number>;
 	fileCursorIndex: number;
 	handleRowClick: (_: number) => void;
+	handleRowDoubleClick: (_: Resource) => void;
 }
 
 export type KeyCombo = {
@@ -69,13 +71,16 @@ export type FileStore = {
 	files: Resource[];
 	setFiles: (newFiles: Resource[]) => void;
 
-	currentDirectory: Directory | null;
-	setCurrentDirectory: (newDirectory: Directory | null) => void;
-
 	rootDirectory: Directory | null;
 	setRootDirectory: (newDirectory: Directory | null) => void;
 
-	refreshFiles: () => void
+	directoryTree: Directory[],
+	setDirectoryTree: (newDirectories: Directory[]) => void,
+
+	// Util functions
+	refreshFiles: () => void;
+	changeDirectory: (newDirectory: Directory) => void
+
 };
 
 export interface NewFolderButtonProps {
