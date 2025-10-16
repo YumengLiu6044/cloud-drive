@@ -5,19 +5,24 @@ import { ButtonGroup } from "./ui/button-group";
 import { Button } from "./ui/button";
 import useKeyDown from "@/hooks/useKeyDown";
 import { useFileStore } from "@/context/fileStore";
+import { useDeviceType } from "@/hooks/useDeviceType";
+import NewFolderButton from "./NewFolderButton";
 
 export default function FileViewer() {
 	// File state variables
 	const files = useFileStore((state) => state.files);
 	const currentDirectory = useFileStore((state) => state.currentDirectory);
-	const {refreshFiles} = useFileStore.getState()
+	const { refreshFiles } = useFileStore.getState();
 
 	const [selectedFiles, setSelectedFiles] = useState<Set<number>>(new Set());
 	const [fileCursorIndex, setFileCursorIndex] = useState<number>(-1);
 
 	useEffect(() => {
-		refreshFiles()
+		refreshFiles();
 	}, []);
+
+	// Screen size
+	const { isDesktop } = useDeviceType();
 
 	// ----------------- Keyboard event interception ---------------------
 	// Shift status
@@ -178,10 +183,10 @@ export default function FileViewer() {
 
 	return (
 		<div
-			className="w-full flex flex-col gap-4"
+			className="w-full flex flex-col gap-4 main-section"
 			onMouseDown={(e) => e.preventDefault()}
 		>
-			<div className="w-full px-5 md:px-10 py-[10px] bg-card flex items-center justify-between border-b">
+			<div className="w-full flex items-center justify-between">
 				<h2>My Drive</h2>
 				<div className="flex items-center gap-5">
 					{selectedFiles.size ? (
@@ -215,8 +220,13 @@ export default function FileViewer() {
 				</div>
 			</div>
 
-			<div className="w-full px-5 md:px-10">
-				<div className="w-full h-[80vh] bg-card rounded-2xl border-border">
+			<div className="relative w-full h-full">
+				{!isDesktop && (
+					<div className="fixed bottom-5 right-5">
+						<NewFolderButton isCollapsed={true}></NewFolderButton>
+					</div>
+				)}
+				<div className="w-full h-full bg-card rounded-2xl border-border">
 					<FileListView
 						handleRowClick={handleRowClick}
 						selectedFiles={selectedFiles}

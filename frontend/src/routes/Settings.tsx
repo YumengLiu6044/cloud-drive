@@ -73,6 +73,7 @@ export default function Settings() {
 
 	// Profile pic state
 	const fileRef = useRef<HTMLInputElement>(null);
+	const [isUploadingFile, setIsUploadingFile] = useState(false);
 
 	const handleClickUpload = useCallback(() => {
 		const inputNode = fileRef.current;
@@ -85,17 +86,20 @@ export default function Settings() {
 		(e: ChangeEvent<HTMLInputElement>) => {
 			const newFile = e.target.files?.[0];
 			if (newFile) {
-				UserApi.uploadProfilePic(newFile).then((response) => {
-					const newProfileId = response.data.profile_image_id;
-					setProfileImageId(newProfileId);
-				});
+				setIsUploadingFile(true);
+				UserApi.uploadProfilePic(newFile)
+					.then((response) => {
+						const newProfileId = response.data.profile_image_id;
+						setProfileImageId(newProfileId);
+					})
+					.finally(() => setIsUploadingFile(false));
 			}
 		},
 		[]
 	);
 
 	return (
-		<div className="w-full flex flex-col gap-4 p-3 md:p-8 h-[90vh] overflow-y-scroll">
+		<div className="main-section w-full flex flex-col gap-4 overflow-y-scroll">
 			<div className="mb-3">
 				<h1 className="text-2xl font-semibold tracking-tight text-foreground">
 					Settings
@@ -118,7 +122,7 @@ export default function Settings() {
 					</CardHeader>
 					<CardContent className="space-y-3">
 						<div className="w-full flex flex-col items-center justify-center gap-5">
-							<div className="relative w-full max-w-[150px] bg-gradient-to-r from-blue-500 to-purple-300 rounded-full aspect-square flex items-center justify-center p-1">
+							<div className="relative w-full max-w-[150px] bg-theme rounded-full aspect-square flex items-center justify-center p-1">
 								<div className="w-full rounded-full aspect-square overflow-clip border-background border-4 flex items-center justify-center">
 									{profileImageId && (
 										<img
@@ -129,7 +133,7 @@ export default function Settings() {
 										></img>
 									)}
 								</div>
-								<div className="absolute right-0 bottom-0 w-8 rounded-full aspect-square bg-gradient-to-r from-blue-500 to-purple-300 flex items-center justify-center">
+								<div className="absolute right-0 bottom-0 w-8 rounded-full aspect-square bg-theme flex items-center justify-center">
 									<Camera
 										size={20}
 										className="text-background"
@@ -149,8 +153,12 @@ export default function Settings() {
 								type="button"
 								className="w-full lg:w-auto bg-blue-500 hover:bg-blue-400 transition-colors"
 								onClick={handleClickUpload}
+								disabled={isUploadingFile}
 							>
 								Upload Photo
+								{isUploadingFile && (
+									<Loader2 className="animate-spin"></Loader2>
+								)}
 							</Button>
 						</div>
 					</CardContent>

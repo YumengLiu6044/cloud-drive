@@ -19,8 +19,12 @@ import DOMPurify from "dompurify";
 import { toast } from "sonner";
 import { DriveApi } from "@/api/driveApi";
 import { useFileStore } from "@/context/fileStore";
+import { useDeviceType } from "@/hooks/useDeviceType";
 
 export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
+	// Screen size
+	const { isDesktop } = useDeviceType();
+
 	// Animation management
 	const controls = useAnimation();
 	const handleMouseEnter = useCallback(() => {
@@ -108,28 +112,33 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
-			<DialogTrigger
-				className={`border border-border p-2 px-3 flex gap-0 items-center text-sm justify-start w-full hover:bg-blue-500 hover:text-background rounded-full hover:shadow-xl ${
-					isCollapsed && "justify-center"
-				}`}
-				aria-label="New Folder"
-				onMouseEnter={handleMouseEnter}
-				onMouseLeave={handleMouseLeave}
-			>
-				<motion.div animate={controls}>
-					<Plus className="w-5 h-5" />
-				</motion.div>
-
-				<CollapsibleText
-					isCollapsed={isCollapsed}
-					className="font-medium"
-					animate={{
-						paddingLeft: isCollapsed ? 0 : "1.25rem",
-					}}
+			{ isDesktop ?
+				<DialogTrigger
+					className={`border border-border p-2 px-3 flex gap-0 items-center text-sm justify-start w-full hover:bg-blue-500 hover:text-background rounded-full hover:shadow-xl ${
+						isCollapsed && "justify-center"
+					}`}
+					aria-label="New Folder"
+					onMouseEnter={handleMouseEnter}
+					onMouseLeave={handleMouseLeave}
 				>
-					New
-				</CollapsibleText>
-			</DialogTrigger>
+					<motion.div animate={controls}>
+						<Plus className="w-5 h-5" />
+					</motion.div>
+
+					<CollapsibleText
+						isCollapsed={isCollapsed}
+						className="font-medium"
+						animate={{
+							paddingLeft: isCollapsed ? 0 : "1.25rem",
+						}}
+					>
+						New
+					</CollapsibleText>
+				</DialogTrigger> :
+				<DialogTrigger aria-label="New folder" className="bg-blue-500 rounded-full w-15 h-15 aspect-square flex justify-center items-center">
+					<Plus className="w-7 h-7 text-background" />
+				</DialogTrigger>
+			}
 			<DialogContent className="bg-accent">
 				<DialogHeader>
 					<DialogTitle>{cardTitle.title}</DialogTitle>

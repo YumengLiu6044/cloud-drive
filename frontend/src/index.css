@@ -123,3 +123,15 @@
 		@apply bg-background text-foreground;
 	}
 }
+
+@layer components {
+	.bg-theme {
+		@apply bg-gradient-to-r from-blue-500 to-purple-300
+	}
+
+	.main-section {
+		height: calc(100vh - 4rem);
+
+		@apply px-5 md:px-10 py-[10px]
+	}
+}

@@ -13,7 +13,6 @@ import Trash from "./routes/Trash";
 import { SUB_ROUTES } from "./constants";
 import Register from "./routes/Register";
 import AppContainer from "./components/Container";
-import Recent from "./routes/Recent";
 import LoginCallback from "./routes/LoginCallback";
 
 export default function App() {
@@ -21,6 +20,7 @@ export default function App() {
 		<Router>
 			<Routes>
 				<Route path="/" element={<AppContainer />}>
+					{/* Public routes */}
 					<Route
 						index
 						element={
@@ -29,7 +29,20 @@ export default function App() {
 					></Route>
 					<Route path={SUB_ROUTES.login} element={<Login />} />
 					<Route path={SUB_ROUTES.register} element={<Register />} />
-					<Route path={SUB_ROUTES.loginCallback} element={<LoginCallback />} />
+					<Route
+						path={SUB_ROUTES.loginCallback}
+						element={<LoginCallback />}
+					/>
+					<Route
+						path={SUB_ROUTES.resetPassword}
+						element={<ResetPassword />}
+					></Route>
+
+					<Route
+						path="*"
+						element={<Navigate to={SUB_ROUTES.login}></Navigate>}
+					></Route>
+					{/* Protected routes */}
 					<Route
 						path={SUB_ROUTES.drive.base}
 						element={<DriveLayout />}
@@ -55,10 +68,6 @@ export default function App() {
 							element={<Settings />}
 						/>
 						<Route
-							path={SUB_ROUTES.drive.recent}
-							element={<Recent />}
-						></Route>
-						<Route
 							path="*"
 							element={
 								<Navigate
@@ -68,10 +77,6 @@ export default function App() {
 							}
 						></Route>
 					</Route>
-					<Route
-						path={SUB_ROUTES.resetPassword}
-						element={<ResetPassword />}
-					></Route>
 				</Route>
 			</Routes>
 		</Router>

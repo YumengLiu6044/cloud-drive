@@ -21,7 +21,7 @@ export default function Sidebar() {
 			animate={{
 				width: isCollapsed ? "5rem" : "18rem",
 			}}
-			className="hidden md:flex h-screen flex-col gap-3 bg-background border-r-1 border-border"
+			className="hidden lg:flex h-screen flex-col gap-3 bg-background border-r-1 border-border"
 		>
 			<div className="flex items-center py-4 px-6">
 				<img src={logo} className="w-12"></img>

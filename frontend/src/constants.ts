@@ -10,7 +10,6 @@ export const SUB_ROUTES = {
 		files: "/drive/files",
 		trash: "/drive/trash",
 		settings: "/drive/settings",
-		recent: "/drive/recent",
 	},
 } as const;
 export const API_BASE = {
@@ -34,11 +33,6 @@ export const SIDEBAR_ITEMS = [
 		name: "Files",
 		Icon: Folder,
 		route: SUB_ROUTES.drive.files,
-	},
-	{
-		name: "Recent",
-		Icon: Clock,
-		route: SUB_ROUTES.drive.recent,
 	},
 	{
 		name: "Trash",

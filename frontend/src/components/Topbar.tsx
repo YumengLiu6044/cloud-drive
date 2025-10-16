@@ -27,7 +27,7 @@ export default function Topbar() {
 	const username = useAuthStore((state) => state.username);
 	const profileId = useAuthStore((state) => state.profileImageId);
 
-	const { isMobile, type } = useDeviceType();
+	const { isDesktop, type } = useDeviceType();
 
 	const controls = useAnimation();
 	const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -43,7 +43,7 @@ export default function Topbar() {
 	return (
 		<div className="w-full h-16 py-[10px] px-[20px] md:px-[40px] bg-background flex justify-between border-b-1 border-border">
 			<div className="flex gap-3 items-center">
-				{!isMobile && (
+				{isDesktop && (
 					<Button variant="outline" onClick={toggleIsCollapsed}>
 						<Menu aria-label="Collapse Sidebar Menu" />
 					</Button>
@@ -65,7 +65,7 @@ export default function Topbar() {
 			>
 				<DropdownMenuTrigger className="h-full">
 					<div className="h-full flex items-center gap-2">
-						<div className="h-full aspect-square flex items-center justify-center rounded-full overflow-clip bg-primary text-background">
+						<div className="h-full aspect-square flex items-center justify-center rounded-full overflow-clip bg-theme text-background">
 							{profileId ? (
 								<img
 									src={UserApi.getProfilePic(profileId)}
