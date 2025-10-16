@@ -5,6 +5,9 @@ export type AuthStore = {
 
 	username: string | null;
 	setUsername: (_: string) => void;
+
+	email: string | null;
+	setEmail: (_: string) => void;
 };
 
 export type JWTPayload = {

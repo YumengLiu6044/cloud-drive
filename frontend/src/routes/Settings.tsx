@@ -27,11 +27,50 @@ import {
 	Trash2,
 	CircleAlert,
 	Image,
-	UserRoundPlus,
-  Camera,
+	Camera,
+	Loader2,
 } from "lucide-react";
+import useAuthStore from "@/context/authStore";
+import { useCallback, useState } from "react";
+import DOMPurify from "dompurify";
+import { toast } from "sonner";
+import { UserApi } from "@/api/userApi";
 
 export default function Settings() {
+	const email = useAuthStore((state) => state.email);
+	const username = useAuthStore((state) => state.username);
+	const {setUsername, logout} = useAuthStore.getState();
+
+
+	const [isEditing, setIsEditing] = useState(false);
+	const [tempUsername, setTempUsername] = useState(username ?? "");
+	const [isLoadingUsername, setIsLoadingUsername] = useState(false);
+
+	const handleSaveUsername = useCallback(() => {
+		const cleanedUsername = DOMPurify.sanitize(tempUsername);
+		if (!cleanedUsername) {
+			toast.error("Username can't be empty");
+			return;
+		}
+
+		setIsLoadingUsername(true);
+		UserApi.changeUserName(tempUsername)
+			.then(() => {
+				setUsername(tempUsername);
+			})
+			.finally(() => {
+				setIsLoadingUsername(false);
+				setIsEditing(false);
+			});
+	}, [tempUsername]);
+
+	const handleCancelEdit = useCallback(() => {
+		if (!isLoadingUsername) {
+			setIsEditing(false);
+			setTempUsername(username ?? "");
+		}
+	}, [username, isLoadingUsername]);
+
 	return (
 		<div className="w-full flex flex-col gap-4 p-3 md:p-8 h-[90vh] overflow-y-scroll">
 			<div className="mb-3">
@@ -57,16 +96,21 @@ export default function Settings() {
 					<CardContent className="space-y-3">
 						<div className="w-full flex flex-col items-center justify-center gap-5">
 							<div className="relative w-full max-w-[150px] bg-gradient-to-r from-blue-500 to-purple-300 rounded-full aspect-square flex items-center justify-center p-1">
-								<div className="w-full rounded-full aspect-square border-background border-4 flex items-center justify-center p-8">
+								<div className="w-full rounded-full aspect-square border-background border-4 flex items-center justify-center p-8"></div>
+								<div className="absolute right-0 bottom-0 w-8 rounded-full aspect-square bg-gradient-to-r from-blue-500 to-purple-300 flex items-center justify-center">
+									<Camera
+										size={20}
+										className="text-background"
+									></Camera>
 								</div>
-                <div className="absolute right-0 bottom-0 w-8 rounded-full aspect-square bg-gradient-to-r from-blue-500 to-purple-300 flex items-center justify-center">
-                  <Camera size={20} className="text-background"></Camera>
-                </div>
 							</div>
 
-              <Button type="button" className="w-full lg:w-auto bg-gradient-to-r from-blue-500 to-purple-300 hover:from-blue-400 hover:to-purple-200 transition-colors">
-                Upload Photo
-              </Button>
+							<Button
+								type="button"
+								className="w-full lg:w-auto bg-blue-500 hover:bg-blue-400 transition-colors"
+							>
+								Upload Photo
+							</Button>
 						</div>
 					</CardContent>
 				</Card>
@@ -90,16 +134,16 @@ export default function Settings() {
 								<div className="flex gap-2">
 									<Input
 										id="username"
-										// value={tempUsername}
-										// onChange={(e) =>
-										// 	setTempUsername(e.target.value)
-										// }
-										// disabled={!isEditing}
+										value={tempUsername}
+										onChange={(e) =>
+											setTempUsername(e.target.value)
+										}
+										disabled={!isEditing}
 										className="flex-1"
 									/>
-									{!false ? (
+									{!isEditing ? (
 										<Button
-											// onClick={() => setIsEditing(true)}
+											onClick={() => setIsEditing(true)}
 											variant="outline"
 										>
 											Edit
@@ -107,12 +151,16 @@ export default function Settings() {
 									) : (
 										<>
 											<Button
-											// onClick={handleSaveUsername}
+												onClick={handleSaveUsername}
+												disabled={isLoadingUsername}
 											>
 												Save
+												{isLoadingUsername && (
+													<Loader2 className="animate-spin"></Loader2>
+												)}
 											</Button>
 											<Button
-												// onClick={handleCancelEdit}
+												onClick={handleCancelEdit}
 												variant="outline"
 											>
 												Cancel
@@ -129,7 +177,7 @@ export default function Settings() {
 								<Label htmlFor="email">Email</Label>
 								<Input
 									id="email"
-									// value={email}
+									value={email ?? ""}
 									disabled
 									className="bg-muted"
 								/>
@@ -140,7 +188,7 @@ export default function Settings() {
 
 							{/* Sign out button */}
 							<Button
-								// onClick={handleSignOut}
+								onClick={logout}
 								variant="outline"
 								className="w-full lg:w-auto bg-transparent"
 							>

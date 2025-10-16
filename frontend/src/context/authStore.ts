@@ -9,7 +9,9 @@ const useAuthStore = create<AuthStore>()(
 		(set) => ({
 			token: null,
 			username: null,
+			email: null,
 			driveRootId: null,
+
 			setUsername: (newUsername: string) =>
 				set({ username: newUsername }),
 			login: (newToken: string | null) => {
@@ -25,12 +27,16 @@ const useAuthStore = create<AuthStore>()(
 
 				set({ token: null });
 			},
+			setEmail(email) {
+				set({ email });
+			},
 		}),
 		{
 			name: STORAGE_KEYS.authStore,
 			partialize: (state) => ({
 				token: state.token,
 				username: state.username,
+				email: state.email,
 			}),
 		}
 	)

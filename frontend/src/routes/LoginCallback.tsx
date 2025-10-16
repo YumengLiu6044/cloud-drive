@@ -9,7 +9,7 @@ import { toast } from "sonner";
 
 export default function LoginCallback() {
 	const navigator = useNavigate();
-	const { token, setUsername } = useAuthStore.getState();
+	const { token, setUsername, setEmail } = useAuthStore.getState();
 	const { setCurrentDirectory, setRootDirectory } = useFileStore.getState();
 
 	if (!token) return;
@@ -26,6 +26,7 @@ export default function LoginCallback() {
 				setRootDirectory(rootDirectory);
 
 				setUsername(body.username);
+				setEmail(body.email);
 				navigator(SUB_ROUTES.drive.base);
 			})
 			.catch(() => {
