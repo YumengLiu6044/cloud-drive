@@ -1,4 +1,4 @@
-import pathli
+import pathlib
 from dotenv import load_dotenv
 from fastapi_mail import ConnectionConfig
 from jinja2 import Environment, FileSystemLoader, select_autoescape

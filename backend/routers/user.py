@@ -1,11 +1,9 @@
 from typing import Annotated
-
 from bson import ObjectId
-from fastapi import APIRouter, Depends, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, HTTPException, UploadFile, Query
 from fastapi.responses import FileResponse, StreamingResponse
 from gridfs import NoFile
-
-from core.constants import PROFILE_PICTURES_TEMPLATE, FALLBACK_PROFILE_PICTURE
+from core.constants import PROFILE_PICTURES_TEMPLATE, FALLBACK_PROFILE_PICTURE, JwtTokenScope
 from core.database import mongo
 from core.file_utils import get_mime_type
 from core.security import security_manager
@@ -20,10 +18,9 @@ async def read_users_me(param: Annotated[str, Depends(security_manager.get_curre
     if not user_record:
         raise HTTPException(status_code=404, detail="User not found")
 
-    user_obj = UserModel(**user_record)
-    returned_user = user_obj.__dict__
-    returned_user.pop("password")
-    return returned_user
+    user_record.pop("password")
+    user_record.pop("_id")
+    return user_record
 
 @user_router.post("/change-username")
 async def change_username(
@@ -67,21 +64,22 @@ async def upload_profile(
 
     async with bucket.open_upload_stream(bucket_file_name, metadata={"contentType": media_type}) as stream:
         await stream.write(file.file)
-        file_id = stream._id
+        file_id = str(stream._id)
 
     await mongo.users.update_one(
         {"email": current_user},
-        {"$set": {"profile_image_id": str(file_id)}},
+        {"$set": {"profile_image_id": file_id}},
     )
-    return {"message": "Profile uploaded successfully"}
+    return {"profile_image_id": file_id}
 
 
 @user_router.get("/profile/{file_id}")
 async def get_profile_picture(
     file_id: str,
-    current_user: Annotated[str, Depends(security_manager.get_current_user)]
+    token: str
 ):
     # Make sure the current_user owns the file
+    current_user = security_manager.decode_access_token(token, JwtTokenScope.auth)
     user_record = await mongo.users.find_one({"email": current_user})
     if not user_record:
         raise HTTPException(status_code=404, detail="User not found")

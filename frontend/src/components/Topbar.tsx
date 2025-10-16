@@ -16,6 +16,7 @@ import { useNavigate } from "react-router-dom";
 import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu";
 import { useDeviceType } from "@/hooks/useDeviceType";
 import { useEffect, useState } from "react";
+import { UserApi } from "@/api/userApi";
 
 export default function Topbar() {
 	const toggleIsCollapsed = useSidebarStore(
@@ -24,6 +25,7 @@ export default function Topbar() {
 
 	const handleLogout = useAuthStore((state) => state.logout);
 	const username = useAuthStore((state) => state.username);
+	const profileId = useAuthStore((state) => state.profileImageId);
 
 	const { isMobile, type } = useDeviceType();
 
@@ -63,8 +65,17 @@ export default function Topbar() {
 			>
 				<DropdownMenuTrigger className="h-full">
 					<div className="h-full flex items-center gap-2">
-						<div className="h-full aspect-square flex items-center justify-center rounded-full p-2.5 bg-primary text-background">
-							<span className="uppercase">{username?.substring(0, 2)}</span>
+						<div className="h-full aspect-square flex items-center justify-center rounded-full overflow-clip bg-primary text-background">
+							{profileId ? (
+								<img
+									src={UserApi.getProfilePic(profileId)}
+									className="w-full h-full"
+								></img>
+							) : (
+								<span className="uppercase m-2.5">
+									{username?.substring(0, 2)}
+								</span>
+							)}
 						</div>
 						<motion.div animate={controls}>
 							<ChevronDown className="w-3 h-3"></ChevronDown>

@@ -8,6 +8,9 @@ export type AuthStore = {
 
 	email: string | null;
 	setEmail: (_: string) => void;
+
+	profileImageId: string | null;
+	setProfileImageId: (_: string) => void;
 };
 
 export type JWTPayload = {

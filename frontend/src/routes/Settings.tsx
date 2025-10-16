@@ -31,17 +31,17 @@ import {
 	Loader2,
 } from "lucide-react";
 import useAuthStore from "@/context/authStore";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState, type ChangeEvent } from "react";
 import DOMPurify from "dompurify";
 import { toast } from "sonner";
 import { UserApi } from "@/api/userApi";
 
 export default function Settings() {
+	// User info state
 	const email = useAuthStore((state) => state.email);
 	const username = useAuthStore((state) => state.username);
-	const {setUsername, logout} = useAuthStore.getState();
-
-
+	const profileImageId = useAuthStore((state) => state.profileImageId);
+	const { setUsername, logout, setProfileImageId } = useAuthStore.getState();
 	const [isEditing, setIsEditing] = useState(false);
 	const [tempUsername, setTempUsername] = useState(username ?? "");
 	const [isLoadingUsername, setIsLoadingUsername] = useState(false);
@@ -71,6 +71,29 @@ export default function Settings() {
 		}
 	}, [username, isLoadingUsername]);
 
+	// Profile pic state
+	const fileRef = useRef<HTMLInputElement>(null);
+
+	const handleClickUpload = useCallback(() => {
+		const inputNode = fileRef.current;
+		if (inputNode) {
+			inputNode.click();
+		}
+	}, []);
+
+	const handleProfileChange = useCallback(
+		(e: ChangeEvent<HTMLInputElement>) => {
+			const newFile = e.target.files?.[0];
+			if (newFile) {
+				UserApi.uploadProfilePic(newFile).then((response) => {
+					const newProfileId = response.data.profile_image_id;
+					setProfileImageId(newProfileId);
+				});
+			}
+		},
+		[]
+	);
+
 	return (
 		<div className="w-full flex flex-col gap-4 p-3 md:p-8 h-[90vh] overflow-y-scroll">
 			<div className="mb-3">
@@ -96,7 +119,16 @@ export default function Settings() {
 					<CardContent className="space-y-3">
 						<div className="w-full flex flex-col items-center justify-center gap-5">
 							<div className="relative w-full max-w-[150px] bg-gradient-to-r from-blue-500 to-purple-300 rounded-full aspect-square flex items-center justify-center p-1">
-								<div className="w-full rounded-full aspect-square border-background border-4 flex items-center justify-center p-8"></div>
+								<div className="w-full rounded-full aspect-square overflow-clip border-background border-4 flex items-center justify-center">
+									{profileImageId && (
+										<img
+											className="w-full h-full aspect-auto"
+											src={UserApi.getProfilePic(
+												profileImageId
+											)}
+										></img>
+									)}
+								</div>
 								<div className="absolute right-0 bottom-0 w-8 rounded-full aspect-square bg-gradient-to-r from-blue-500 to-purple-300 flex items-center justify-center">
 									<Camera
 										size={20}
@@ -104,10 +136,19 @@ export default function Settings() {
 									></Camera>
 								</div>
 							</div>
-
+							<input
+								className="hidden"
+								ref={fileRef}
+								type="file"
+								accept="image/*"
+								maxLength={1}
+								required
+								onChange={handleProfileChange}
+							></input>
 							<Button
 								type="button"
 								className="w-full lg:w-auto bg-blue-500 hover:bg-blue-400 transition-colors"
+								onClick={handleClickUpload}
 							>
 								Upload Photo
 							</Button>
