@@ -8,6 +8,50 @@ const Cell = ({ children, className = "" }: CustomNode) => (
 	<TableCell className={`py-5 ${className}`}>{children}</TableCell>
 );
 
+function getDayText(dateObj: Date) {
+	const now = new Date();
+
+	// One day ago (UTC)
+	const oneDayAgo = new Date(
+		Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 1)
+	);
+
+	// One week ago (UTC)
+	const oneWeekAgo = new Date(
+		Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate() - 7)
+	);
+
+	// Convert dateObj to UTC midnight for comparison
+	const dateUTC = new Date(
+		Date.UTC(
+			dateObj.getUTCFullYear(),
+			dateObj.getUTCMonth(),
+			dateObj.getUTCDate()
+		)
+	);
+
+	if (dateUTC > oneDayAgo) {
+		// Less than 1 day ago → show time
+		return dateObj.toLocaleTimeString("en-US", {
+			hour: "numeric",
+			minute: "2-digit",
+			hour12: true,
+		});
+	} else if (dateUTC > oneWeekAgo) {
+		// Between 1 day and 1 week ago → show "x Days Ago"
+		const diffTime = now.getTime() - dateObj.getTime();
+		const dayCount = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+		return `${dayCount} Day${dayCount > 1 ? "s" : ""} Ago`;
+	} else {
+		// More than a week ago → show date
+		return dateObj.toLocaleDateString("en-US", {
+			month: "short",
+			day: "numeric",
+			year: "numeric",
+		});
+	}
+}
+
 export default function FileListRow({
 	item,
 	isActive,
@@ -55,13 +99,7 @@ export default function FileListRow({
 							))}
 						<span>
 							{key === "last_modified"
-								? new Date(
-										item.last_modified
-								  ).toLocaleDateString("en-US", {
-										month: "short",
-										day: "numeric",
-										year: "numeric",
-								  })
+								? getDayText(new Date(item.last_modified))
 								: item[key as keyof Resource]}
 						</span>
 					</div>
