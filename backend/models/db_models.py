@@ -7,7 +7,7 @@ class UserModel(BaseModel):
     username: str = Field(default=None, description="Username")
     password: str = Field(default=None, description="Password")
     drive_root_id: str = Field(default=None, description="Drive root folder ID")
-
+    profile_image_id: str = Field(default=None, description="Profile image id")
 
 class DriveModel(BaseModel):
     parent_id: str = Field(default=None, description="Parent ID")

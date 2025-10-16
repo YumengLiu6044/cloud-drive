@@ -1,3 +1,5 @@
+import pathlib
+
 from dotenv import load_dotenv
 from fastapi_mail import ConnectionConfig
 from jinja2 import Environment, FileSystemLoader, select_autoescape
@@ -17,6 +19,9 @@ DATABASE_NAME = "cloud-drive-data"
 class COLLECTIONS(str, Enum):
     USERS = "users"
     FILES = "files"
+
+class BUCKETS(str, Enum):
+    PROFILE_PICTURES = "profile_pictures"
 
 # Password Config
 PASSWORD_MIN_LENGTH = 8
@@ -49,8 +54,9 @@ MAIL_CONFIG = ConnectionConfig(
     USE_CREDENTIALS=True,
 )
 
+ASSET_PATH = pathlib.Path("./assets")
 jinja_env = Environment(
-    loader=FileSystemLoader("./assets"),
+    loader=FileSystemLoader(ASSET_PATH),
     autoescape=select_autoescape(["html", "xml"])
 )
 TEMPLATE_NAME = "email_template.html"
@@ -59,3 +65,7 @@ COMMON_TEMPLATE_VARIABLES = {
     "expiry_minutes": JWT_TOKEN_EXPIRATION,
 }
 PASSWORD_RESET_TEMPLATE = f"{FRONTEND_URL}/reset-password?token={{}}"
+
+# Profile pictures
+PROFILE_PICTURES_TEMPLATE = f"{{}}-profile"
+FALLBACK_PROFILE_PICTURE = ASSET_PATH / "profile_fallback.png"
