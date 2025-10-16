@@ -12,16 +12,14 @@ export default function useKeyDown(
 				tag === "INPUT" ||
 				tag === "TEXTAREA" ||
 				(e.target as HTMLElement).isContentEditable;
-
 			if (isEditable) return; // skip when typing in inputs
-			e.preventDefault();
+
 			if (e.key === listenKey) {
+				// e.preventDefault();
 				callback();
 			}
 		};
 		const handleKeyUp = (e: KeyboardEvent) => {
-			e.preventDefault();
-
 			if (e.key === listenKey) {
 				keyupCallback();
 			}

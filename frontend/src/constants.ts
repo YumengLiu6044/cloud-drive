@@ -1,5 +1,4 @@
 import { Clock, Folder, Settings, Trash2 } from "lucide-react";
-import type { Resource } from "./type";
 
 export const SUB_ROUTES = {
 	login: "/login",
