@@ -1,5 +1,7 @@
 from datetime import datetime
-from pydantic import BaseModel, EmailStr, Field
+
+from bson import ObjectId
+from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_validator, model_serializer
 
 
 class UserModel(BaseModel):
@@ -14,7 +16,7 @@ class DriveModel(BaseModel):
     owner: EmailStr = Field(default=EmailStr, description="Owner")
     name: str = Field(default=None, description="File name")
     is_folder: bool = Field(default=False, description="Is folder")
-    uri: str = Field(default=None, description="File URI")
-    size: int = Field(default=None, description="Resource Size")
-    last_modified: int = Field(default=None, description="The UNIX timestamp that the resource was last modified")
-    type: str = Field(default=None, description="The type of the file")
+    uri: str | None = Field(default=None, description="File URI")
+    size: int | None = Field(default=None, description="Resource Size")
+    last_modified: int | None = Field(default=None, description="The UNIX timestamp that the resource was last modified")
+    type: str | None = Field(default=None, description="The type of the file")

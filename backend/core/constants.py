@@ -18,6 +18,7 @@ DATABASE_NAME = "cloud-drive-data"
 class COLLECTIONS(str, Enum):
     USERS = "users"
     FILES = "files"
+    TRASH = "trash"
 
 class BUCKETS(str, Enum):
     PROFILE_PICTURES = "profile_pictures"

@@ -31,6 +31,10 @@ class MongoDBClient:
         return self.database[COLLECTIONS.FILES]
 
     @property
+    def trash(self):
+        return self.database[COLLECTIONS.TRASH]
+
+    @property
     def profile_bucket(self):
         if self._bucket_instance is not None:
             return self._bucket_instance

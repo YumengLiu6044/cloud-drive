@@ -1,4 +1,4 @@
-import { Copy, Download, Trash2, X } from "lucide-react";
+import { Copy, Download, Loader2, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import FileListView from "./FileListView";
 import { ButtonGroup } from "./ui/button-group";
@@ -8,6 +8,8 @@ import { useFileStore } from "@/context/fileStore";
 import { useDeviceType } from "@/hooks/useDeviceType";
 import NewFolderButton from "./NewFolderButton";
 import type { Resource } from "@/type";
+import { DriveApi } from "@/api/driveApi";
+import { toast } from "sonner";
 
 export default function FileViewer() {
 	// File state variables
@@ -21,6 +23,33 @@ export default function FileViewer() {
 	useEffect(() => {
 		refreshFiles();
 	}, [directoryTree]);
+
+	const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+	const handleDelete = useCallback(() => {
+		if (isLoadingDelete) return;
+
+		const selectedIDs: string[] = [];
+		for (const index of selectedFiles) {
+			selectedIDs.push(files[index]._id);
+		}
+
+		setIsLoadingDelete(true);
+		const promise = DriveApi.moveToTrash(selectedIDs)
+			.then(() => {
+				setFileCursorIndex(-1);
+				setSelectedFiles(new Set());
+				refreshFiles();
+			})
+			.finally(() => setIsLoadingDelete(false));
+
+		toast.promise(promise, {
+			loading: "Loading",
+			success: (_) => {
+				return `Moved files to trash`;
+			},
+			error: "Failed to move files to trash",
+		});
+	}, [selectedFiles, files]);
 
 	// Screen size
 	const { isDesktop } = useDeviceType();
@@ -194,9 +223,7 @@ export default function FileViewer() {
 	}, []);
 
 	return (
-		<div
-			className="w-full flex flex-col gap-4 main-section"
-		>
+		<div className="w-full flex flex-col gap-4 main-section">
 			<div className="w-full flex items-center justify-between">
 				<div className="flex gap-2 items-center">
 					{directoryTree.map((item, index) => (
@@ -236,6 +263,7 @@ export default function FileViewer() {
 							<Button
 								variant="outline"
 								aria-label="Move to trash"
+								onClick={handleDelete}
 							>
 								<Trash2></Trash2>
 							</Button>

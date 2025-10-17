@@ -26,7 +26,6 @@ export default function FileListView({
 	const [renderedList, setRenderedList] = useState(files);
 
 	useEffect(() => {
-		console.log(files)
 		setRenderedList(files);
 		setSortBy(null);
 	}, [files]);

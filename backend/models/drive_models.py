@@ -1,3 +1,4 @@
+from typing import List
 from pydantic import BaseModel, Field
 
 
@@ -8,3 +9,7 @@ class ListContentModel(BaseModel):
 class CreateFolderRequest(BaseModel):
     parent_id: str
     name: str
+
+
+class DeleteFilesRequest(BaseModel):
+    files: List[str] = Field(default_factory=list)

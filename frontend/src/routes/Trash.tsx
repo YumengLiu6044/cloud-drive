@@ -1,3 +1,4 @@
+import FileViewer from "@/components/FileViewer";
 
 
 export default function Trash() {
