@@ -16,5 +16,5 @@ class DriveModel(BaseModel):
     is_folder: bool = Field(default=False, description="Is folder")
     uri: str = Field(default=None, description="File URI")
     size: int = Field(default=None, description="Resource Size")
-    last_modified: datetime = Field(default=None, description="The time that the resource was last modified")
+    last_modified: int = Field(default=None, description="The UNIX timestamp that the resource was last modified")
     type: str = Field(default=None, description="The type of the file")

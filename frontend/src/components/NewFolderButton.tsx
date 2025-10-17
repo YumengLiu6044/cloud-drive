@@ -203,6 +203,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 							type="text"
 							value={newFolderName}
 							onChange={(e) => setNewFolderName(e.target.value)}
+							onClick={(e) => e.stopPropagation()}
 						/>
 					</div>
 				)}

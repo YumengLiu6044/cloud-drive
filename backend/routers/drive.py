@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Annotated
 from bson import ObjectId
 from fastapi import (
@@ -58,7 +58,7 @@ async def create_folder(
         is_folder=True,
         name=param.name,
         owner=current_user,
-        last_modified=datetime.now(),
+        last_modified=int(datetime.now(timezone.utc).timestamp()),
         type="Folder"
     )
     try:

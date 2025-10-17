@@ -196,12 +196,11 @@ export default function FileViewer() {
 	return (
 		<div
 			className="w-full flex flex-col gap-4 main-section"
-			onMouseDown={(e) => e.preventDefault()}
 		>
 			<div className="w-full flex items-center justify-between">
 				<div className="flex gap-2 items-center">
 					{directoryTree.map((item, index) => (
-						<div className="flex gap-2 items-center">
+						<div className="flex gap-2 items-center" key={index}>
 							<span
 								key={index}
 								className="cursor-pointer hover:underline"

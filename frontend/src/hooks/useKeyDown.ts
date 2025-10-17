@@ -15,7 +15,7 @@ export default function useKeyDown(
 			if (isEditable) return; // skip when typing in inputs
 
 			if (e.key === listenKey) {
-				// e.preventDefault();
+				e.preventDefault();
 				callback();
 			}
 		};

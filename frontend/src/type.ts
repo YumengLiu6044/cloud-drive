@@ -34,7 +34,7 @@ export type Resource = {
 	name: string;
 	is_folder: string;
 	size: string | null;
-	last_modified: string;
+	last_modified: number;
 	owner: string;
 	type: string
 };
@@ -85,4 +85,10 @@ export type FileStore = {
 
 export interface NewFolderButtonProps {
 	isCollapsed: boolean;
+}
+
+export type ListHeader = {
+	id: keyof Resource,
+	label: string,
+	sortOrder?: string | null
 }

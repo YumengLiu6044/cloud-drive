@@ -1,4 +1,5 @@
-import { Clock, Folder, Settings, Trash2 } from "lucide-react";
+import { Folder, Settings, Trash2 } from "lucide-react";
+import type { ListHeader } from "./type";
 
 export const SUB_ROUTES = {
 	login: "/login",
@@ -60,9 +61,21 @@ export const DEVICE_TYPES = {
 	desktop: "desktop",
 } as const;
 
-export const LIST_HEADER_COLS = {
-	name: "Name",
-	type: "Type",
-	last_modified: "Date Added",
-	size: "Size",
-};
+export const LIST_HEADER_COLS: ListHeader[] = [
+	{
+		id: "name",
+		label: "Name",
+	},
+	{
+		id: "type",
+		label: "Type",
+	},
+	{
+		id: "last_modified",
+		label: "Date Added",
+	},
+	{
+		id: "size",
+		label: "Size",
+	},
+] as const;
