@@ -99,12 +99,15 @@ export default function FileListView({
 									{item.label}
 									{sortBy && sortBy.id === item.id ? (
 										<motion.div
-											style={{
+											animate={{
 												rotate:
 													sortBy.sortOrder ===
 													"increase"
 														? 0
 														: 180,
+											}}
+											transition={{
+												type: "tween"
 											}}
 										>
 											<ArrowUp className="" size={15} />
