@@ -14,5 +14,7 @@ export const DriveApi = {
 	moveToTrash: (files: string[]) =>
 		axiosClient.post(API_BASE.drive + "/move-to-trash", {
 			files
-		})
+		}),
+	listTrashContent: () =>
+		axiosClient.get(API_BASE.drive + "/list-trash-content")
 };

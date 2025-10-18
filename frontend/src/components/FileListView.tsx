@@ -19,8 +19,8 @@ export default function FileListView({
 	fileCursorIndex,
 	handleRowClick,
 	handleRowDoubleClick,
+	files
 }: FileListViewProps) {
-	const files = useFileStore((state) => state.files);
 
 	const [sortBy, setSortBy] = useState<ListHeader | null>(null);
 	const [renderedList, setRenderedList] = useState(files);

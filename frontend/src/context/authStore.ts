@@ -2,6 +2,7 @@ import { STORAGE_KEYS } from "@/constants";
 import type { AuthStore } from "@/type";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
+import { useFileStore } from "./fileStore";
 
 const useAuthStore = create<AuthStore>()(
 	persist(
@@ -18,7 +19,12 @@ const useAuthStore = create<AuthStore>()(
 				set({ token: newToken });
 			},
 			logout: () => {
-				set({token: null});
+				const { setDirectoryTree, setFiles, setRootDirectory } =
+					useFileStore.getState();
+				setDirectoryTree([]);
+				setFiles([]);
+				setRootDirectory(null);
+				set({ token: null });
 			},
 			setEmail(email) {
 				set({ email });
@@ -33,7 +39,7 @@ const useAuthStore = create<AuthStore>()(
 				token: state.token,
 				username: state.username,
 				email: state.email,
-				profileImageId: state.profileImageId
+				profileImageId: state.profileImageId,
 			}),
 		}
 	)

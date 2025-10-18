@@ -12,7 +12,7 @@ from models.user_models import UserChangeNameRequest
 
 user_router = APIRouter(prefix="/user", tags=["user"])
 
-@user_router.post("/")
+@user_router.get("/")
 async def read_users_me(param: Annotated[str, Depends(security_manager.get_current_user)]):
     user_record = await mongo.users.find_one({"email": param})
     if not user_record:

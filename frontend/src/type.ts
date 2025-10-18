@@ -1,3 +1,5 @@
+import type { Dispatch, ReactNode, SetStateAction } from "react";
+
 export type AuthStore = {
 	token: string | null;
 	login: (_: string | null) => void;
@@ -36,7 +38,7 @@ export type Resource = {
 	size: string | null;
 	last_modified: number;
 	owner: string;
-	type: string
+	type: string;
 };
 
 export interface FileListRowProps {
@@ -52,6 +54,7 @@ export interface FileListViewProps {
 	fileCursorIndex: number;
 	handleRowClick: (_: number) => void;
 	handleRowDoubleClick: (_: Resource) => void;
+	files: Resource[]
 }
 
 export type KeyCombo = {
@@ -65,7 +68,7 @@ export type KeyCombo = {
 export type Directory = {
 	id: string;
 	name: string;
-}
+};
 
 export type FileStore = {
 	files: Resource[];
@@ -74,13 +77,16 @@ export type FileStore = {
 	rootDirectory: Directory | null;
 	setRootDirectory: (newDirectory: Directory | null) => void;
 
-	directoryTree: Directory[],
-	setDirectoryTree: (newDirectories: Directory[]) => void,
+	directoryTree: Directory[];
+	setDirectoryTree: (newDirectories: Directory[]) => void;
+
+	trashFiles: Resource[];
+	setTrashFiles: (newFiles: Resource[]) => void;
 
 	// Util functions
 	refreshFiles: () => void;
-	changeDirectory: (newDirectory: Directory) => void
-
+	refreshTrash: () => void;
+	changeDirectory: (newDirectory: Directory) => void;
 };
 
 export interface NewFolderButtonProps {
@@ -88,7 +94,24 @@ export interface NewFolderButtonProps {
 }
 
 export type ListHeader = {
-	id: keyof Resource,
-	label: string,
-	sortOrder?: string | null
+	id: keyof Resource;
+	label: string;
+	sortOrder?: string | null;
+};
+
+export interface FileViewerProps {
+	files: Resource[];
+	directoryTree: Directory[];
+	onDoubleClick: (_: Resource) => void;
+	selectedFiles: Set<number>;
+	setSelectedFiles: Dispatch<SetStateAction<Set<number>>>;
+	fileCursorIndex: number;
+	setFileCursorIndex: Dispatch<SetStateAction<number>>;
+	onDirectoryClick: (_: Directory) => void;
+
+	fileActions: {
+		action: () => void;
+		Icon: ReactNode;
+		label: string;
+	}[]
 }

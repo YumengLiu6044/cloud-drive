@@ -80,7 +80,7 @@ async def move_files_to_trash(
     current_user: Annotated[EmailStr, Depends(security_manager.get_current_user)]
 ):
     # Load records from DB
-    requested_records: List[DriveModel] = []
+    requested_records = []
     for requested_file in param.files:
         record = await get_file_from_db(requested_file, current_user)
         requested_records.append(record)
@@ -101,3 +101,16 @@ async def move_files_to_trash(
         await mongo.trash.insert_one(current_top)
 
     return {"message": "Moved files to trash"}
+
+
+@drive_router.get("/list-trash-content")
+async def list_trash_content(
+    current_user: Annotated[EmailStr, Depends(security_manager.get_current_user)]
+):
+    records = []
+    trash_query = {"owner": current_user}
+    async for trash_file_row in mongo.trash.find(trash_query):
+        trash_file_row["_id"] = str(trash_file_row["_id"])
+        records.append(trash_file_row)
+
+    return {"result": records}

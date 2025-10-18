@@ -1,56 +1,24 @@
-import { Copy, Download, Loader2, Trash2, X } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { X } from "lucide-react";
+import { useCallback, useState } from "react";
 import FileListView from "./FileListView";
 import { ButtonGroup } from "./ui/button-group";
 import { Button } from "./ui/button";
 import useKeyDown from "@/hooks/useKeyDown";
-import { useFileStore } from "@/context/fileStore";
 import { useDeviceType } from "@/hooks/useDeviceType";
 import NewFolderButton from "./NewFolderButton";
-import type { Resource } from "@/type";
-import { DriveApi } from "@/api/driveApi";
-import { toast } from "sonner";
+import type { FileViewerProps } from "@/type";
 
-export default function FileViewer() {
-	// File state variables
-	const files = useFileStore((state) => state.files);
-	const directoryTree = useFileStore((state) => state.directoryTree);
-	const { refreshFiles, changeDirectory } = useFileStore.getState();
-
-	const [selectedFiles, setSelectedFiles] = useState<Set<number>>(new Set());
-	const [fileCursorIndex, setFileCursorIndex] = useState<number>(-1);
-
-	useEffect(() => {
-		refreshFiles();
-	}, [directoryTree]);
-
-	const [isLoadingDelete, setIsLoadingDelete] = useState(false);
-	const handleDelete = useCallback(() => {
-		if (isLoadingDelete) return;
-
-		const selectedIDs: string[] = [];
-		for (const index of selectedFiles) {
-			selectedIDs.push(files[index]._id);
-		}
-
-		setIsLoadingDelete(true);
-		const promise = DriveApi.moveToTrash(selectedIDs)
-			.then(() => {
-				setFileCursorIndex(-1);
-				setSelectedFiles(new Set());
-				refreshFiles();
-			})
-			.finally(() => setIsLoadingDelete(false));
-
-		toast.promise(promise, {
-			loading: "Loading",
-			success: (_) => {
-				return `Moved files to trash`;
-			},
-			error: "Failed to move files to trash",
-		});
-	}, [selectedFiles, files]);
-
+export default function FileViewer({
+	directoryTree,
+	files,
+	onDoubleClick,
+	fileCursorIndex,
+	selectedFiles,
+	setFileCursorIndex,
+	setSelectedFiles,
+	onDirectoryClick,
+	fileActions,
+}: FileViewerProps) {
 	// Screen size
 	const { isDesktop } = useDeviceType();
 
@@ -211,17 +179,6 @@ export default function FileViewer() {
 		[shiftDownIndex, isControlPressed, isMetaPressed]
 	);
 
-	const handleRowDoubleClick = useCallback((file: Resource) => {
-		// Only handle folder double clicks
-		if (file.is_folder) {
-			// Reset selections
-			setSelectedFiles(new Set());
-			setFileCursorIndex(-1);
-
-			changeDirectory({ name: file.name, id: file._id });
-		}
-	}, []);
-
 	return (
 		<div className="w-full flex flex-col gap-4 main-section">
 			<div className="w-full flex items-center justify-between">
@@ -231,7 +188,7 @@ export default function FileViewer() {
 							<span
 								key={index}
 								className="cursor-pointer hover:underline"
-								onClick={() => changeDirectory(item)}
+								onClick={() => onDirectoryClick(item)}
 							>
 								{item.name}
 							</span>
@@ -251,22 +208,16 @@ export default function FileViewer() {
 								<X></X>
 								{selectedFiles.size} selected
 							</Button>
-							<Button variant="outline" aria-label="Copy files">
-								<Copy></Copy>
-							</Button>
-							<Button
-								variant="outline"
-								aria-label="Download files"
-							>
-								<Download></Download>
-							</Button>
-							<Button
-								variant="outline"
-								aria-label="Move to trash"
-								onClick={handleDelete}
-							>
-								<Trash2></Trash2>
-							</Button>
+							{fileActions.map((item, index) => (
+								<Button
+									variant="outline"
+									key={index}
+									aria-label={item.label}
+									onClick={item.action}
+								>
+									{item.Icon}
+								</Button>
+							))}
 						</ButtonGroup>
 					) : (
 						<></>
@@ -282,8 +233,9 @@ export default function FileViewer() {
 				)}
 				<div className="w-full h-full bg-card rounded-2xl border-border">
 					<FileListView
+						files={files}
 						handleRowClick={handleRowClick}
-						handleRowDoubleClick={handleRowDoubleClick}
+						handleRowDoubleClick={onDoubleClick}
 						selectedFiles={selectedFiles}
 						fileCursorIndex={fileCursorIndex}
 					/>
