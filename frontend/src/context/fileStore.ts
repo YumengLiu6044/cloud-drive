@@ -30,6 +30,15 @@ export const useFileStore = create<FileStore>()(
 				set({trashFiles: newFiles});
 			},
 
+			resetState: () => {
+				set({
+					files: [],
+					trashFiles: [],
+					directoryTree: [],
+					rootDirectory: null
+				})
+			},
+
 			refreshFiles() {
 				const { directoryTree } = get();
 				const currentDirectory = directoryTree.at(-1);
@@ -45,7 +54,6 @@ export const useFileStore = create<FileStore>()(
 				DriveApi.listTrashContent()
 					.then((res) => {
 						const newTrashFiles = res.data?.result ?? [];
-						console.log(newTrashFiles)
 						setTrashFiles(newTrashFiles)
 					})
 			},

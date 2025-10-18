@@ -10,7 +10,6 @@ import { LIST_HEADER_COLS } from "@/constants";
 import { ArrowUp } from "lucide-react";
 import FileListRow from "./FileListRow";
 import type { FileListViewProps, ListHeader } from "@/type";
-import { useFileStore } from "@/context/fileStore";
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "motion/react";
 

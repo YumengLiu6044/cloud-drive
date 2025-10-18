@@ -84,6 +84,7 @@ export type FileStore = {
 	setTrashFiles: (newFiles: Resource[]) => void;
 
 	// Util functions
+	resetState: () => void,
 	refreshFiles: () => void;
 	refreshTrash: () => void;
 	changeDirectory: (newDirectory: Directory) => void;

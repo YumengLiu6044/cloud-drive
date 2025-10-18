@@ -1,8 +1,7 @@
-import { DriveApi } from "@/api/driveApi";
 import FileViewer from "@/components/FileViewer";
 import { useFileStore } from "@/context/fileStore";
 import type { Resource } from "@/type";
-import { ArchiveRestore, Copy, Download, Trash2 } from "lucide-react";
+import { ArchiveRestore, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 

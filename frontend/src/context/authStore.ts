@@ -10,7 +10,6 @@ const useAuthStore = create<AuthStore>()(
 			token: null,
 			username: null,
 			email: null,
-			driveRootId: null,
 			profileImageId: null,
 
 			setUsername: (newUsername: string) =>
@@ -19,12 +18,15 @@ const useAuthStore = create<AuthStore>()(
 				set({ token: newToken });
 			},
 			logout: () => {
-				const { setDirectoryTree, setFiles, setRootDirectory } =
+				const { resetState } =
 					useFileStore.getState();
-				setDirectoryTree([]);
-				setFiles([]);
-				setRootDirectory(null);
-				set({ token: null });
+				resetState()
+				set({ 
+					token: null,
+					username: null,
+					email: null,
+					profileImageId: null
+				 });
 			},
 			setEmail(email) {
 				set({ email });
