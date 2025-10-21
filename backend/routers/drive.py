@@ -1,42 +1,28 @@
 from datetime import datetime, timezone
-from typing import Annotated, List
-from bson import ObjectId
+from typing import Annotated, Mapping
+from urllib.parse import unquote
 from fastapi import (
     APIRouter,
     Depends,
     HTTPException,
+    Request, Query
 )
 from pydantic import EmailStr
 from pymongo.errors import DuplicateKeyError
 from core.database import mongo
+from core.file_utils import get_mime_type, get_file_from_db, verify_parent_folder
 from core.security import security_manager
 from models.db_models import DriveModel
 from models.drive_models import CreateFolderRequest, ListContentModel, DeleteFilesRequest
 
 drive_router = APIRouter(prefix="/drive", tags=["drive"])
 
-async def get_file_from_db(
-    file_id: str,
-    current_user: EmailStr
-):
-    # Check if the requested folder belongs to current_user
-    find_owner_request = {"_id": ObjectId(file_id)}
-    find_owner_response = await mongo.files.find_one(find_owner_request)
-    if find_owner_response is None:
-        raise HTTPException(status_code=404, detail="Folder Not found")
-    if find_owner_response["owner"] != current_user:
-        raise HTTPException(status_code=403, detail="Not authorized")
 
-    return find_owner_response
-
-
-@drive_router.post("/list-content")
+@drive_router.get("/list-content/{parent_id}")
 async def list_content(
-    param: ListContentModel,
-    current_user: Annotated[EmailStr, Depends(security_manager.get_current_user)]
+    parent_record: Annotated[Mapping, Depends(verify_parent_folder)],
 ):
-    requested_parent = param.parent_id
-    await get_file_from_db(requested_parent, current_user)
+    requested_parent = str(parent_record["_id"])
 
     # Query for all files
     all_files_request = {"parent_id": requested_parent}
@@ -114,3 +100,49 @@ async def list_trash_content(
         records.append(trash_file_row)
 
     return {"result": records}
+
+@drive_router.post("/upload-file/{parent_id}")
+async def upload_file(
+    parent_record: Annotated[Mapping, Depends(verify_parent_folder)],
+    current_user: Annotated[EmailStr, Depends(security_manager.get_current_user)],
+    file_name: Annotated[str, Query(...)],
+    request: Request
+):
+    bucket = mongo.file_bucket
+    parent_id = str(parent_record.get("_id"))
+    file_name = unquote(file_name)
+    file_mime_type = get_mime_type(file_name)
+
+    # Insert file document
+    new_record = DriveModel(
+        parent_id=parent_id,
+        is_folder=False,
+        name=file_name,
+        type=file_mime_type,
+        owner=current_user,
+        last_modified=int(datetime.now(timezone.utc).timestamp()),
+    )
+
+    try:
+        inserted_record = await mongo.files.insert_one(new_record.__dict__)
+    except DuplicateKeyError:
+        raise HTTPException(status_code=400, detail="File of the same name already exists")
+
+    # Upload file and update uri field
+    metadata = {"contentType": file_mime_type}
+    try:
+        async with bucket.open_upload_stream(file_name, metadata=metadata) as upload_stream:
+            async for chunk in request.stream():
+                await upload_stream.write(chunk)
+            file_id = upload_stream._id
+    except Exception as e:
+        await mongo.files.delete_one({"_id": inserted_record.inserted_id})
+        raise e
+
+    await mongo.files.update_one(
+        {"_id": inserted_record.inserted_id},
+        {"$set": {"uri": str(file_id)}},
+    )
+
+    # Return
+    return {"result": str(file_id)}

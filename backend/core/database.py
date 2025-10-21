@@ -6,7 +6,8 @@ from core.constants import DATABASE_URL, DATABASE_NAME, COLLECTIONS, BUCKETS
 
 class MongoDBClient:
     _client: AsyncMongoClient | None = None
-    _bucket_instance: AsyncGridFSBucket | None = None
+    _profile_bucket_instance: AsyncGridFSBucket | None = None
+    _file_storage_instance: AsyncGridFSBucket | None = None
 
     async def connect(self):
         self._client = AsyncMongoClient(DATABASE_URL)
@@ -36,11 +37,18 @@ class MongoDBClient:
 
     @property
     def profile_bucket(self):
-        if self._bucket_instance is not None:
-            return self._bucket_instance
+        if self._profile_bucket_instance is not None:
+            return self._profile_bucket_instance
 
-        self._bucket_instance = gridfs.AsyncGridFSBucket(self.database, BUCKETS.PROFILE_PICTURES.name)
-        return self._bucket_instance
+        self._profile_bucket_instance = gridfs.AsyncGridFSBucket(self.database, BUCKETS.PROFILE_PICTURES.name)
+        return self._profile_bucket_instance
 
+    @property
+    def file_bucket(self):
+        if self._file_storage_instance is not None:
+            return self._file_storage_instance
+
+        self._file_storage_instance = gridfs.AsyncGridFSBucket(self.database, BUCKETS.FILE_STORAGE.name)
+        return self._file_storage_instance
 
 mongo = MongoDBClient()

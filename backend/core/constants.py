@@ -22,6 +22,7 @@ class COLLECTIONS(str, Enum):
 
 class BUCKETS(str, Enum):
     PROFILE_PICTURES = "profile_pictures"
+    FILE_STORAGE = "file_storage"
 
 # Password Config
 PASSWORD_MIN_LENGTH = 8
