@@ -65,10 +65,21 @@ async def move_files_to_trash(
     param: DeleteFilesRequest,
     current_user: Annotated[EmailStr, Depends(security_manager.get_current_user)]
 ):
+    files_to_delete = param.files
+    if not files_to_delete:
+        raise HTTPException(status_code=400, detail="No files to delete")
+
     # Load records from DB
     requested_records = []
-    for requested_file in param.files:
+    global_parent = None
+    for requested_file in files_to_delete:
         record = await get_file_from_db(requested_file, current_user)
+        if global_parent:
+            if record["parent_id"] != global_parent:
+                raise HTTPException(status_code=400, detail="Must delete from the same parent folder")
+        else:
+            global_parent = record["parent_id"]
+
         requested_records.append(record)
 
     # Move records to trash using DFS
@@ -84,6 +95,7 @@ async def move_files_to_trash(
         if not delete_response.deleted_count:
             raise HTTPException(status_code=404, detail="Folder Not found")
 
+        current_top["time_trashed"] = int(datetime.now(timezone.utc).timestamp())
         await mongo.trash.insert_one(current_top)
 
     return {"message": "Moved files to trash"}
