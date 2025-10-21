@@ -130,10 +130,12 @@ async def upload_file(
 
     # Upload file and update uri field
     metadata = {"contentType": file_mime_type}
+    file_size = 0
     try:
         async with bucket.open_upload_stream(file_name, metadata=metadata) as upload_stream:
             async for chunk in request.stream():
                 await upload_stream.write(chunk)
+                file_size += len(chunk)
             file_id = upload_stream._id
     except Exception as e:
         await mongo.files.delete_one({"_id": inserted_record.inserted_id})
@@ -141,7 +143,7 @@ async def upload_file(
 
     await mongo.files.update_one(
         {"_id": inserted_record.inserted_id},
-        {"$set": {"uri": str(file_id)}},
+        {"$set": {"uri": str(file_id), "size": file_size}},
     )
 
     # Return

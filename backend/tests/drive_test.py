@@ -1,4 +1,5 @@
 import unittest
+import uuid
 
 from bson import ObjectId
 from starlette.testclient import TestClient
@@ -9,7 +10,7 @@ from core.security import security_manager
 from tests.config import TEST_USER
 
 
-class DriveTest(unittest.TestCase):
+class DriveTest(unittest.IsolatedAsyncioTestCase):
     @classmethod
     def setUpClass(cls) -> None:
         cls._client = TestClient(app).__enter__()
@@ -25,7 +26,10 @@ class DriveTest(unittest.TestCase):
         user_record = user_record_response.json()
         drive_root_id = user_record['drive_root_id']
 
-        endpoint = f"/drive/upload-file/{drive_root_id}?file_name=hello.txt"
+        random_file_name = uuid.uuid4().hex + ".txt"
+        fake_payload = b"hello world"
+
+        endpoint = f"/drive/upload-file/{drive_root_id}?file_name={random_file_name}"
         headers = {
             "Authorization": f"Bearer {auth_token}",
             "Content-Type": "multipart/form-data",
@@ -33,7 +37,7 @@ class DriveTest(unittest.TestCase):
         upload_response = self._client.post(
             endpoint,
             headers=headers,
-            content=b"Hello World!"
+            content=fake_payload
         )
         self.assertEqual(upload_response.status_code, 200)
 
@@ -42,10 +46,10 @@ class DriveTest(unittest.TestCase):
             f"/drive/list-content/{drive_root_id}",
             headers={"Authorization": f"Bearer {auth_token}"},
         )
-        files = list_content_response.json()
+        files = list_content_response.json()["result"]
         for file in files:
-            await mongo.files.delete_one({"_id": ObjectId(file["_id"])})
-            await mongo.file_bucket.delete({"_id": ObjectId(file["uri"])})
+            mongo.files.delete_one({"_id": ObjectId(file["_id"])})
+            mongo.file_bucket.delete({"_id": ObjectId(file["uri"])})
 
     def test_upload_file_invalid_parent(self):
         auth_token = security_manager.create_access_token(TEST_USER, JwtTokenScope.auth)
