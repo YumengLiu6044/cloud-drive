@@ -10,10 +10,11 @@ from fastapi import (
 from pydantic import EmailStr
 from pymongo.errors import DuplicateKeyError
 from core.database import mongo
-from core.file_utils import get_mime_type, get_file_from_db, verify_parent_folder
+from core.file_utils import get_mime_type, get_file_from_db, verify_parent_folder, move_files_to_trash, \
+    verify_deletion_request
 from core.security import security_manager
 from models.db_models import DriveModel
-from models.drive_models import CreateFolderRequest, ListContentModel, DeleteFilesRequest
+from models.drive_models import CreateFolderRequest, DeleteFilesRequest
 
 drive_router = APIRouter(prefix="/drive", tags=["drive"])
 
@@ -39,7 +40,7 @@ async def create_folder(
     current_user: Annotated[EmailStr, Depends(security_manager.get_current_user)]
 ):
     requested_parent = param.parent_id
-    await get_file_from_db(requested_parent, current_user)
+    await get_file_from_db(requested_parent, current_user, mongo.files)
 
     new_folder = DriveModel(
         parent_id=param.parent_id,
@@ -58,47 +59,6 @@ async def create_folder(
         raise HTTPException(status_code=500, detail="Failed to create folder")
 
     return {"new_folder": str(insertion_result.inserted_id)}
-
-
-@drive_router.post("/move-to-trash")
-async def move_files_to_trash(
-    param: DeleteFilesRequest,
-    current_user: Annotated[EmailStr, Depends(security_manager.get_current_user)]
-):
-    files_to_delete = param.files
-    if not files_to_delete:
-        raise HTTPException(status_code=400, detail="No files to delete")
-
-    # Load records from DB
-    requested_records = []
-    global_parent = None
-    for requested_file in files_to_delete:
-        record = await get_file_from_db(requested_file, current_user)
-        if global_parent:
-            if record["parent_id"] != global_parent:
-                raise HTTPException(status_code=400, detail="Must delete from the same parent folder")
-        else:
-            global_parent = record["parent_id"]
-
-        requested_records.append(record)
-
-    # Move records to trash using DFS
-    while len(requested_records) > 0:
-        current_top = requested_records.pop(-1)
-        current_top_id = current_top.get("_id")
-
-        find_children_query = {"parent_id": str(current_top_id), "owner": current_user}
-        async for file_row in mongo.files.find(find_children_query):
-            requested_records.append(file_row)
-
-        delete_response = await mongo.files.delete_one({"_id": current_top_id})
-        if not delete_response.deleted_count:
-            raise HTTPException(status_code=404, detail="Folder Not found")
-
-        current_top["time_trashed"] = int(datetime.now(timezone.utc).timestamp())
-        await mongo.trash.insert_one(current_top)
-
-    return {"message": "Moved files to trash"}
 
 
 @drive_router.get("/list-trash-content")
@@ -140,7 +100,7 @@ async def upload_file(
     except DuplicateKeyError:
         raise HTTPException(status_code=400, detail="File of the same name already exists")
 
-    # Upload file and update uri field
+    # Upload file and update fields
     metadata = {"contentType": file_mime_type}
     file_size = 0
     try:
@@ -150,6 +110,7 @@ async def upload_file(
                 file_size += len(chunk)
             file_id = upload_stream._id
     except Exception as e:
+        # Remove file record if uploading fails
         await mongo.files.delete_one({"_id": inserted_record.inserted_id})
         raise e
 
@@ -159,4 +120,25 @@ async def upload_file(
     )
 
     # Return
-    return {"result": str(file_id)}
+    return {
+        "result": str(inserted_record.inserted_id),
+        "file_uri": str(file_id),
+    }
+
+
+@drive_router.post("/move-to-trash")
+async def move_files_to_trash_route(
+    param: Annotated[DeleteFilesRequest, Depends(verify_deletion_request)],
+    current_user: Annotated[EmailStr, Depends(security_manager.get_current_user)]
+):
+    await move_files_to_trash(param.files, current_user, permanent=False)
+    return {"message": "Moved files to trash"}
+
+
+@drive_router.post("/delete-from-trash")
+async def delete_files_from_trash_route(
+    param: Annotated[DeleteFilesRequest, Depends(verify_deletion_request)],
+    current_user: Annotated[EmailStr, Depends(security_manager.get_current_user)],
+):
+    await move_files_to_trash(param.files, current_user, permanent=True)
+    return {"message": "Deleted files from trash"}

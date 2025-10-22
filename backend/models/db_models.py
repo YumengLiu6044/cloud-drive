@@ -1,6 +1,3 @@
-from datetime import datetime
-
-from bson import ObjectId
 from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_validator, model_serializer
 
 
