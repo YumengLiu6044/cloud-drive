@@ -1,6 +1,6 @@
 import mimetypes
 from datetime import datetime, timezone
-from typing import Annotated, List
+from typing import Annotated, List, Set
 from bson import ObjectId
 from fastapi import HTTPException, Depends
 from gridfs import NoFile
@@ -44,7 +44,6 @@ async def verify_parent_folder(
 
 async def move_files_to_trash(
     files_to_delete: List[str],
-    current_user: EmailStr,
     permanent=False
 ) -> None:
     if permanent:
@@ -53,40 +52,34 @@ async def move_files_to_trash(
         collection = mongo.files
 
     # Load records from DB
-    requested_records = []
-    global_parent = None
-    for requested_file in files_to_delete:
-        record = await get_file_from_db(requested_file, current_user, collection)
-        if global_parent:
-            if record["parent_id"] != global_parent:
-                raise HTTPException(status_code=400, detail="Must delete from the same parent folder")
-        else:
-            global_parent = record["parent_id"]
-
-        requested_records.append(record)
+    deleted_record_ids: Set[str] = set()
 
     # Delete records using DFS
-    while len(requested_records) > 0:
-        current_top = requested_records.pop(-1)
-        current_top_id = current_top.get("_id")
+    while len(files_to_delete) > 0:
+        current_top = files_to_delete.pop(-1)
+        current_top_id = ObjectId(current_top)
 
         # Push children to stack
         find_children_query = {"parent_id": str(current_top_id)}
         async for file_row in collection.find(find_children_query):
-            requested_records.append(file_row)
+            child_file_id = str(file_row["_id"])
+            if child_file_id not in deleted_record_ids:
+                files_to_delete.append(child_file_id)
 
         # Delete current top from the collection
-        await collection.delete_one({"_id": current_top_id})
+        delete_response = await collection.find_one_and_delete({"_id": current_top_id})
+        if delete_response:
+            deleted_record_ids.add(str(current_top_id))
 
-        if permanent:
-            if file_uri := current_top.get("uri"):
-                try:
-                    await mongo.file_bucket.delete(ObjectId(file_uri))
-                except NoFile:
-                    ...
-        else:
-            current_top["time_trashed"] = int(datetime.now(timezone.utc).timestamp())
-            await mongo.trash.insert_one(current_top)
+            if permanent:
+                if file_uri := delete_response.get("uri"):
+                    try:
+                        await mongo.file_bucket.delete(ObjectId(file_uri))
+                    except NoFile:
+                        ...
+            else:
+                delete_response["time_trashed"] = int(datetime.now(timezone.utc).timestamp())
+                await mongo.trash.insert_one(delete_response)
 
 
 def verify_deletion_request(param: DeleteFilesRequest):

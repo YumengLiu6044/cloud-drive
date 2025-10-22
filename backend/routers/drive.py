@@ -129,16 +129,16 @@ async def upload_file(
 @drive_router.post("/move-to-trash")
 async def move_files_to_trash_route(
     param: Annotated[DeleteFilesRequest, Depends(verify_deletion_request)],
-    current_user: Annotated[EmailStr, Depends(security_manager.get_current_user)]
+    _: Annotated[EmailStr, Depends(security_manager.get_current_user)]
 ):
-    await move_files_to_trash(param.files, current_user, permanent=False)
+    await move_files_to_trash(param.files, permanent=False)
     return {"message": "Moved files to trash"}
 
 
 @drive_router.post("/delete-from-trash")
 async def delete_files_from_trash_route(
     param: Annotated[DeleteFilesRequest, Depends(verify_deletion_request)],
-    current_user: Annotated[EmailStr, Depends(security_manager.get_current_user)],
+    _: Annotated[EmailStr, Depends(security_manager.get_current_user)],
 ):
-    await move_files_to_trash(param.files, current_user, permanent=True)
+    await move_files_to_trash(param.files, permanent=True)
     return {"message": "Deleted files from trash"}

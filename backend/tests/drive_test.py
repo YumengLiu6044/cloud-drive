@@ -157,37 +157,6 @@ class DriveTest(unittest.TestCase):
         search_child_in_trash = self.trash_collection.find_one({"_id": ObjectId(child_folder_id)})
         self.assertIsNotNone(search_child_in_trash)
 
-    def test_move_file_to_trash_different_parent(self):
-        auth_token = self.auth_token
-        user_record = self.user_record
-        drive_root_id = user_record['drive_root_id']
-
-        parent_folder_name = "parent"
-        child_folder_name = "child"
-
-        insertion_result = self._client.post(
-            '/drive/create-folder',
-            headers={"Authorization": f"Bearer {auth_token}"},
-            json={"parent_id": drive_root_id, "name": parent_folder_name}
-        )
-        self.assertEqual(insertion_result.status_code, 200)
-        parent_folder_id = insertion_result.json()["new_folder"]
-
-        insertion_result = self._client.post(
-            '/drive/create-folder',
-            headers={"Authorization": f"Bearer {auth_token}"},
-            json={"parent_id": parent_folder_id, "name": child_folder_name}
-        )
-        self.assertEqual(insertion_result.status_code, 200)
-        child_folder_id = insertion_result.json()["new_folder"]
-
-        move_to_trash_result = self._client.post(
-            "/drive/move-to-trash",
-            headers={"Authorization": f"Bearer {auth_token}"},
-            json={"files": [parent_folder_id, child_folder_id]},
-        )
-        self.assertEqual(move_to_trash_result.status_code, 400)
-
     def test_delete_files_from_trash(self):
         auth_token = self.auth_token
 
@@ -220,6 +189,9 @@ class DriveTest(unittest.TestCase):
             json={"files": [outer_parent_id]},
         ).status_code == 200
 
+        for file_uri in [child_file_uri1, child_file_uri2]:
+            find_file_object_response = self.file_bucket._files.find_one({"_id": ObjectId(file_uri)})
+            self.assertIsNone(find_file_object_response)
 
 if __name__ == '__main__':
     unittest.main()
