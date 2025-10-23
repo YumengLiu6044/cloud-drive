@@ -86,6 +86,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 		DriveApi.createNewFolder(currentDirectory.id, newFolderName)
 			.then(() => {
 				refreshFiles();
+				setNewFolderName("");
 				setIsDialogOpen(false);
 			})
 			.finally(() => {

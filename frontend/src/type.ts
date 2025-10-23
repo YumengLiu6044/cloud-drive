@@ -45,16 +45,20 @@ export interface FileListRowProps {
 	item: Resource;
 	isSelected: boolean;
 	isActive: boolean;
+	isDragging: boolean;
 	onClick: () => void;
 	handleRowDoubleClick: (_: Resource) => void;
 }
 
 export interface FileListViewProps {
 	selectedFiles: Set<number>;
+	setSelectedFiles: Dispatch<SetStateAction<Set<number>>>;
 	fileCursorIndex: number;
+	setFileCursorIndex: Dispatch<SetStateAction<number>>;
+	
 	handleRowClick: (_: number) => void;
 	handleRowDoubleClick: (_: Resource) => void;
-	files: Resource[]
+	files: Resource[];
 }
 
 export type KeyCombo = {
@@ -84,7 +88,7 @@ export type FileStore = {
 	setTrashFiles: (newFiles: Resource[]) => void;
 
 	// Util functions
-	resetState: () => void,
+	resetState: () => void;
 	refreshFiles: () => void;
 	refreshTrash: () => void;
 	changeDirectory: (newDirectory: Directory) => void;
@@ -104,15 +108,17 @@ export interface FileViewerProps {
 	files: Resource[];
 	directoryTree: Directory[];
 	onDoubleClick: (_: Resource) => void;
+
 	selectedFiles: Set<number>;
 	setSelectedFiles: Dispatch<SetStateAction<Set<number>>>;
 	fileCursorIndex: number;
 	setFileCursorIndex: Dispatch<SetStateAction<number>>;
+
 	onDirectoryClick: (_: Directory) => void;
 
 	fileActions: {
 		action: () => void;
 		Icon: ReactNode;
 		label: string;
-	}[]
+	}[];
 }

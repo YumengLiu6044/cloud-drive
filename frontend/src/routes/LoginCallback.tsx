@@ -28,7 +28,7 @@ export default function LoginCallback() {
 				setUsername(body.username);
 				setEmail(body.email);
 				setProfileImageId(body.profile_image_id)
-				navigator(SUB_ROUTES.drive.base);
+				navigator(SUB_ROUTES.drive.files);
 			})
 			.catch(() => {
 				toast.error("Failed to login due to unknown error");

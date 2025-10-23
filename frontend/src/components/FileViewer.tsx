@@ -238,6 +238,8 @@ export default function FileViewer({
 						handleRowDoubleClick={onDoubleClick}
 						selectedFiles={selectedFiles}
 						fileCursorIndex={fileCursorIndex}
+						setFileCursorIndex={setFileCursorIndex}
+						setSelectedFiles={setSelectedFiles}
 					/>
 				</div>
 			</div>
