@@ -113,7 +113,7 @@ export default function FileListView({
 									}}
 									key={index}
 								>
-									<div className="w-5 h-5 flex items-center justify-center">
+									<div className="w-4 h-4 flex items-center justify-center">
 										{index === 0 && draggedItem.is_folder ? (
 											<Folder></Folder>
 										) : (

@@ -1,8 +1,8 @@
 import { motion, useAnimation } from "motion/react";
 import { Button } from "./ui/button";
-import { FolderPlus, Loader2, Plus, Upload } from "lucide-react";
+import { CircleCheck, FolderPlus, Loader2, Plus, Upload } from "lucide-react";
 import CollapsibleText from "./CollapsibleText";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type { NewFolderButtonProps } from "@/type";
 import {
 	Dialog,
@@ -20,6 +20,8 @@ import { toast } from "sonner";
 import { DriveApi } from "@/api/driveApi";
 import { useFileStore } from "@/context/fileStore";
 import { useDeviceType } from "@/hooks/useDeviceType";
+import { DndContext } from "@dnd-kit/core";
+import { useDropzone } from "react-dropzone";
 
 export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 	// Screen size
@@ -56,17 +58,33 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 	);
 
 	// File states
-	const directoryTree = useFileStore((state) => state.directoryTree)
-	const currentDirectory = directoryTree.at(-1)
-	
+	const directoryTree = useFileStore((state) => state.directoryTree);
+	const currentDirectory = directoryTree.at(-1);
+
 	const refreshFiles = useFileStore((state) => state.refreshFiles);
 
 	const [newFolderName, setNewFolderName] = useState("");
 	const [isCreateNewFolder, setIsCreateNewFolder] = useState(false);
 	const [isUploadNewFodler, setIsUploadNewFolder] = useState(false);
+
+	const [files, setFiles] = useState<File[]>([]);
+	const {
+		getRootProps,
+		getInputProps,
+		acceptedFiles,
+		isDragActive,
+		inputRef,
+	} = useDropzone({
+		onDrop: setFiles,
+	});
+
+	const isDragAccept = files.length > 0;
+
 	const returnToMain = useCallback(() => {
 		setIsCreateNewFolder(false);
 		setIsUploadNewFolder(false);
+		setFiles([]);
+		setNewFolderName("");
 	}, []);
 
 	const handleSubmit = useCallback(() => {
@@ -115,7 +133,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
-			{ isDesktop ?
+			{isDesktop ? (
 				<DialogTrigger
 					className={`border border-border p-2 px-3 flex gap-0 items-center text-sm justify-start w-full hover:bg-blue-500 hover:text-background rounded-full hover:shadow-xl ${
 						isCollapsed && "justify-center"
@@ -137,11 +155,15 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 					>
 						New
 					</CollapsibleText>
-				</DialogTrigger> :
-				<DialogTrigger aria-label="New folder" className="bg-blue-500 rounded-full w-15 h-15 aspect-square flex justify-center items-center">
+				</DialogTrigger>
+			) : (
+				<DialogTrigger
+					aria-label="New folder"
+					className="bg-blue-500 rounded-full w-15 h-15 aspect-square flex justify-center items-center"
+				>
 					<Plus className="w-7 h-7 text-background" />
 				</DialogTrigger>
-			}
+			)}
 			<DialogContent className="bg-accent">
 				<DialogHeader>
 					<DialogTitle>{cardTitle.title}</DialogTitle>
@@ -209,26 +231,48 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 					</div>
 				)}
 				{isUploadNewFodler && (
-					<button
-						className="h-full w-full p-5 rounded-xl flex flex-col gap-1 justify-center items-center border-2 border-dashed border-secondary hover:border-primary transition-colors bg-card"
-						aria-label="Upload files"
-						onClick={() => setIsUploadNewFolder(true)}
-					>
-						<div className="p-4 rounded-full bg-blue-500">
-							<Upload
-								className="text-background"
-								size={30}
-							></Upload>
+					<DndContext>
+						<div
+							{...getRootProps()}
+							style={{
+								borderColor: isDragActive
+									? "var(--primary)"
+									: "",
+							}}
+							className="h-full w-full p-5 rounded-xl flex flex-col gap-1 justify-center items-center border-2 border-dashed border-secondary hover:border-primary transition-colors bg-card"
+							aria-label="Upload files"
+							onClick={() => inputRef.current?.click()}
+						>
+							<input {...getInputProps()}></input>
+							<div className="p-4 rounded-full bg-blue-500">
+								{isDragAccept ? (
+									<CircleCheck
+										className="text-background"
+										size={30}
+									/>
+								) : (
+									<Upload
+										className="text-background"
+										size={30}
+									></Upload>
+								)}
+							</div>
+							<div className="flex flex-col items-center">
+								<p className="text-xl">
+									{isDragAccept
+										? `${acceptedFiles.length} file${acceptedFiles.length > 1 ? "s" : ""} added successfully`
+										: isDragActive
+										? "Release to upload files"
+										: "Click to upload or drag and drop"}
+								</p>
+								<p className="text-sm text-muted-foreground text-cente">
+									{isDragAccept
+										? 'Click "Upload Files" to confirm'
+										: "Select one or more files"}
+								</p>
+							</div>
 						</div>
-						<div className="flex flex-col items-center">
-							<p className="text-xl">
-								Click to upload or drag and drop
-							</p>
-							<p className="text-sm text-muted-foreground text-cente">
-								Select one or more files
-							</p>
-						</div>
-					</button>
+					</DndContext>
 				)}
 
 				{(isCreateNewFolder || isUploadNewFodler) && (
