@@ -2,7 +2,7 @@ import { motion, useAnimation } from "motion/react";
 import { Button } from "./ui/button";
 import { CircleCheck, FolderPlus, Loader2, Plus, Upload } from "lucide-react";
 import CollapsibleText from "./CollapsibleText";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import type { NewFolderButtonProps } from "@/type";
 import {
 	Dialog,
@@ -21,7 +21,8 @@ import { DriveApi } from "@/api/driveApi";
 import { useFileStore } from "@/context/fileStore";
 import { useDeviceType } from "@/hooks/useDeviceType";
 import { DndContext } from "@dnd-kit/core";
-import { useDropzone } from "react-dropzone";
+import { useDropzone, type FileWithPath } from "react-dropzone";
+import useFileUpload from "@/hooks/useFileUpload";
 
 export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 	// Screen size
@@ -65,9 +66,10 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 
 	const [newFolderName, setNewFolderName] = useState("");
 	const [isCreateNewFolder, setIsCreateNewFolder] = useState(false);
-	const [isUploadNewFodler, setIsUploadNewFolder] = useState(false);
+	const [isUploadNewFiles, setIsUploadNewFiles] = useState(false);
 
-	const [files, setFiles] = useState<File[]>([]);
+	const [files, setFiles] = useState<FileWithPath[]>([]);
+	const { uploadFiles } = useFileUpload();
 	const {
 		getRootProps,
 		getInputProps,
@@ -82,12 +84,12 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 
 	const returnToMain = useCallback(() => {
 		setIsCreateNewFolder(false);
-		setIsUploadNewFolder(false);
+		setIsUploadNewFiles(false);
 		setFiles([]);
 		setNewFolderName("");
 	}, []);
 
-	const handleSubmit = useCallback(() => {
+	const handleSubmitNewFolder = useCallback(() => {
 		// API call for creating new file
 		const sanitizedName = DOMPurify.sanitize(newFolderName);
 		if (!sanitizedName) {
@@ -112,13 +114,35 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 			});
 	}, [newFolderName, currentDirectory, newFolderName]);
 
+	const handleUploadFiles = useCallback(() => {
+		if (files.length === 0) {
+			toast.error("No files selected for upload");
+			return;
+		}
+		uploadFiles(files);
+		setIsDialogOpen(false);
+	}, [files, uploadFiles]);
+
+	const handleSubmit = useCallback(() => {
+		if (isCreateNewFolder) {
+			handleSubmitNewFolder();
+		} else if (isUploadNewFiles) {
+			handleUploadFiles();
+		}
+	}, [
+		isCreateNewFolder,
+		isUploadNewFiles,
+		handleSubmitNewFolder,
+		handleUploadFiles,
+	]);
+
 	const cardTitle = useMemo(() => {
 		if (isCreateNewFolder) {
 			return {
 				title: "Create New Folder",
 				description: `Create new folder under ${currentDirectory?.name}`,
 			};
-		} else if (isUploadNewFodler) {
+		} else if (isUploadNewFiles) {
 			return {
 				title: "Upload Files",
 				description: "Upload local files to Cloud Drive",
@@ -129,7 +153,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 				description: "Select an action to get started",
 			};
 		}
-	}, [isCreateNewFolder, isUploadNewFodler, currentDirectory]);
+	}, [isCreateNewFolder, isUploadNewFiles, currentDirectory]);
 
 	return (
 		<Dialog open={isDialogOpen} onOpenChange={handleDialogOpenChange}>
@@ -172,7 +196,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 					</DialogDescription>
 				</DialogHeader>
 				{/* Main Menu */}
-				{!isCreateNewFolder && !isUploadNewFodler && (
+				{!isCreateNewFolder && !isUploadNewFiles && (
 					<div className="w-full flex flex-col md:flex-row items-center gap-5 [&>button]:bg-card">
 						<button
 							className="group hover:bg-primary h-full w-full p-5 rounded-xl border border-border flex flex-col gap-1 justify-center items-center transition-all"
@@ -197,7 +221,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 						<button
 							className="group hover:bg-blue-500 h-full w-full p-5 rounded-xl border border-border flex flex-col gap-1 justify-center items-center transition-all"
 							aria-label="Upload files"
-							onClick={() => setIsUploadNewFolder(true)}
+							onClick={() => setIsUploadNewFiles(true)}
 						>
 							<div className="p-4 rounded-full bg-blue-500 group-hover:bg-background transition-all">
 								<Upload
@@ -230,7 +254,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 						/>
 					</div>
 				)}
-				{isUploadNewFodler && (
+				{isUploadNewFiles && (
 					<DndContext>
 						<div
 							{...getRootProps()}
@@ -260,7 +284,11 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 							<div className="flex flex-col items-center">
 								<p className="text-xl">
 									{isDragAccept
-										? `${acceptedFiles.length} file${acceptedFiles.length > 1 ? "s" : ""} added successfully`
+										? `${acceptedFiles.length} file${
+												acceptedFiles.length > 1
+													? "s"
+													: ""
+										  } added successfully`
 										: isDragActive
 										? "Release to upload files"
 										: "Click to upload or drag and drop"}
@@ -275,7 +303,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 					</DndContext>
 				)}
 
-				{(isCreateNewFolder || isUploadNewFodler) && (
+				{(isCreateNewFolder || isUploadNewFiles) && (
 					<DialogFooter>
 						<div className="w-full flex justify-between">
 							<Button variant="outline" onClick={returnToMain}>
@@ -291,7 +319,7 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 								{isCreateNewFolder && (
 									<span>Create Folder</span>
 								)}
-								{isUploadNewFodler && <span>Upload Files</span>}
+								{isUploadNewFiles && <span>Upload Files</span>}
 								{isLoading && (
 									<Loader2 className="animate-spin"></Loader2>
 								)}

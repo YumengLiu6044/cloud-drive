@@ -31,7 +31,7 @@ export const DriveApi = {
 
 		return axiosClient.post(endpoint, form, {
 			headers: {
-				"Content-Type": "multipart/form-data",
+				"Content-Type": file.type || "application/octet-stream",
 			},
 			onUploadProgress: uploadProgress,
 		});

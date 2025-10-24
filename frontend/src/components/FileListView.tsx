@@ -100,10 +100,15 @@ export default function FileListView({
 			<DragOverlay dropAnimation={null}>
 				{isDragging && draggedItem && (
 					<div className="relative w-fit">
+						<div className="text-sm absolute -top-1 -left-2 w-5 aspect-square rounded-full bg-blue-500 text-background flex items-center justify-center shadow-lg">
+							{selectedFiles.size}
+						</div>
 						{selectedFiles.size > 0 &&
-							[...selectedFiles].slice(0, 3).map((fileIndex, index) => (
+							Array.from({
+								length: Math.min(3, selectedFiles.size),
+							}).map((_, index) => (
 								<div
-									className="w-30 overflow-clip flex gap-2 items-center bg-background rounded-xl p-3 shadow-lg cursor-grabbing"
+									className="w-30 h-10 overflow-clip flex gap-2 items-center bg-background rounded-xl p-3 shadow-lg cursor-grabbing"
 									style={{
 										position: "absolute",
 										top: index * 5,
@@ -114,17 +119,15 @@ export default function FileListView({
 									key={index}
 								>
 									<div className="w-4 h-4 flex items-center justify-center">
-										{index === 0 && draggedItem.is_folder ? (
+										{index === 0 &&
+										draggedItem.is_folder ? (
 											<Folder></Folder>
 										) : (
 											<FileText></FileText>
 										)}
 									</div>
-									<span>
-										{index === 0
-											? draggedItem.name
-											: renderedList[Number(fileIndex)]
-													.name}
+									<span className="whitespace-nowrap max-w-10 text-ellipsis">
+										{index === 0 && draggedItem.name}
 									</span>
 								</div>
 							))}

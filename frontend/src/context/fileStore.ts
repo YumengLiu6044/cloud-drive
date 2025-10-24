@@ -27,7 +27,7 @@ export const useFileStore = create<FileStore>()(
 
 			trashFiles: [],
 			setTrashFiles(newFiles) {
-				set({trashFiles: newFiles});
+				set({ trashFiles: newFiles });
 			},
 
 			resetState: () => {
@@ -35,8 +35,8 @@ export const useFileStore = create<FileStore>()(
 					files: [],
 					trashFiles: [],
 					directoryTree: [],
-					rootDirectory: null
-				})
+					rootDirectory: null,
+				});
 			},
 
 			refreshFiles() {
@@ -50,12 +50,11 @@ export const useFileStore = create<FileStore>()(
 			},
 
 			refreshTrash() {
-				const {setTrashFiles} = get();
-				DriveApi.listTrashContent()
-					.then((res) => {
-						const newTrashFiles = res.data?.result ?? [];
-						setTrashFiles(newTrashFiles)
-					})
+				const { setTrashFiles } = get();
+				DriveApi.listTrashContent().then((res) => {
+					const newTrashFiles = res.data?.result ?? [];
+					setTrashFiles(newTrashFiles);
+				});
 			},
 
 			changeDirectory(newDirectory) {

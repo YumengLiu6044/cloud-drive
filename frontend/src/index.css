@@ -135,3 +135,7 @@
 		@apply px-5 md:px-10 py-[10px]
 	}
 }
+
+[data-content] {
+	width: 100%;
+}
