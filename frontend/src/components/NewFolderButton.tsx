@@ -20,7 +20,6 @@ import { toast } from "sonner";
 import { DriveApi } from "@/api/driveApi";
 import { useFileStore } from "@/context/fileStore";
 import { useDeviceType } from "@/hooks/useDeviceType";
-import { DndContext } from "@dnd-kit/core";
 import { useDropzone, type FileWithPath } from "react-dropzone";
 import useFileUpload from "@/hooks/useFileUpload";
 
@@ -255,52 +254,49 @@ export default function NewFolderButton({ isCollapsed }: NewFolderButtonProps) {
 					</div>
 				)}
 				{isUploadNewFiles && (
-					<DndContext>
-						<div
-							{...getRootProps()}
-							style={{
-								borderColor: isDragActive
-									? "var(--primary)"
-									: "",
-							}}
-							className="h-full w-full p-5 rounded-xl flex flex-col gap-1 justify-center items-center border-2 border-dashed border-secondary hover:border-primary transition-colors bg-card"
-							aria-label="Upload files"
-							onClick={() => inputRef.current?.click()}
-						>
-							<input {...getInputProps()}></input>
-							<div className="p-4 rounded-full bg-blue-500">
-								{isDragAccept ? (
-									<CircleCheck
-										className="text-background"
-										size={30}
-									/>
-								) : (
-									<Upload
-										className="text-background"
-										size={30}
-									></Upload>
-								)}
-							</div>
-							<div className="flex flex-col items-center">
-								<p className="text-xl">
-									{isDragAccept
-										? `${acceptedFiles.length} file${
-												acceptedFiles.length > 1
-													? "s"
-													: ""
-										  } added successfully`
-										: isDragActive
-										? "Release to upload files"
-										: "Click to upload or drag and drop"}
-								</p>
-								<p className="text-sm text-muted-foreground text-cente">
-									{isDragAccept
-										? 'Click "Upload Files" to confirm'
-										: "Select one or more files"}
-								</p>
-							</div>
+					<div
+						{...getRootProps()}
+						style={{
+							borderColor: isDragActive ? "var(--primary)" : "",
+							backgroundColor: isDragActive
+								? "var(--color-blue-100)"
+								: "",
+						}}
+						className="h-full w-full p-5 rounded-xl flex flex-col gap-1 justify-center items-center border-2 border-dashed border-secondary hover:border-primary transition-colors bg-card"
+						aria-label="Upload files"
+						onClick={() => inputRef.current?.click()}
+					>
+						<input {...getInputProps()}></input>
+						<div className="p-4 rounded-full bg-blue-500">
+							{isDragAccept ? (
+								<CircleCheck
+									className="text-background"
+									size={30}
+								/>
+							) : (
+								<Upload
+									className="text-background"
+									size={30}
+								></Upload>
+							)}
 						</div>
-					</DndContext>
+						<div className="flex flex-col items-center">
+							<p className="text-xl">
+								{isDragAccept
+									? `${acceptedFiles.length} file${
+											acceptedFiles.length > 1 ? "s" : ""
+									  } added successfully`
+									: isDragActive
+									? "Release to upload files"
+									: "Click to upload or drag and drop"}
+							</p>
+							<p className="text-sm text-muted-foreground text-cente">
+								{isDragAccept
+									? 'Click "Upload Files" to confirm'
+									: "Select one or more files"}
+							</p>
+						</div>
+					</div>
 				)}
 
 				{(isCreateNewFolder || isUploadNewFiles) && (
