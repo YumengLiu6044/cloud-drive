@@ -1,3 +1,4 @@
+import { DriveApi } from "@/api/driveApi";
 import FileViewer from "@/components/FileViewer";
 import { useFileStore } from "@/context/fileStore";
 import type { Resource } from "@/type";
@@ -7,6 +8,7 @@ import { toast } from "sonner";
 
 export default function Trash() {
 	const trashFiles = useFileStore((state) => state.trashFiles);
+	const [renderedList, setRenderedList] = useState(trashFiles);
 	const { refreshTrash } = useFileStore.getState();
 
 	useEffect(() => {
@@ -18,9 +20,31 @@ export default function Trash() {
 	const [fileCursorIndex, setFileCursorIndex] = useState<number>(-1);
 
 	const [isLoadingDelete, setIsLoadingDelete] = useState(false);
-	const handleDelete = useCallback(() => {}, [
+	const handleDelete = useCallback(() => {
+		if (isLoadingDelete) return;
+		
+		const selectedIDs: string[] = [];
+		for (const index of selectedFiles) {
+			selectedIDs.push(renderedList[index]._id);
+		}
+
+		setIsLoadingDelete(true);
+		const promise = DriveApi.deleteFromTrash(selectedIDs)
+			.then(() => {
+				setFileCursorIndex(-1);
+				setSelectedFiles(new Set());
+				refreshTrash();
+			})
+			.finally(() => setIsLoadingDelete(false));
+
+		toast.promise(promise, {
+			loading: "Permanently deleting files from trash...",
+			success: `Permanently deleted files from trash`,
+			error: "Failed to permanently delete files from trash",
+		});
+	}, [
 		selectedFiles,
-		trashFiles,
+		renderedList,
 		isLoadingDelete,
 	]);
 
@@ -52,6 +76,8 @@ export default function Trash() {
 			setSelectedFiles={setSelectedFiles}
 			selectedFiles={selectedFiles}
 			fileActions={fileActions}
+			renderedList={renderedList}
+			setRenderedList={setRenderedList}
 		></FileViewer>
 	);
 }

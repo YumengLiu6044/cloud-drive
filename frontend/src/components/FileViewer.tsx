@@ -18,6 +18,8 @@ export default function FileViewer({
 	setSelectedFiles,
 	onDirectoryClick,
 	fileActions,
+	renderedList,
+	setRenderedList,
 }: FileViewerProps) {
 	// Screen size
 	const { isDesktop } = useDeviceType();
@@ -240,6 +242,8 @@ export default function FileViewer({
 						fileCursorIndex={fileCursorIndex}
 						setFileCursorIndex={setFileCursorIndex}
 						setSelectedFiles={setSelectedFiles}
+						renderedList={renderedList}
+						setRenderedList={setRenderedList}
 					/>
 				</div>
 			</div>

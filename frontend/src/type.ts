@@ -59,6 +59,8 @@ export interface FileListViewProps {
 	handleRowClick: (_: number) => void;
 	handleRowDoubleClick: (_: Resource) => void;
 	files: Resource[];
+	renderedList: Resource[];
+	setRenderedList: Dispatch<SetStateAction<Resource[]>>;
 }
 
 export type KeyCombo = {
@@ -106,6 +108,8 @@ export type ListHeader = {
 
 export interface FileViewerProps {
 	files: Resource[];
+	renderedList: Resource[];
+	setRenderedList: Dispatch<SetStateAction<Resource[]>>;
 	directoryTree: Directory[];
 	onDoubleClick: (_: Resource) => void;
 

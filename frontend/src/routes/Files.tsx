@@ -8,6 +8,8 @@ import { toast } from "sonner";
 
 export default function Files() {
 	const files = useFileStore((state) => state.files);
+	const [renderedList, setRenderedList] = useState(files);
+
 	const directoryTree = useFileStore((state) => state.directoryTree);
 	const { changeDirectory, refreshFiles } = useFileStore.getState();
 
@@ -25,7 +27,7 @@ export default function Files() {
 
 		const selectedIDs: string[] = [];
 		for (const index of selectedFiles) {
-			selectedIDs.push(files[index]._id);
+			selectedIDs.push(renderedList[index]._id);
 		}
 
 		setIsLoadingDelete(true);
@@ -38,11 +40,11 @@ export default function Files() {
 			.finally(() => setIsLoadingDelete(false));
 
 		toast.promise(promise, {
-			loading: "Loading",
+			loading: "Moving files to trash...",
 			success: `Moved files to trash`,
 			error: "Failed to move files to trash",
 		});
-	}, [selectedFiles, files, isLoadingDelete]);
+	}, [selectedFiles, renderedList, isLoadingDelete]);
 
 	const handleRowDoubleClick = useCallback((file: Resource) => {
 		// Only handle folder double clicks
@@ -86,6 +88,8 @@ export default function Files() {
 			setSelectedFiles={setSelectedFiles}
 			selectedFiles={selectedFiles}
 			fileActions={fileActions}
+			renderedList={renderedList}
+			setRenderedList={setRenderedList}
 		></FileViewer>
 	);
 }

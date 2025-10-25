@@ -16,8 +16,13 @@ export const DriveApi = {
 		axiosClient.post(API_BASE.drive + "/move-to-trash", {
 			files,
 		}),
+	deleteFromTrash: (files: string[]) =>
+		axiosClient.post(API_BASE.drive + "/delete-from-trash", {
+			files,
+		}),
 	listTrashContent: () =>
 		axiosClient.get(API_BASE.drive + "/list-trash-content"),
+
 	uploadFile: (
 		file: File,
 		parentId: string,

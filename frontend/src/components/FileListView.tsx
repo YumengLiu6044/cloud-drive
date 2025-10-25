@@ -22,9 +22,10 @@ export default function FileListView({
 	files,
 	setFileCursorIndex,
 	setSelectedFiles,
+	renderedList,
+	setRenderedList,
 }: FileListViewProps) {
 	const [sortBy, setSortBy] = useState<ListHeader | null>(null);
-	const [renderedList, setRenderedList] = useState(files);
 
 	useEffect(() => {
 		setRenderedList(files);
