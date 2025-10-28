@@ -113,6 +113,8 @@ export interface FileViewerProps {
 	directoryTree: Directory[];
 	onDoubleClick: (_: Resource) => void;
 
+	isTrash: boolean;
+
 	selectedFiles: Set<number>;
 	setSelectedFiles: Dispatch<SetStateAction<Set<number>>>;
 	fileCursorIndex: number;

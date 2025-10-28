@@ -79,6 +79,7 @@ export default function Files() {
 
 	return (
 		<FileViewer
+			isTrash={false}
 			onDirectoryClick={changeDirectory}
 			files={files}
 			directoryTree={directoryTree}

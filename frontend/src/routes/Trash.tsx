@@ -67,6 +67,7 @@ export default function Trash() {
 
 	return (
 		<FileViewer
+			isTrash={true}
 			onDirectoryClick={() => {}}
 			onDoubleClick={(_: Resource) => {}}
 			files={trashFiles}

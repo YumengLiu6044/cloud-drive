@@ -105,15 +105,21 @@ export default function FileListRow({
 				)}
 			</Cell>
 			{LIST_HEADER_COLS.map((header, index) => (
-				<Cell key={index}>
+				<Cell
+					key={index}
+					className={header.id === "name" ? "max-w-[100px]" : ""}
+				>
 					<div className="flex gap-2 items-center">
-						{header.id === "name" &&
-							(item.is_folder ? (
-								<Folder size={15}></Folder>
-							) : (
-								<FileText size={15}></FileText>
-							))}
-						<span>
+						{header.id === "name" && (
+							<div>
+								{item.is_folder ? (
+									<Folder className="w-5 h-5"></Folder>
+								) : (
+									<FileText className="w-5 h-5"></FileText>
+								)}
+							</div>
+						)}
+						<span className="truncate">
 							{header.id === "last_modified"
 								? getDayText(
 										new Date(item.last_modified * 1000)

@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { CloudUpload, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import FileListView from "./FileListView";
 import { ButtonGroup } from "./ui/button-group";
@@ -7,6 +7,8 @@ import useKeyDown from "@/hooks/useKeyDown";
 import { useDeviceType } from "@/hooks/useDeviceType";
 import NewFolderButton from "./NewFolderButton";
 import type { FileViewerProps } from "@/type";
+import { useDropzone, type FileWithPath } from "react-dropzone";
+import useFileUpload from "@/hooks/useFileUpload";
 
 export default function FileViewer({
 	directoryTree,
@@ -20,9 +22,24 @@ export default function FileViewer({
 	fileActions,
 	renderedList,
 	setRenderedList,
+	isTrash,
 }: FileViewerProps) {
 	// Screen size
 	const { isDesktop } = useDeviceType();
+
+	// Drag and drop management
+	const { uploadFiles } = useFileUpload();
+	const handleOnDrop = useCallback(
+		(files: FileWithPath[]) => {
+			if (!files.length || isTrash) return;
+			uploadFiles(files);
+		},
+		[uploadFiles, isTrash]
+	);
+
+	const { getRootProps, isDragActive } = useDropzone({
+		onDrop: handleOnDrop,
+	});
 
 	// ----------------- Keyboard event interception ---------------------
 	// Shift status
@@ -233,7 +250,10 @@ export default function FileViewer({
 						<NewFolderButton isCollapsed={true}></NewFolderButton>
 					</div>
 				)}
-				<div className="w-full h-full bg-card rounded-2xl border-border">
+				<div
+					{...getRootProps()}
+					className="relative w-full h-full bg-card rounded-2xl border-border"
+				>
 					<FileListView
 						files={files}
 						handleRowClick={handleRowClick}
@@ -245,6 +265,14 @@ export default function FileViewer({
 						renderedList={renderedList}
 						setRenderedList={setRenderedList}
 					/>
+					{!isTrash && isDragActive && (
+						<div className="absolute z-10 inset-0 rounded-2xl border border-blue-400 bg-blue-200/50 flex items-center justify-center">
+							<div className="flex flex-col gap-2 items-center">
+								<CloudUpload size={60}></CloudUpload>
+								<p>Drop to Upload</p>
+							</div>
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
