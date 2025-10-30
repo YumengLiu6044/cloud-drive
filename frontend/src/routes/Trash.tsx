@@ -18,11 +18,15 @@ export default function Trash() {
 	// File state variables
 	const [selectedFiles, setSelectedFiles] = useState<Set<number>>(new Set());
 	const [fileCursorIndex, setFileCursorIndex] = useState<number>(-1);
+	useEffect(() => {
+		setSelectedFiles(new Set());
+		setFileCursorIndex(-1);
+	}, [trashFiles]);
 
 	const [isLoadingDelete, setIsLoadingDelete] = useState(false);
 	const handleDelete = useCallback(() => {
 		if (isLoadingDelete) return;
-		
+
 		const selectedIDs: string[] = [];
 		for (const index of selectedFiles) {
 			selectedIDs.push(renderedList[index]._id);
@@ -42,13 +46,7 @@ export default function Trash() {
 			success: `Permanently deleted files from trash`,
 			error: "Failed to permanently delete files from trash",
 		});
-	}, [
-		selectedFiles,
-		renderedList,
-		isLoadingDelete,
-	]);
-
-	const handleRowDoubleClick = () => {};
+	}, [selectedFiles, renderedList, isLoadingDelete]);
 
 	const fileActions = useMemo(() => {
 		return [

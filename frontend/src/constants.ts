@@ -29,23 +29,23 @@ export const PASSWORD_MIN_LENGTH = 8;
 
 export const IGNORE_401_ROUTES = ["/reset-password", "/login"] as const;
 
-export const SIDEBAR_ITEMS = [
-	{
+export const SIDEBAR_ITEMS = {
+	files: {
 		name: "Files",
 		Icon: Folder,
 		route: SUB_ROUTES.drive.files,
 	},
-	{
+	trash: {
 		name: "Trash",
 		Icon: Trash2,
 		route: SUB_ROUTES.drive.trash,
 	},
-	{
+	settings: {
 		name: "Settings",
 		Icon: Settings,
 		route: SUB_ROUTES.drive.settings,
 	},
-];
+};
 
 export const TAILWIND_BREAKPOINTS = {
 	sm: 640,

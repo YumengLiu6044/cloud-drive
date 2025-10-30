@@ -1,17 +1,16 @@
-import { DriveApi } from "@/api/driveApi";
 import FileViewer from "@/components/FileViewer";
 import { useFileStore } from "@/context/fileStore";
 import type { Resource } from "@/type";
 import { Copy, Download, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { toast } from "sonner";
 
 export default function Files() {
 	const files = useFileStore((state) => state.files);
 	const [renderedList, setRenderedList] = useState(files);
 
 	const directoryTree = useFileStore((state) => state.directoryTree);
-	const { changeDirectory, refreshFiles } = useFileStore.getState();
+	const { changeDirectory, refreshFiles, handleMoveToTrash } =
+		useFileStore.getState();
 
 	useEffect(() => {
 		refreshFiles();
@@ -21,30 +20,10 @@ export default function Files() {
 	const [selectedFiles, setSelectedFiles] = useState<Set<number>>(new Set());
 	const [fileCursorIndex, setFileCursorIndex] = useState<number>(-1);
 
-	const [isLoadingDelete, setIsLoadingDelete] = useState(false);
-	const handleDelete = useCallback(() => {
-		if (isLoadingDelete) return;
-
-		const selectedIDs: string[] = [];
-		for (const index of selectedFiles) {
-			selectedIDs.push(renderedList[index]._id);
-		}
-
-		setIsLoadingDelete(true);
-		const promise = DriveApi.moveToTrash(selectedIDs)
-			.then(() => {
-				setFileCursorIndex(-1);
-				setSelectedFiles(new Set());
-				refreshFiles();
-			})
-			.finally(() => setIsLoadingDelete(false));
-
-		toast.promise(promise, {
-			loading: "Moving files to trash...",
-			success: `Moved files to trash`,
-			error: "Failed to move files to trash",
-		});
-	}, [selectedFiles, renderedList, isLoadingDelete]);
+	useEffect(() => {
+		setSelectedFiles(new Set());
+		setFileCursorIndex(-1);
+	}, [files])
 
 	const handleRowDoubleClick = useCallback((file: Resource) => {
 		// Only handle folder double clicks
@@ -56,6 +35,14 @@ export default function Files() {
 			changeDirectory({ name: file.name, id: file._id });
 		}
 	}, []);
+
+	const moveToTrash = useCallback(() => {
+		const selectedIDs: string[] = [];
+		for (const index of selectedFiles) {
+			selectedIDs.push(renderedList[index]._id);
+		}
+		handleMoveToTrash(selectedIDs);
+	}, [selectedFiles, renderedList, handleMoveToTrash]);
 
 	const fileActions = useMemo(() => {
 		return [
@@ -72,10 +59,10 @@ export default function Files() {
 			{
 				Icon: <Trash2></Trash2>,
 				label: "Move files to trash",
-				action: handleDelete,
+				action: moveToTrash,
 			},
 		];
-	}, [handleDelete]);
+	}, [moveToTrash]);
 
 	return (
 		<FileViewer

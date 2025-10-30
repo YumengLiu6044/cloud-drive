@@ -1,6 +1,7 @@
 import { DriveApi } from "@/api/driveApi";
 import { STORAGE_KEYS } from "@/constants";
 import type { Directory, FileStore } from "@/type";
+import { toast } from "sonner";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
@@ -28,6 +29,26 @@ export const useFileStore = create<FileStore>()(
 			trashFiles: [],
 			setTrashFiles(newFiles) {
 				set({ trashFiles: newFiles });
+			},
+
+			draggedItem: null,
+			setDraggedItem(newItem) {
+				set({ draggedItem: newItem });
+			},
+
+			isDraggingFiles: false,
+			setIsDraggingFiles(isDragging) {
+				set({ isDraggingFiles: isDragging });
+			},
+
+			draggingItemIds: [],
+			setDraggingItemIds(newIds) {
+				set({ draggingItemIds: newIds });
+			},
+
+			isLoadingDelete: false,
+			setIsLoadingDelete(isLoading) {
+				set({ isLoadingDelete: isLoading });
 			},
 
 			resetState: () => {
@@ -73,6 +94,22 @@ export const useFileStore = create<FileStore>()(
 				else {
 					setDirectoryTree([...directoryTree, newDirectory]);
 				}
+			},
+
+			handleMoveToTrash(ids: string[]) {
+				const { setIsLoadingDelete, isLoadingDelete, refreshFiles} = get();
+				if (isLoadingDelete || !ids.length) return;
+
+				setIsLoadingDelete(true);
+				const promise = DriveApi.moveToTrash(ids)
+					.then(refreshFiles)
+					.finally(() => setIsLoadingDelete(false));
+
+				toast.promise(promise, {
+					loading: "Moving files to trash...",
+					success: `Moved files to trash`,
+					error: "Failed to move files to trash",
+				});
 			},
 		}),
 		{

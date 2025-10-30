@@ -9,6 +9,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import { motion } from "motion/react";
 import CollapsibleText from "./CollapsibleText";
 import NewFolderButton from "./NewFolderButton";
+import { Droppable } from "./Droppable";
 
 export default function Sidebar() {
 	const isCollapsed = useSidebarStore((state) => state.isCollapsed);
@@ -42,30 +43,31 @@ export default function Sidebar() {
 			</div>
 
 			<div className="h-full w-full flex flex-col gap-2 py-2 px-4">
-				{SIDEBAR_ITEMS.map((item, index) => (
-					<Button
-						key={index}
-						variant="ghost"
-						className={`flex justify-start w-full gap-0 ${
-							isCollapsed && "justify-center"
-						} ${
-							location.pathname === item.route
-								? "text-background bg-blue-500 hover:bg-blue-500 hover:text-background"
-								: "text-primary hover:border border-blue-400 hover:text-primary hover:bg-accent"
-						}`}
-						onClick={() => navigator(item.route)}
-					>
-						<item.Icon className="w-5 h-5"></item.Icon>
-
-						<CollapsibleText
-							isCollapsed={isCollapsed}
-							animate={{
-								paddingLeft: isCollapsed ? 0 : "1.25rem",
-							}}
+				{Object.values(SIDEBAR_ITEMS).map((item, index) => (
+					<Droppable key={index} id={item.name} isOverClassName="outline outline-blue-400 rounded-md">
+						<Button
+							variant="ghost"
+							className={`flex justify-start w-full gap-0 ${
+								isCollapsed && "justify-center"
+							} ${
+								location.pathname === item.route
+									? "text-background bg-blue-500 hover:bg-blue-500 hover:text-background"
+									: "text-primary hover:border border-blue-400 hover:text-primary hover:bg-accent"
+							}`}
+							onClick={() => navigator(item.route)}
 						>
-							{item.name}
-						</CollapsibleText>
-					</Button>
+							<item.Icon className="w-5 h-5"></item.Icon>
+	
+							<CollapsibleText
+								isCollapsed={isCollapsed}
+								animate={{
+									paddingLeft: isCollapsed ? 0 : "1.25rem",
+								}}
+							>
+								{item.name}
+							</CollapsibleText>
+						</Button>
+					</Droppable>
 				))}
 				<div className="h-full" />
 			</div>

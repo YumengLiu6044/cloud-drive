@@ -84,7 +84,7 @@ export default function Topbar() {
 				</DropdownMenuTrigger>
 				<DropdownMenuContent>
 					<DropdownMenuGroup>
-						{SIDEBAR_ITEMS.map((item, index) => (
+						{Object.values(SIDEBAR_ITEMS).map((item, index) => (
 							<DropdownMenuItem
 								className="text-xs md:text-base flex gap-5"
 								key={index}

@@ -106,8 +106,8 @@ export default function FileViewer({
 				const newIndex = prev + 1;
 				if (newIndex >= files.length) return prev;
 				if (newIndex > shiftDownIndex) {
-					setSelectedFiles((prev) =>
-						new Set<number>(prev).add(newIndex)
+					setSelectedFiles((prevFiles) =>
+						new Set<number>(prevFiles).add(newIndex)
 					);
 				} else if (newIndex <= shiftDownIndex) {
 					setSelectedFiles((prevFiles) => {
@@ -147,8 +147,8 @@ export default function FileViewer({
 						return newSet;
 					});
 				} else {
-					setSelectedFiles((prev) =>
-						new Set<number>(prev).add(newIndex)
+					setSelectedFiles((prevFiles) =>
+						new Set<number>(prevFiles).add(newIndex)
 					);
 				}
 				return newIndex;

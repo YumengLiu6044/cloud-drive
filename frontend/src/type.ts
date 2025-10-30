@@ -89,11 +89,24 @@ export type FileStore = {
 	trashFiles: Resource[];
 	setTrashFiles: (newFiles: Resource[]) => void;
 
+	draggedItem: Resource | null;
+	setDraggedItem: (newItems: Resource | null) => void;
+
+	isDraggingFiles: boolean;
+	setIsDraggingFiles: (isDragging: boolean) => void;
+
+	draggingItemIds: string[];
+	setDraggingItemIds: (newIds: string[]) => void;
+
+	isLoadingDelete: boolean;
+	setIsLoadingDelete: (isLoading: boolean) => void;
+
 	// Util functions
 	resetState: () => void;
 	refreshFiles: () => void;
 	refreshTrash: () => void;
 	changeDirectory: (newDirectory: Directory) => void;
+	handleMoveToTrash: (ids: string[]) => void;
 };
 
 export interface NewFolderButtonProps {
@@ -127,4 +140,11 @@ export interface FileViewerProps {
 		Icon: ReactNode;
 		label: string;
 	}[];
+}
+
+export interface DroppableProps {
+	id: string;
+	children: ReactNode;
+	className?: string;
+	isOverClassName?: string;
 }

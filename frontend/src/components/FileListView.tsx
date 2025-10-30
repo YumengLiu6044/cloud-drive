@@ -9,10 +9,11 @@ import {
 import { LIST_HEADER_COLS } from "@/constants";
 import { ArrowUp, FileText, Folder } from "lucide-react";
 import FileListRow from "./FileListRow";
-import type { FileListViewProps, ListHeader, Resource } from "@/type";
+import type { FileListViewProps, ListHeader } from "@/type";
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "motion/react";
-import { DndContext, DragOverlay, type DragStartEvent } from "@dnd-kit/core";
+import { DragOverlay } from "@dnd-kit/core";
+import { useFileStore } from "@/context/fileStore";
 
 export default function FileListView({
 	selectedFiles,
@@ -84,20 +85,26 @@ export default function FileListView({
 		});
 	}, []);
 
-	const [isDragging, setIsDragging] = useState(false);
-	const [draggedItem, setDraggedItem] = useState<Resource | null>(null);
+	const draggedItem = useFileStore((state) => state.draggedItem);
+	const isDragging = useFileStore((state) => state.isDraggingFiles);
+	const setDraggingItemIds = useFileStore(
+		(state) => state.setDraggingItemIds
+	);
 
-	const handleDragStart = useCallback((e: DragStartEvent) => {
-		setDraggedItem(e.active.data.current?.item);
-		setIsDragging(true);
-	}, []);
-
-	const handleDragEnd = useCallback(() => {
-		setIsDragging(false);
-	}, []);
+	useEffect(() => {
+		if (isDragging) {
+			setDraggingItemIds(
+				[...selectedFiles].map(
+					(val, _) => renderedList[val]._id
+				)
+			);
+		} else {
+			setDraggingItemIds([]);
+		}
+	}, [isDragging, selectedFiles, files]);
 
 	return (
-		<DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+		<div>
 			<DragOverlay dropAnimation={null}>
 				{isDragging && draggedItem && (
 					<div className="relative w-fit">
@@ -127,7 +134,7 @@ export default function FileListView({
 											<FileText></FileText>
 										)}
 									</div>
-									<span className="whitespace-nowrap max-w-10 text-ellipsis">
+									<span className="whitespace-nowrap truncate">
 										{index === 0 && draggedItem.name}
 									</span>
 								</div>
@@ -203,6 +210,6 @@ export default function FileListView({
 					</TableBody>
 				</Table>
 			</div>
-		</DndContext>
+		</div>
 	);
 }
