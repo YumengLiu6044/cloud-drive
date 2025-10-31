@@ -1,4 +1,4 @@
-import { LIST_HEADER_COLS } from "@/constants";
+import { LIST_HEADER_COLS, SIDEBAR_ITEMS } from "@/constants";
 import type { CustomNode, FileListRowProps } from "@/type";
 import { Folder, FileText, GripVertical } from "lucide-react";
 import { TableCell, TableRow } from "./ui/table";
@@ -60,10 +60,11 @@ export default function FileListRow({
 	isDragging,
 	onClick,
 	handleRowDoubleClick,
+	isTrash
 }: FileListRowProps) {
 	const { attributes, listeners, setNodeRef, node } = useDraggable({
 		id: item._id,
-		data: { item },
+		data: { item, type: isTrash ? SIDEBAR_ITEMS.trash.name : SIDEBAR_ITEMS.files.name },
 	});
 
 	useEffect(() => {

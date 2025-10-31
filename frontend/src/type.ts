@@ -46,6 +46,7 @@ export interface FileListRowProps {
 	isSelected: boolean;
 	isActive: boolean;
 	isDragging: boolean;
+	isTrash: boolean;
 	onClick: () => void;
 	handleRowDoubleClick: (_: Resource) => void;
 }
@@ -55,6 +56,8 @@ export interface FileListViewProps {
 	setSelectedFiles: Dispatch<SetStateAction<Set<number>>>;
 	fileCursorIndex: number;
 	setFileCursorIndex: Dispatch<SetStateAction<number>>;
+
+	isTrash: boolean;
 	
 	handleRowClick: (_: number) => void;
 	handleRowDoubleClick: (_: Resource) => void;
@@ -147,4 +150,5 @@ export interface DroppableProps {
 	children: ReactNode;
 	className?: string;
 	isOverClassName?: string;
+	accepts?: string;
 }

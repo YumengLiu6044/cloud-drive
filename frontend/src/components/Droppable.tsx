@@ -6,9 +6,11 @@ export function Droppable({
 	children,
 	className,
 	isOverClassName,
+  accepts,
 }: DroppableProps) {
 	const { isOver, setNodeRef } = useDroppable({
 		id: id,
+    data: { accepts }
 	});
 
 	return (

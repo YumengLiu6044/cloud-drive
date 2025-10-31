@@ -34,16 +34,19 @@ export const SIDEBAR_ITEMS = {
 		name: "Files",
 		Icon: Folder,
 		route: SUB_ROUTES.drive.files,
+		accepts: "Trash",
 	},
 	trash: {
 		name: "Trash",
 		Icon: Trash2,
 		route: SUB_ROUTES.drive.trash,
+		accepts: "Files",
 	},
 	settings: {
 		name: "Settings",
 		Icon: Settings,
 		route: SUB_ROUTES.drive.settings,
+		accepts: "",
 	},
 };
 

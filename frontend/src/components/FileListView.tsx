@@ -25,6 +25,7 @@ export default function FileListView({
 	setSelectedFiles,
 	renderedList,
 	setRenderedList,
+	isTrash,
 }: FileListViewProps) {
 	const [sortBy, setSortBy] = useState<ListHeader | null>(null);
 
@@ -134,7 +135,7 @@ export default function FileListView({
 											<FileText></FileText>
 										)}
 									</div>
-									<span className="whitespace-nowrap truncate">
+									<span className="whitespace-nowrap truncate text-xs">
 										{index === 0 && draggedItem.name}
 									</span>
 								</div>
@@ -192,6 +193,7 @@ export default function FileListView({
 						{renderedList.length > 0 &&
 							renderedList.map((item, index) => (
 								<FileListRow
+									isTrash={isTrash}
 									handleRowDoubleClick={handleRowDoubleClick}
 									key={item._id}
 									onClick={() => handleRowClick(index)}

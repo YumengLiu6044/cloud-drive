@@ -44,7 +44,7 @@ export default function Sidebar() {
 
 			<div className="h-full w-full flex flex-col gap-2 py-2 px-4">
 				{Object.values(SIDEBAR_ITEMS).map((item, index) => (
-					<Droppable key={index} id={item.name} isOverClassName="outline outline-blue-400 rounded-md">
+					<Droppable key={index} id={item.name} isOverClassName="outline outline-blue-400 rounded-md" accepts={item.accepts}>
 						<Button
 							variant="ghost"
 							className={`flex justify-start w-full gap-0 ${

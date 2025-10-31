@@ -21,6 +21,15 @@ export default function DriveLayout() {
 		setIsDraggingFiles(true);
 	}, []);
 	const handleDragEnd = useCallback((event: DragEndEvent) => {
+		const dropTargetAccepts = event.over?.data?.current?.accepts;
+		const draggingItemType = event.active?.data?.current?.type;
+		
+		if (dropTargetAccepts && draggingItemType && dropTargetAccepts !== draggingItemType) {
+			setDraggedItem(null);
+			setIsDraggingFiles(false);
+			return;
+		}
+		
 		const overId = event.over?.id;
 		switch (overId) {
 			case SIDEBAR_ITEMS.trash.name:
@@ -31,7 +40,6 @@ export default function DriveLayout() {
 				break;
 			default:
 				break;
-
 		}
 
 		setDraggedItem(null);

@@ -255,6 +255,7 @@ export default function FileViewer({
 					className="relative w-full h-full bg-card rounded-2xl border-border"
 				>
 					<FileListView
+						isTrash={isTrash}
 						files={files}
 						handleRowClick={handleRowClick}
 						handleRowDoubleClick={onDoubleClick}
