@@ -5,17 +5,18 @@ export function Droppable({
 	id,
 	children,
   accepts,
+	type
 }: DroppableProps) {
 	const { isOver, setNodeRef } = useDroppable({
 		id: id,
-    data: { accepts }
+    data: { accepts, type }
 	});
 
 	return (
 		<div
 			ref={setNodeRef}
 		>
-			{typeof children === "function" ? children(isOver) : children}
+			{typeof children === "function" ? children(isOver, setNodeRef) : children}
 		</div>
 	);
 }

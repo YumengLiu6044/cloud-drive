@@ -3,7 +3,7 @@ import type { CustomNode, FileListRowProps } from "@/type";
 import { Folder, FileText, GripVertical } from "lucide-react";
 import { TableCell, TableRow } from "./ui/table";
 import { useCallback, useEffect } from "react";
-import { useDraggable } from "@dnd-kit/core";
+import { useDraggable, useDroppable } from "@dnd-kit/core";
 
 const Cell = ({ children, className = "" }: CustomNode) => (
 	<TableCell className={`py-5 ${className}`}>{children}</TableCell>
@@ -60,11 +60,27 @@ export default function FileListRow({
 	isDragging,
 	onClick,
 	handleRowDoubleClick,
-	isTrash
+	isTrash,
 }: FileListRowProps) {
-	const { attributes, listeners, setNodeRef, node } = useDraggable({
+	const {
+		attributes,
+		listeners,
+		setNodeRef: setNodeDragRef,
+		node,
+	} = useDraggable({
 		id: item._id,
-		data: { item, type: isTrash ? SIDEBAR_ITEMS.trash.name : SIDEBAR_ITEMS.files.name },
+		data: {
+			item,
+			type: isTrash ? SIDEBAR_ITEMS.trash.name : SIDEBAR_ITEMS.files.name,
+		},
+	});
+	const {setNodeRef: setNodeDropRef, isOver} = useDroppable({
+		id: item._id,
+		disabled: isTrash,
+		data: {
+			accepts: SIDEBAR_ITEMS.files.name,
+			type: isTrash ? SIDEBAR_ITEMS.trash.name : SIDEBAR_ITEMS.files.name,
+		},
 	});
 
 	useEffect(() => {
@@ -85,12 +101,12 @@ export default function FileListRow({
 
 	return (
 		<TableRow
-			ref={setNodeRef}
+			ref={isActive ? setNodeDragRef : setNodeDropRef}
 			{...attributes}
 			className={`
 				group
 				${isActive ? "bg-blue-100 hover:bg-blue-100" : ""} 
-				${isSelected ? "outline outline-blue-500" : ""} 
+				${isSelected || (isOver && item.is_folder) ? "outline outline-blue-500" : ""} 
 				${isDragging ? "opacity-50" : ""}
 				`}
 			onClick={onClick}

@@ -110,6 +110,7 @@ export type FileStore = {
 	refreshTrash: () => void;
 	changeDirectory: (newDirectory: Directory) => void;
 	handleMoveToTrash: (ids: string[]) => void;
+	handleMoveFiles: (newParentId: string) => void;
 };
 
 export interface NewFolderButtonProps {
@@ -147,6 +148,10 @@ export interface FileViewerProps {
 
 export interface DroppableProps {
 	id: string;
-	children: (isOver: boolean)=> ReactNode | ReactNode;
+	children: (
+		isOver: boolean,
+		setNodeRef: (node: HTMLElement | null) => void
+	) => ReactNode;
 	accepts?: string;
+	type?: string;
 }

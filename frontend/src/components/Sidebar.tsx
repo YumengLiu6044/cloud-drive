@@ -49,8 +49,9 @@ export default function Sidebar() {
 						id={item.name}
 						accepts={item.accepts}
 					>
-						{(isOver) => (
+						{(isOver, setNodeRef) => (
 							<Button
+								ref={setNodeRef}
 								variant="ghost"
 								className={`flex justify-start w-full gap-0 
 									${isCollapsed && "justify-center"} 

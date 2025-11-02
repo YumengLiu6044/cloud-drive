@@ -111,6 +111,20 @@ export const useFileStore = create<FileStore>()(
 					error: "Failed to move files to trash",
 				});
 			},
+
+			handleMoveFiles(newParentId: string) {
+				const { draggingItemIds, refreshFiles } = get();
+				if (!draggingItemIds.length) return;
+
+				const promise = DriveApi.moveDirectory(draggingItemIds, newParentId)
+					.then(refreshFiles);
+
+				toast.promise(promise, {
+					loading: "Moving files...",
+					success: `Moved files successfully`,
+					error: "Failed to move files",
+				});
+			}
 		}),
 		{
 			name: STORAGE_KEYS.fileStore,

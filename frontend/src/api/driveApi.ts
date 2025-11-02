@@ -41,4 +41,11 @@ export const DriveApi = {
 			onUploadProgress: uploadProgress,
 		});
 	},
+
+	moveDirectory(childrenIds: string[], newParentId: string) {
+		return axiosClient.post(API_BASE.drive + "/move-directory", {
+			files: childrenIds,
+			new_parent_id: newParentId,
+		});
+	}
 };

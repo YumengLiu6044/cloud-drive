@@ -9,6 +9,8 @@ import NewFolderButton from "./NewFolderButton";
 import type { FileViewerProps } from "@/type";
 import { useDropzone, type FileWithPath } from "react-dropzone";
 import useFileUpload from "@/hooks/useFileUpload";
+import { Droppable } from "./Droppable";
+import { SIDEBAR_ITEMS } from "@/constants";
 
 export default function FileViewer({
 	directoryTree,
@@ -203,18 +205,26 @@ export default function FileViewer({
 			<div className="w-full flex items-center justify-between">
 				<div className="flex gap-2 items-center">
 					{directoryTree.map((item, index) => (
-						<div className="flex gap-2 items-center" key={index}>
-							<span
-								key={index}
-								className="cursor-pointer hover:underline"
-								onClick={() => onDirectoryClick(item)}
-							>
-								{item.name}
-							</span>
-							{index !== directoryTree.length - 1 && (
-								<span>{">"}</span>
+						<Droppable id={item.id} key={index} type={SIDEBAR_ITEMS.files.name}>
+							{(isOver, setNodeRef) => (
+								<div
+									className="flex gap-2 items-center"
+									key={index}
+									ref={setNodeRef}
+								>
+									<span
+										key={index}
+										className={`cursor-pointer hover:underline ${isOver ? "underline" : ""}`}
+										onClick={() => onDirectoryClick(item)}
+									>
+										{item.name}
+									</span>
+									{index !== directoryTree.length - 1 && (
+										<span>{">"}</span>
+									)}
+								</div>
 							)}
-						</div>
+						</Droppable>
 					))}
 				</div>
 				<div className="flex items-center gap-5">
