@@ -147,8 +147,6 @@ export interface FileViewerProps {
 
 export interface DroppableProps {
 	id: string;
-	children: ReactNode;
-	className?: string;
-	isOverClassName?: string;
+	children: (isOver: boolean)=> ReactNode | ReactNode;
 	accepts?: string;
 }

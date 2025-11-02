@@ -44,29 +44,39 @@ export default function Sidebar() {
 
 			<div className="h-full w-full flex flex-col gap-2 py-2 px-4">
 				{Object.values(SIDEBAR_ITEMS).map((item, index) => (
-					<Droppable key={index} id={item.name} isOverClassName="outline outline-blue-400 rounded-md" accepts={item.accepts}>
-						<Button
-							variant="ghost"
-							className={`flex justify-start w-full gap-0 ${
-								isCollapsed && "justify-center"
-							} ${
-								location.pathname === item.route
-									? "text-background bg-blue-500 hover:bg-blue-500 hover:text-background"
-									: "text-primary hover:border border-blue-400 hover:text-primary hover:bg-accent"
-							}`}
-							onClick={() => navigator(item.route)}
-						>
-							<item.Icon className="w-5 h-5"></item.Icon>
-	
-							<CollapsibleText
-								isCollapsed={isCollapsed}
-								animate={{
-									paddingLeft: isCollapsed ? 0 : "1.25rem",
-								}}
+					<Droppable
+						key={index}
+						id={item.name}
+						accepts={item.accepts}
+					>
+						{(isOver) => (
+							<Button
+								variant="ghost"
+								className={`flex justify-start w-full gap-0 
+									${isCollapsed && "justify-center"} 
+									${
+										location.pathname === item.route
+											? "text-background bg-blue-500 hover:bg-blue-500 hover:text-background"
+											: "text-primary hover:text-primary hover:bg-accent"
+									}
+									${isOver && "border border-blue-400"}
+								`}
+								onClick={() => navigator(item.route)}
 							>
-								{item.name}
-							</CollapsibleText>
-						</Button>
+								<item.Icon className="w-5 h-5"></item.Icon>
+
+								<CollapsibleText
+									isCollapsed={isCollapsed}
+									animate={{
+										paddingLeft: isCollapsed
+											? 0
+											: "1.25rem",
+									}}
+								>
+									{item.name}
+								</CollapsibleText>
+							</Button>
+						)}
 					</Droppable>
 				))}
 				<div className="h-full" />
