@@ -13,3 +13,8 @@ class CreateFolderRequest(BaseModel):
 
 class DeleteFilesRequest(BaseModel):
     files: List[str] = Field(default_factory=list)
+
+
+class MoveFilesRequest(BaseModel):
+    files: List[str] = Field(default_factory=list)
+    new_parent_id: str

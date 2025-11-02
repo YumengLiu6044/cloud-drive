@@ -193,5 +193,39 @@ class DriveTest(unittest.TestCase):
             find_file_object_response = self.file_bucket._files.find_one({"_id": ObjectId(file_uri)})
             self.assertIsNone(find_file_object_response)
 
+    def test_move_directory(self):
+        auth_token = self.auth_token
+        parent_name1 = "outer_parent1-" + uuid.uuid4().hex
+        parent_name2 = "outer_parent2-" + uuid.uuid4().hex
+        child_name = "inner_child-" + uuid.uuid4().hex
+
+        parent_id1 = self._create_folder(self.user_record["drive_root_id"], parent_name1)
+        parent_id2 = self._create_folder(self.user_record["drive_root_id"], parent_name2)
+        child_id = self._create_folder(parent_id1, child_name)
+
+        assert self._client.post(
+            "/drive/move-directory",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            json={"files": [child_id], "new_parent_id": parent_id2},
+        ).status_code == 200
+
+        child_record = self.files_collection.find_one({"_id": ObjectId(child_id)})
+        self.assertEqual(child_record["parent_id"], parent_id2)
+
+    def test_move_directory_invalid(self):
+        auth_token = self.auth_token
+        parent_name = "outer_parent1-" + uuid.uuid4().hex
+        child_name = "inner_child-" + uuid.uuid4().hex
+
+        parent_id = self._create_folder(self.user_record["drive_root_id"], parent_name)
+        child_id = self._create_folder(parent_id, child_name)
+
+        response = self._client.post(
+            "/drive/move-directory",
+            headers={"Authorization": f"Bearer {auth_token}"},
+            json={"files": [parent_id], "new_parent_id": child_id},
+        )
+        self.assertEqual(response.status_code, 409)
+
 if __name__ == '__main__':
     unittest.main()

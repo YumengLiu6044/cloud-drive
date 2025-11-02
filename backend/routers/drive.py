@@ -1,6 +1,8 @@
 from datetime import datetime, timezone
 from typing import Annotated, Mapping
 from urllib.parse import unquote
+
+from bson import ObjectId
 from fastapi import (
     APIRouter,
     Depends,
@@ -14,7 +16,7 @@ from core.file_utils import get_mime_type, get_file_from_db, verify_parent_folde
     verify_deletion_request
 from core.security import security_manager
 from models.db_models import DriveModel
-from models.drive_models import CreateFolderRequest, DeleteFilesRequest
+from models.drive_models import CreateFolderRequest, DeleteFilesRequest, MoveFilesRequest
 
 drive_router = APIRouter(prefix="/drive", tags=["drive"])
 
@@ -142,3 +144,32 @@ async def delete_files_from_trash_route(
 ):
     await move_files_to_trash(param.files, permanent=True)
     return {"message": "Deleted files from trash"}
+
+
+@drive_router.post("/move-directory")
+async def move_files_to_new_folder_route(
+    param: MoveFilesRequest,
+    current_user: Annotated[EmailStr, Depends(security_manager.get_current_user)],
+):
+    parent_record = await verify_parent_folder(param.new_parent_id, current_user)
+    file_id_set = set(param.files)
+
+    # Verify that the new parent_id isn't a child of the files
+    next_parent_id = parent_record.get("parent_id")
+    while next_parent_id:
+        if next_parent_id in file_id_set:
+            raise HTTPException(status_code=409, detail="The new parent can't be a child of itself")
+        next_parent_record = await mongo.files.find_one({"_id": ObjectId(next_parent_id)})
+        if next_parent_record:
+            next_parent_id = next_parent_record["parent_id"]
+        else:
+            next_parent_id = None
+
+    for file_id in file_id_set:
+        await mongo.files.update_one(
+            {"_id": ObjectId(file_id)},
+            {"$set": {"parent_id": param.new_parent_id}},
+        )
+
+    return {"message": "Moved files to new folder"}
+
