@@ -4,8 +4,8 @@ import type { AxiosProgressEvent } from "axios";
 
 export const DriveApi = {
 	listContent: (parent_id: string) => {
-		const endpoint = `${API_BASE.drive}/list-content/${parent_id}`
-		return axiosClient.get(endpoint)
+		const endpoint = `${API_BASE.drive}/list-content/${parent_id}`;
+		return axiosClient.get(endpoint);
 	},
 	createNewFolder: (parent_id: string, name: string) =>
 		axiosClient.post(API_BASE.drive + "/create-folder", {
@@ -47,5 +47,38 @@ export const DriveApi = {
 			files: childrenIds,
 			new_parent_id: newParentId,
 		});
-	}
+	},
+
+	async downloadFiles(fileIds: string[]) {
+		try {
+			const response = await axiosClient.post(
+				API_BASE.drive + "/download-files",
+				{
+					files: fileIds,
+				},
+				{
+					responseType: "blob",
+				}
+			);
+			const disposition: string =
+				response.headers["content-disposition"] ?? "";
+			let filename = "download.zip";
+			const match = disposition.match(/.*filename=(.*)/);
+			if (match && match[1]) {
+				filename = match[1];
+			}
+
+			const blob = new Blob([response.data], { type: "application/zip" });
+			const url = window.URL.createObjectURL(blob);
+
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = filename;
+			a.click();
+
+			window.URL.revokeObjectURL(url);
+		} catch (e) {
+			console.log(e)
+		}
+	},
 };

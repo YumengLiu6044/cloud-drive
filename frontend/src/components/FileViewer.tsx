@@ -256,7 +256,7 @@ export default function FileViewer({
 
 			<div className="relative w-full h-[90%]">
 				{!isDesktop && (
-					<div className="fixed bottom-5 right-5">
+					<div className="fixed bottom-5 right-5 z-100">
 						<NewFolderButton isCollapsed={true}></NewFolderButton>
 					</div>
 				)}

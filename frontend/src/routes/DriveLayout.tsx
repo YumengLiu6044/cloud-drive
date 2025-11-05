@@ -1,4 +1,3 @@
-import { DriveApi } from "@/api/driveApi";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";

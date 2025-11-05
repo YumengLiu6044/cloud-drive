@@ -111,6 +111,7 @@ export type FileStore = {
 	changeDirectory: (newDirectory: Directory) => void;
 	handleMoveToTrash: (ids: string[]) => void;
 	handleMoveFiles: (newParentId: string) => void;
+	handleFileDownload: (ids: string[]) => void;
 };
 
 export interface NewFolderButtonProps {

@@ -97,7 +97,8 @@ export const useFileStore = create<FileStore>()(
 			},
 
 			handleMoveToTrash(ids: string[]) {
-				const { setIsLoadingDelete, isLoadingDelete, refreshFiles} = get();
+				const { setIsLoadingDelete, isLoadingDelete, refreshFiles } =
+					get();
 				if (isLoadingDelete || !ids.length) return;
 
 				setIsLoadingDelete(true);
@@ -116,15 +117,25 @@ export const useFileStore = create<FileStore>()(
 				const { draggingItemIds, refreshFiles } = get();
 				if (!draggingItemIds.length) return;
 
-				const promise = DriveApi.moveDirectory(draggingItemIds, newParentId)
-					.then(refreshFiles);
+				const promise = DriveApi.moveDirectory(
+					draggingItemIds,
+					newParentId
+				).then(refreshFiles);
 
 				toast.promise(promise, {
 					loading: "Moving files...",
 					success: `Moved files successfully`,
 					error: "Failed to move files",
 				});
-			}
+			},
+			handleFileDownload(ids) {
+				const promise = DriveApi.downloadFiles(ids);
+				toast.promise(promise, {
+					loading: "Downloading files...",
+					success: `Downloaded files successfully`,
+					error: "Failed to download files",
+				});
+			},
 		}),
 		{
 			name: STORAGE_KEYS.fileStore,

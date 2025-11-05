@@ -9,8 +9,12 @@ export default function Files() {
 	const [renderedList, setRenderedList] = useState(files);
 
 	const directoryTree = useFileStore((state) => state.directoryTree);
-	const { changeDirectory, refreshFiles, handleMoveToTrash } =
-		useFileStore.getState();
+	const {
+		changeDirectory,
+		refreshFiles,
+		handleMoveToTrash,
+		handleFileDownload,
+	} = useFileStore.getState();
 
 	useEffect(() => {
 		refreshFiles();
@@ -20,10 +24,18 @@ export default function Files() {
 	const [selectedFiles, setSelectedFiles] = useState<Set<number>>(new Set());
 	const [fileCursorIndex, setFileCursorIndex] = useState<number>(-1);
 
+	const activeFiles = useMemo(() => {
+		const selectedIDs: string[] = [];
+		for (const index of selectedFiles) {
+			selectedIDs.push(renderedList[index]._id);
+		}
+		return selectedIDs;
+	}, [selectedFiles, renderedList]);
+
 	useEffect(() => {
 		setSelectedFiles(new Set());
 		setFileCursorIndex(-1);
-	}, [files])
+	}, [files]);
 
 	const handleRowDoubleClick = useCallback((file: Resource) => {
 		// Only handle folder double clicks
@@ -37,12 +49,12 @@ export default function Files() {
 	}, []);
 
 	const moveToTrash = useCallback(() => {
-		const selectedIDs: string[] = [];
-		for (const index of selectedFiles) {
-			selectedIDs.push(renderedList[index]._id);
-		}
-		handleMoveToTrash(selectedIDs);
-	}, [selectedFiles, renderedList, handleMoveToTrash]);
+		handleMoveToTrash(activeFiles);
+	}, [activeFiles, handleMoveToTrash]);
+
+	const handleDownload = useCallback(() => {
+		handleFileDownload(activeFiles);
+	}, [activeFiles, handleFileDownload]);
 
 	const fileActions = useMemo(() => {
 		return [
@@ -54,7 +66,7 @@ export default function Files() {
 			{
 				Icon: <Download></Download>,
 				label: "Download Files",
-				action: () => {},
+				action: handleDownload,
 			},
 			{
 				Icon: <Trash2></Trash2>,
@@ -62,7 +74,7 @@ export default function Files() {
 				action: moveToTrash,
 			},
 		];
-	}, [moveToTrash]);
+	}, [moveToTrash, handleDownload]);
 
 	return (
 		<FileViewer

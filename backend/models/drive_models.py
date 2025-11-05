@@ -18,3 +18,7 @@ class DeleteFilesRequest(BaseModel):
 class MoveFilesRequest(BaseModel):
     files: List[str] = Field(default_factory=list)
     new_parent_id: str
+
+
+class DownloadFilesRequest(BaseModel):
+    files: List[str] = Field(default_factory=list)

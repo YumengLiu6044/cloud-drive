@@ -1,7 +1,10 @@
+import io
+import uuid
 from datetime import datetime, timezone
 from typing import Annotated, Mapping
 from urllib.parse import unquote
-
+from zipfile import ZipFile, ZIP_DEFLATED
+from pathlib import Path
 from bson import ObjectId
 from fastapi import (
     APIRouter,
@@ -11,12 +14,14 @@ from fastapi import (
 )
 from pydantic import EmailStr
 from pymongo.errors import DuplicateKeyError
+from starlette.responses import StreamingResponse
+
 from core.database import mongo
 from core.file_utils import get_mime_type, get_file_from_db, verify_parent_folder, move_files_to_trash, \
     verify_deletion_request
 from core.security import security_manager
 from models.db_models import DriveModel
-from models.drive_models import CreateFolderRequest, DeleteFilesRequest, MoveFilesRequest
+from models.drive_models import CreateFolderRequest, DeleteFilesRequest, MoveFilesRequest, DownloadFilesRequest
 
 drive_router = APIRouter(prefix="/drive", tags=["drive"])
 
@@ -173,3 +178,59 @@ async def move_files_to_new_folder_route(
 
     return {"message": "Moved files to new folder"}
 
+
+@drive_router.post("/download-files")
+async def download_files(
+    param: DownloadFilesRequest,
+    current_user: Annotated[EmailStr, Depends(security_manager.get_current_user)],
+):
+    # Load file records
+    file_records = []
+    for file_id in param.files:
+        file_record = await get_file_from_db(file_id, current_user, mongo.files)
+        if not file_record:
+            raise HTTPException(status_code=404, detail="File not found")
+        file_records.append(file_record)
+
+    # Verify downloading from same folder
+    if set(file_record.get("parent_id") for file_record in file_records).__len__() != 1:
+        raise HTTPException(status_code=404, detail="Must be from the same folder")
+
+    # Traverse and construct in-memory zip file
+    io_stream = io.BytesIO()
+    id_path_mapping = {}
+
+    with ZipFile(io_stream, "w", ZIP_DEFLATED) as zip_file:
+        while len(file_records) > 0:
+            current_top = file_records.pop(-1)
+            current_top_path = id_path_mapping.get(
+                current_top["_id"],
+                Path(current_top["name"])
+            )
+
+            if current_top.get("is_folder", False):
+                # Retrieve children and push to stack
+                current_top_id = str(current_top.get("_id"))
+                async for child in mongo.files.find({"parent_id": current_top_id}):
+                    file_records.append(child)
+                    id_path_mapping[child["_id"]] = current_top_path / child["name"]
+            else:
+                # Download and write to zip_file
+                file_uri = current_top.get("uri", None)
+                if not file_uri:
+                    raise HTTPException(status_code=404, detail="File uri not found")
+
+                file_obj = await mongo.file_bucket.open_download_stream(ObjectId(file_uri))
+                zip_file.writestr(current_top_path.as_posix(), await file_obj.read())
+    io_stream.seek(0)
+
+    # Return a Streaming Response
+    file_name = f"{uuid.uuid4()}.zip"
+    return StreamingResponse(
+        io_stream,
+        media_type="application/zip",
+        headers={
+            'Access-Control-Expose-Headers': 'Content-Disposition',
+            'Content-Disposition': f'attachment; filename={file_name}',
+        }
+    )
