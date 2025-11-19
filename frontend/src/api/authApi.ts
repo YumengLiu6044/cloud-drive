@@ -25,4 +25,5 @@ export const AuthApi = {
 				},
 			}
 		),
+	deleteAccount: () => axiosClient.post(API_BASE.auth + "/delete-account"),
 };

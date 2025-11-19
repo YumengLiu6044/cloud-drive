@@ -30,9 +30,6 @@ async def google_login(request: Request):
     redirect_uri = request.url_for("google_callback")
     return await google.authorize_redirect(request, redirect_uri)
 
-@google_auth_router.get("/test")
-async def test_route():
-    return {"message": "Google login test"}
 
 @google_auth_router.get("/callback")
 async def google_callback(request: Request):

@@ -6,6 +6,7 @@ from core.auth_utils import create_user
 from core.constants import JwtTokenScope, MAIL_CONFIG, jinja_env, TEMPLATE_NAME, \
     COMMON_TEMPLATE_VARIABLES, PASSWORD_RESET_TEMPLATE
 from core.database import mongo
+from core.file_utils import move_files_to_trash
 from core.security import security_manager
 from models.auth_models import (
     AuthLoginModel, Token,
@@ -97,3 +98,23 @@ async def reset_password(
 
     return {"message": "Password reset successful"}
 
+
+@auth_router.post("/delete-account")
+async def delete_account(
+    current_user_email: Annotated[str, Depends(security_manager.get_current_user)]
+):
+    user_record = await mongo.users.find_one({"email": current_user_email})
+    if not user_record:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    # Delete user files
+    drive_root_id = user_record.get("drive_root_id")
+    await move_files_to_trash([drive_root_id], permanent=False)
+    await move_files_to_trash([drive_root_id], permanent=True)
+
+    # Delete user data
+    deleted_record = await mongo.users.find_one_and_delete({"email": current_user_email})
+    if profile_id := deleted_record.get("profile_image_id", None):
+        await mongo.profile_bucket.delete(profile_id)
+
+    return {"message": "Account deleted successfully"}

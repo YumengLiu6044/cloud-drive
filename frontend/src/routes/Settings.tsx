@@ -35,6 +35,7 @@ import { useCallback, useRef, useState, type ChangeEvent } from "react";
 import DOMPurify from "dompurify";
 import { toast } from "sonner";
 import { UserApi } from "@/api/userApi";
+import { AuthApi } from "@/api/authApi";
 
 export default function Settings() {
 	// User info state
@@ -97,6 +98,11 @@ export default function Settings() {
 		},
 		[]
 	);
+
+	const handleDeleteAccount = useCallback((_: any) => {
+		AuthApi.deleteAccount()
+			.then(logout)
+	}, [])
 
 	return (
 		<div className="main-section w-full flex flex-col gap-4 overflow-y-scroll">
@@ -287,7 +293,7 @@ export default function Settings() {
 											<AlertDialogCancel>
 												Cancel
 											</AlertDialogCancel>
-											<Button variant="destructive">
+											<Button variant="destructive" onClick={handleDeleteAccount}>
 												Delete Account
 											</Button>
 										</div>
