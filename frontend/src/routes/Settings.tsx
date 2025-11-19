@@ -31,7 +31,13 @@ import {
 	Loader2,
 } from "lucide-react";
 import useAuthStore from "@/context/authStore";
-import { useCallback, useRef, useState, type ChangeEvent } from "react";
+import {
+	useCallback,
+	useMemo,
+	useRef,
+	useState,
+	type ChangeEvent,
+} from "react";
 import DOMPurify from "dompurify";
 import { toast } from "sonner";
 import { UserApi } from "@/api/userApi";
@@ -41,7 +47,17 @@ export default function Settings() {
 	// User info state
 	const email = useAuthStore((state) => state.email);
 	const username = useAuthStore((state) => state.username);
-	const profileImageId = useAuthStore((state) => state.profileImageId);
+	const profileId = useAuthStore((state) => state.profileImageId);
+	const googleProfileURL = useAuthStore((state) => state.googleProfileURL);
+
+	const renderedProfile = useMemo(() => {
+		if (profileId) {
+			return UserApi.getProfilePic(profileId);
+		}
+		if (googleProfileURL) return googleProfileURL;
+		return null;
+	}, [profileId, googleProfileURL]);
+
 	const { setUsername, logout, setProfileImageId } = useAuthStore.getState();
 	const [isEditing, setIsEditing] = useState(false);
 	const [tempUsername, setTempUsername] = useState(username ?? "");
@@ -99,10 +115,23 @@ export default function Settings() {
 		[]
 	);
 
-	const handleDeleteAccount = useCallback((_: any) => {
-		AuthApi.deleteAccount()
-			.then(logout)
-	}, [])
+	// Deletion state
+	const [isLoadingDelete, setIsLoadingDelete] = useState(false);
+
+	const handleDeleteAccount = useCallback(
+		(_: any) => {
+			if (isLoadingDelete) return;
+
+			setIsLoadingDelete(true);
+			AuthApi.deleteAccount()
+				.then(() => {
+					logout()
+					toast.success("Account deleted")
+				})
+				.finally(() => setIsLoadingDelete(false));
+		},
+		[isLoadingDelete]
+	);
 
 	return (
 		<div className="main-section w-full flex flex-col gap-4 overflow-y-scroll">
@@ -130,12 +159,10 @@ export default function Settings() {
 						<div className="w-full flex flex-col items-center justify-center gap-5">
 							<div className="relative w-full max-w-[150px] bg-theme rounded-full aspect-square flex items-center justify-center p-1">
 								<div className="w-full rounded-full aspect-square overflow-clip border-background border-4 flex items-center justify-center">
-									{profileImageId && (
+									{renderedProfile && (
 										<img
 											className="w-full h-full aspect-auto"
-											src={UserApi.getProfilePic(
-												profileImageId
-											)}
+											src={renderedProfile}
 										></img>
 									)}
 								</div>
@@ -290,11 +317,20 @@ export default function Settings() {
 									</AlertDialogHeader>
 									<AlertDialogFooter>
 										<div className="w-full flex justify-between">
-											<AlertDialogCancel>
+											<AlertDialogCancel
+												disabled={isLoadingDelete}
+											>
 												Cancel
 											</AlertDialogCancel>
-											<Button variant="destructive" onClick={handleDeleteAccount}>
+											<Button
+												variant="destructive"
+												onClick={handleDeleteAccount}
+												disabled={isLoadingDelete}
+											>
 												Delete Account
+												{isLoadingDelete && (
+													<Loader2 className="animate-spin"></Loader2>
+												)}
 											</Button>
 										</div>
 									</AlertDialogFooter>

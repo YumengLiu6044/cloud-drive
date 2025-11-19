@@ -11,6 +11,7 @@ const useAuthStore = create<AuthStore>()(
 			username: null,
 			email: null,
 			profileImageId: null,
+			googleProfileURL: null,
 
 			setUsername: (newUsername: string) =>
 				set({ username: newUsername }),
@@ -34,6 +35,9 @@ const useAuthStore = create<AuthStore>()(
 			setProfileImageId(newId) {
 				set({ profileImageId: newId });
 			},
+			setGoogleProfileURL(newURL) {
+				set({ googleProfileURL: newURL})
+			},
 		}),
 		{
 			name: STORAGE_KEYS.authStore,
@@ -42,6 +46,7 @@ const useAuthStore = create<AuthStore>()(
 				username: state.username,
 				email: state.email,
 				profileImageId: state.profileImageId,
+				googleProfileURL: state.googleProfileURL
 			}),
 		}
 	)

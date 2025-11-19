@@ -14,6 +14,7 @@ from models.auth_models import (
     AuthResetPasswordModel
 )
 from models.db_models import UserModel
+from bson import ObjectId
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -115,6 +116,6 @@ async def delete_account(
     # Delete user data
     deleted_record = await mongo.users.find_one_and_delete({"email": current_user_email})
     if profile_id := deleted_record.get("profile_image_id", None):
-        await mongo.profile_bucket.delete(profile_id)
+        await mongo.profile_bucket.delete(ObjectId(profile_id))
 
     return {"message": "Account deleted successfully"}

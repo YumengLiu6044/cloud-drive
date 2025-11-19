@@ -12,7 +12,10 @@ export type AuthStore = {
 	setEmail: (_: string) => void;
 
 	profileImageId: string | null;
-	setProfileImageId: (_: string) => void;
+	setProfileImageId: (_: string | null) => void;
+
+	googleProfileURL: string | null;
+	setGoogleProfileURL: (_: string | null) => void;
 };
 
 export type JWTPayload = {

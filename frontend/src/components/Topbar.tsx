@@ -15,7 +15,7 @@ import { SIDEBAR_ITEMS } from "@/constants";
 import { useNavigate } from "react-router-dom";
 import { DropdownMenuGroup } from "@radix-ui/react-dropdown-menu";
 import { useDeviceType } from "@/hooks/useDeviceType";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { UserApi } from "@/api/userApi";
 
 export default function Topbar() {
@@ -26,6 +26,16 @@ export default function Topbar() {
 	const handleLogout = useAuthStore((state) => state.logout);
 	const username = useAuthStore((state) => state.username);
 	const profileId = useAuthStore((state) => state.profileImageId);
+	const googleProfileURL = useAuthStore((state) => state.googleProfileURL);
+
+	const renderedProfile = useMemo(() => {
+		if (profileId) {
+			return UserApi.getProfilePic(profileId)
+		}
+		if (googleProfileURL)
+			return googleProfileURL
+		return null;
+	}, [profileId, googleProfileURL])
 
 	const { isDesktop, type } = useDeviceType();
 
@@ -66,9 +76,9 @@ export default function Topbar() {
 				<DropdownMenuTrigger className="h-full">
 					<div className="h-full flex items-center gap-2">
 						<div className="h-full aspect-square flex items-center justify-center rounded-full overflow-clip bg-theme text-background">
-							{profileId ? (
+							{renderedProfile ? (
 								<img
-									src={UserApi.getProfilePic(profileId)}
+									src={renderedProfile}
 									className="w-full h-full"
 								></img>
 							) : (

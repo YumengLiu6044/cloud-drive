@@ -16,7 +16,7 @@ export default function GoogleCallback() {
 	const token = queryParams.get("token");
 	const error = queryParams.get("error");
 
-  const { login, setUsername, setEmail, setProfileImageId } = useAuthStore.getState();
+  const { login, setUsername, setEmail, setProfileImageId, setGoogleProfileURL } = useAuthStore.getState();
 	const { setDirectoryTree, setRootDirectory } = useFileStore.getState();
 
 	useEffect(() => {
@@ -40,6 +40,7 @@ export default function GoogleCallback() {
 				setUsername(body.username);
 				setEmail(body.email);
 				setProfileImageId(body.profile_image_id);
+        setGoogleProfileURL(body.google_profile_url)
 				navigator(SUB_ROUTES.drive.files);
 			})
 			.catch(() => {
