@@ -5,6 +5,7 @@ export const SUB_ROUTES = {
 	login: "/login",
 	register: "/register",
 	loginCallback: "/login-callback",
+	googleCallback: "/google-callback",
 	resetPassword: "/reset-password",
 	drive: {
 		base: "/drive",
@@ -24,6 +25,8 @@ export const STORAGE_KEYS = {
 };
 
 export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL;
+
+export const GOOGLE_LOGIN_URL = BACKEND_URL + "/google-auth/login";
 
 export const PASSWORD_MIN_LENGTH = 8;
 
@@ -82,3 +85,5 @@ export const LIST_HEADER_COLS: ListHeader[] = [
 		label: "Size",
 	},
 ] as const;
+
+export const GOOGLE_ICON_URL = "https://upload.wikimedia.org/wikipedia/commons/3/3a/Google-favicon-vector.png?20221007124453";

@@ -2,7 +2,7 @@ from datetime import datetime
 from typing import Annotated
 from fastapi import APIRouter, HTTPException, Depends, BackgroundTasks
 from fastapi_mail import MessageSchema, MessageType, FastMail
-from pymongo.errors import DuplicateKeyError
+from core.auth_utils import create_user
 from core.constants import JwtTokenScope, MAIL_CONFIG, jinja_env, TEMPLATE_NAME, \
     COMMON_TEMPLATE_VARIABLES, PASSWORD_RESET_TEMPLATE
 from core.database import mongo
@@ -12,7 +12,7 @@ from models.auth_models import (
     AuthRegisterModel, AuthForgotPasswordModel,
     AuthResetPasswordModel
 )
-from models.db_models import UserModel, DriveModel
+from models.db_models import UserModel
 
 auth_router = APIRouter(
     prefix="/auth",
@@ -26,6 +26,8 @@ async def login_user(param: AuthLoginModel):
         raise HTTPException(status_code=404, detail="User not found")
 
     user_obj = UserModel(**user_record)
+    if user_obj.is_google_account:
+        raise HTTPException(status_code=403, detail="Please login using Google account")
     if not security_manager.verify_password(param.password, user_obj.password):
         raise HTTPException(status_code=401, detail="Password incorrect")
 
@@ -42,7 +44,6 @@ async def register_user(param: AuthRegisterModel):
     if insertion_result.inserted_id:
         token = security_manager.create_access_token(param.email, JwtTokenScope.auth)
         return Token(access_token=token, scope=JwtTokenScope.auth)
-
     else:
         raise HTTPException(status_code=500, detail="Failed to create user")
 
@@ -52,8 +53,11 @@ async def forgot_password(
     background_tasks: BackgroundTasks
 ):
     user_email = param.email
-    if not await mongo.users.find_one({"email": user_email}):
+    user_record = await mongo.users.find_one({"email": user_email})
+    if not user_record:
         raise HTTPException(status_code=404, detail="User not found")
+    elif user_record.get("is_google_account"):
+        raise HTTPException(status_code=403, detail="Cannot reset password using Google account")
 
     forgot_token = security_manager.create_access_token(
         user_email,
@@ -93,27 +97,3 @@ async def reset_password(
 
     return {"message": "Password reset successful"}
 
-
-async def create_user(new_user: UserModel):
-    try:
-        insertion_result = await mongo.users.insert_one(new_user.__dict__)
-    except DuplicateKeyError:
-        raise HTTPException(status_code=409, detail="User already exists")
-
-    root_folder = DriveModel(
-        owner=new_user.email,
-        parent_id="",
-        name="My Drive",
-        is_folder=True
-    )
-    root_insertion = await mongo.files.insert_one(root_folder.__dict__)
-    if root_row_id := root_insertion.inserted_id:
-        await mongo.users.update_one(
-            {"email": new_user.email},
-            {"$set": {"drive_root_id": str(root_row_id)}}
-        )
-
-    else:
-        raise HTTPException(status_code=500, detail="Failed to create root folder")
-
-    return insertion_result

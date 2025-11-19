@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { PASSWORD_MIN_LENGTH, SUB_ROUTES } from "@/constants";
+import { GOOGLE_ICON_URL, GOOGLE_LOGIN_URL, PASSWORD_MIN_LENGTH, SUB_ROUTES } from "@/constants";
 import useAuthStore from "@/context/authStore";
 import { LoaderCircle } from "lucide-react";
 import { useCallback, useState } from "react";
@@ -155,18 +155,20 @@ export default function Register() {
 							Or Continue with Google
 						</p>
 					</div>
-					<Button
-						type="button"
-						variant="outline"
-						className="w-full font-normal"
-					>
-						<img
-							width="25"
-							alt="Google-favicon-vector"
-							src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Google-favicon-vector.png?20221007124453"
-						/>
-						Continue with Google
-					</Button>
+					<a href={GOOGLE_LOGIN_URL}>
+						<Button
+							type="button"
+							variant="outline"
+							className="w-full font-normal"
+						>
+							<img
+								width="25"
+								alt="Google-favicon-vector"
+								src={GOOGLE_ICON_URL}
+							/>
+							Continue with Google
+						</Button>
+					</a>
 				</div>
 			</form>
 		</AuthCard>

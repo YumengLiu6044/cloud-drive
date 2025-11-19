@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field, ConfigDict, field_validator, model_serializer
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserModel(BaseModel):
@@ -7,6 +7,9 @@ class UserModel(BaseModel):
     password: str = Field(default=None, description="Password")
     drive_root_id: str = Field(default=None, description="Drive root folder ID")
     profile_image_id: str | None = Field(default=None, description="Profile image id")
+    is_google_account: bool = Field(default=False, description="Is Google account")
+    google_profile_url: str | None = Field(default=None, description="Google profile url")
+
 
 class DriveModel(BaseModel):
     parent_id: str = Field(default=None, description="Parent ID")

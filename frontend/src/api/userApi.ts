@@ -3,22 +3,33 @@ import axiosClient from "./axiosClient";
 import useAuthStore from "@/context/authStore";
 
 export const UserApi = {
-	getUser: () => axiosClient.get(API_BASE.user),
+	getUser: (token?: string) =>
+		axiosClient.get(API_BASE.user, {
+			headers: {
+				Authorization: `Bearer ${token}`,
+			},
+		}),
 	changeUserName: (newUserName: string) =>
 		axiosClient.post(API_BASE.user + "/change-username", {
 			new_name: newUserName,
 		}),
 	uploadProfilePic: (profilePic: File) => {
-		const formData = new FormData()
-		formData.append('file', profilePic)
+		const formData = new FormData();
+		formData.append("file", profilePic);
 		return axiosClient.post(API_BASE.user + "/upload-profile", formData, {
 			headers: {
-				"Content-Type": "multipart/form-data"
-			}
-		})
+				"Content-Type": "multipart/form-data",
+			},
+		});
 	},
 	getProfilePic(profileId: string) {
-		const {token} = useAuthStore.getState()
-		return BACKEND_URL + API_BASE.user + "/profile/" + profileId + `/?token=${token}`
-	}
+		const { token } = useAuthStore.getState();
+		return (
+			BACKEND_URL +
+			API_BASE.user +
+			"/profile/" +
+			profileId +
+			`/?token=${token}`
+		);
+	},
 };

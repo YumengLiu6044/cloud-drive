@@ -6,7 +6,7 @@ import { Separator } from "@/components/ui/separator";
 import { useCallback, useState } from "react";
 import { toast } from "sonner";
 import PasswordField from "@/components/PasswordField";
-import { SUB_ROUTES } from "@/constants";
+import { GOOGLE_ICON_URL, GOOGLE_LOGIN_URL, SUB_ROUTES } from "@/constants";
 import { useNavigate } from "react-router-dom";
 import useAuthStore from "@/context/authStore";
 import { LoaderCircle } from "lucide-react";
@@ -144,18 +144,20 @@ export default function Login() {
 								Or Continue with Google
 							</p>
 						</div>
-						<Button
-							type="button"
-							variant="outline"
-							className="w-full font-normal"
-						>
-							<img
-								width="25"
-								alt="Google-favicon-vector"
-								src="https://upload.wikimedia.org/wikipedia/commons/3/3a/Google-favicon-vector.png?20221007124453"
-							/>
-							Continue with Google
-						</Button>
+						<a href={GOOGLE_LOGIN_URL}>
+							<Button
+								type="button"
+								variant="outline"
+								className="w-full font-normal"
+							>
+								<img
+									width="25"
+									alt="Google-favicon-vector"
+									src={GOOGLE_ICON_URL}
+								/>
+								Continue with Google
+							</Button>
+						</a>
 					</div>
 				) : (
 					<div className="flex flex-col gap-6">

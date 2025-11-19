@@ -12,3 +12,5 @@ python-jose[cryptography]
 fastapi-mail
 python-multipart
 jinja2
+authlib
+starlette[full]

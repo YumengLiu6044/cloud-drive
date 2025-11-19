@@ -14,6 +14,7 @@ import { SUB_ROUTES } from "./constants";
 import Register from "./routes/Register";
 import AppContainer from "./components/Container";
 import LoginCallback from "./routes/LoginCallback";
+import GoogleCallback from "./routes/GoogleCallback";
 
 export default function App() {
 	return (
@@ -32,6 +33,10 @@ export default function App() {
 					<Route
 						path={SUB_ROUTES.loginCallback}
 						element={<LoginCallback />}
+					/>
+					<Route
+						path={SUB_ROUTES.googleCallback}
+						element={<GoogleCallback />}
 					/>
 					<Route
 						path={SUB_ROUTES.resetPassword}

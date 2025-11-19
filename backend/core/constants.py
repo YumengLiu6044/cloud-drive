@@ -70,3 +70,16 @@ PASSWORD_RESET_TEMPLATE = f"{FRONTEND_URL}/reset-password?token={{}}"
 # Profile pictures
 PROFILE_PICTURES_TEMPLATE = f"{{}}-profile"
 FALLBACK_PROFILE_PICTURE = ASSET_PATH / "profile_fallback.png"
+
+# Google Auth
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+GOOGLE_SERVER_METADATA = "https://accounts.google.com/.well-known/openid-configuration"
+GOOGLE_SCOPE = [
+    "openid",
+    "profile",
+    "email",
+]
+
+# Session secret
+SESSION_SECRET = os.getenv("SESSION_SECRET_KEY")

@@ -5,7 +5,6 @@ from fastapi.security import OAuth2PasswordBearer, HTTPBearer, HTTPAuthorization
 from passlib.hash import sha256_crypt
 from jose import jwt, JWTError, ExpiredSignatureError
 from pydantic import EmailStr
-
 from core.constants import JWT_TOKEN_EXPIRATION, JWT_SECRET_KEY, JWT_ALGORITHM, JwtTokenScope
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
