@@ -262,7 +262,7 @@ export default function FileViewer({
 				)}
 				<div
 					{...getRootProps()}
-					className="relative w-full h-full bg-card rounded-2xl border-border"
+					className="relative w-full h-full bg-card rounded-2xl border-border overflow-y-auto"
 				>
 					<FileListView
 						isTrash={isTrash}
