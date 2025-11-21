@@ -27,6 +27,7 @@ google = oauth.register(
 
 @google_auth_router.get("/login")
 async def google_login(request: Request):
+    request.session.clear()
     redirect_uri = request.url_for("google_callback")
     return await google.authorize_redirect(request, redirect_uri)
 

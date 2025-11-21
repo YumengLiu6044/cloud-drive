@@ -4,7 +4,7 @@ import "./index.css";
 import App from "./App.tsx";
 import { Toaster } from "sonner";
 import { Loader2 } from "lucide-react";
-
+console.log("BACKEND_URL:", import.meta.env.VITE_BACKEND_URL);
 createRoot(document.getElementById("root")!).render(
 	<StrictMode>
 		<App />

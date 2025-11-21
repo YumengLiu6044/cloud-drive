@@ -29,10 +29,10 @@ app.add_middleware(
     secret_key=SESSION_SECRET
 )
 
-app.include_router(auth_router)
-app.include_router(user_router)
-app.include_router(drive_router)
-app.include_router(google_auth_router)
+app.include_router(auth_router, prefix="/api")
+app.include_router(user_router, prefix="/api")
+app.include_router(drive_router, prefix="/api")
+app.include_router(google_auth_router, prefix="/api")
 @app.get('/')
 async def root():
     return {"message": "Welcome to Cloud Drive"}

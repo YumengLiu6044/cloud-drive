@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
-import { useCallback, useState } from "react";
+import {useCallback, useState} from "react";
 import { toast } from "sonner";
 import PasswordField from "@/components/PasswordField";
 import { GOOGLE_ICON_URL, GOOGLE_LOGIN_URL, SUB_ROUTES } from "@/constants";

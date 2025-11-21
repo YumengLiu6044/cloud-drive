@@ -14,6 +14,7 @@ export const SUB_ROUTES = {
 		settings: "/drive/settings",
 	},
 } as const;
+
 export const API_BASE = {
 	auth: "/auth",
 	user: "/user",
