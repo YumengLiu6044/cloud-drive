@@ -1,5 +1,4 @@
 import io
-import uuid
 from datetime import datetime, timezone
 from typing import Annotated, Mapping
 from urllib.parse import unquote
@@ -225,7 +224,7 @@ async def download_files(
     io_stream.seek(0)
 
     # Return a Streaming Response
-    file_name = f"{uuid.uuid4()}.zip"
+    file_name = f"drive-download-{int(datetime.now(timezone.utc).timestamp())}.zip"
     return StreamingResponse(
         io_stream,
         media_type="application/zip",
